@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package admin;
+
+option go_package = "internal/proto/admin;adminpb";
+
+import "google/protobuf/empty.proto";
+
+service AppUserService {
+  rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string password = 2;
+  string role = 3;
+}
+
+message ListUsersRequest {
+  string app_id = 1;
+}
+
+message AppUser {
+  string id = 1;
+  string email = 2;
+  string role = 3;
+  string status = 4;
+}
+
+message ListUsersResponse {
+  repeated AppUser users = 1;
+}

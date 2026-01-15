@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package admin;
+
+option go_package = "internal/proto/admin;adminpb";
+
+import "google/protobuf/empty.proto";
+
+service ApiKeyService {
+  rpc Create(CreateApiKeyRequest) returns (CreateApiKeyResponse);
+  rpc Revoke(RevokeApiKeyRequest) returns (google.protobuf.Empty);
+}
+
+message CreateApiKeyRequest {
+  string app_id = 1;
+  repeated string scopes = 2;
+}
+
+message CreateApiKeyResponse {
+  string api_key = 1;
+}
+
+message RevokeApiKeyRequest {
+  string key_id = 1;
+}

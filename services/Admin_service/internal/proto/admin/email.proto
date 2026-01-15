@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package admin;
+
+option go_package = "internal/proto/admin;adminpb";
+
+import "google/protobuf/empty.proto";
+
+service EmailService {
+  rpc Configure(ConfigureEmailRequest) returns (google.protobuf.Empty);
+}
+
+message ConfigureEmailRequest {
+  string app_id = 1;
+  string provider = 2;
+  string from_email = 3;
+}
