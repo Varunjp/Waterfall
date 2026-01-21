@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v6.33.1
-// source: internal/proto/job.proto
+// source: proto/job.proto
 
 package jobpb
 
@@ -19,10 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	JobService_CreateJob_FullMethodName  = "/job.JobService/CreateJob"
-	JobService_ModifyJob_FullMethodName  = "/job.JobService/ModifyJob"
-	JobService_CancelJob_FullMethodName  = "/job.JobService/CancelJob"
-	JobService_TriggerNow_FullMethodName = "/job.JobService/TriggerNow"
+	JobService_CreateJob_FullMethodName = "/job.JobService/CreateJob"
+	JobService_UpdateJob_FullMethodName = "/job.JobService/UpdateJob"
+	JobService_CancelJob_FullMethodName = "/job.JobService/CancelJob"
 )
 
 // JobServiceClient is the client API for JobService service.
@@ -30,9 +29,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type JobServiceClient interface {
 	CreateJob(ctx context.Context, in *CreateJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
-	ModifyJob(ctx context.Context, in *ModifyJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
+	UpdateJob(ctx context.Context, in *UpdateJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
 	CancelJob(ctx context.Context, in *CancelJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
-	TriggerNow(ctx context.Context, in *TriggerNowRequest, opts ...grpc.CallOption) (*JobResponse, error)
 }
 
 type jobServiceClient struct {
@@ -53,10 +51,10 @@ func (c *jobServiceClient) CreateJob(ctx context.Context, in *CreateJobRequest, 
 	return out, nil
 }
 
-func (c *jobServiceClient) ModifyJob(ctx context.Context, in *ModifyJobRequest, opts ...grpc.CallOption) (*JobResponse, error) {
+func (c *jobServiceClient) UpdateJob(ctx context.Context, in *UpdateJobRequest, opts ...grpc.CallOption) (*JobResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(JobResponse)
-	err := c.cc.Invoke(ctx, JobService_ModifyJob_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, JobService_UpdateJob_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,24 +71,13 @@ func (c *jobServiceClient) CancelJob(ctx context.Context, in *CancelJobRequest, 
 	return out, nil
 }
 
-func (c *jobServiceClient) TriggerNow(ctx context.Context, in *TriggerNowRequest, opts ...grpc.CallOption) (*JobResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(JobResponse)
-	err := c.cc.Invoke(ctx, JobService_TriggerNow_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // JobServiceServer is the server API for JobService service.
 // All implementations must embed UnimplementedJobServiceServer
 // for forward compatibility.
 type JobServiceServer interface {
 	CreateJob(context.Context, *CreateJobRequest) (*JobResponse, error)
-	ModifyJob(context.Context, *ModifyJobRequest) (*JobResponse, error)
+	UpdateJob(context.Context, *UpdateJobRequest) (*JobResponse, error)
 	CancelJob(context.Context, *CancelJobRequest) (*JobResponse, error)
-	TriggerNow(context.Context, *TriggerNowRequest) (*JobResponse, error)
 	mustEmbedUnimplementedJobServiceServer()
 }
 
@@ -104,14 +91,11 @@ type UnimplementedJobServiceServer struct{}
 func (UnimplementedJobServiceServer) CreateJob(context.Context, *CreateJobRequest) (*JobResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateJob not implemented")
 }
-func (UnimplementedJobServiceServer) ModifyJob(context.Context, *ModifyJobRequest) (*JobResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ModifyJob not implemented")
+func (UnimplementedJobServiceServer) UpdateJob(context.Context, *UpdateJobRequest) (*JobResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateJob not implemented")
 }
 func (UnimplementedJobServiceServer) CancelJob(context.Context, *CancelJobRequest) (*JobResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CancelJob not implemented")
-}
-func (UnimplementedJobServiceServer) TriggerNow(context.Context, *TriggerNowRequest) (*JobResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method TriggerNow not implemented")
 }
 func (UnimplementedJobServiceServer) mustEmbedUnimplementedJobServiceServer() {}
 func (UnimplementedJobServiceServer) testEmbeddedByValue()                    {}
@@ -152,20 +136,20 @@ func _JobService_CreateJob_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _JobService_ModifyJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ModifyJobRequest)
+func _JobService_UpdateJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateJobRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(JobServiceServer).ModifyJob(ctx, in)
+		return srv.(JobServiceServer).UpdateJob(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: JobService_ModifyJob_FullMethodName,
+		FullMethod: JobService_UpdateJob_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(JobServiceServer).ModifyJob(ctx, req.(*ModifyJobRequest))
+		return srv.(JobServiceServer).UpdateJob(ctx, req.(*UpdateJobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -188,24 +172,6 @@ func _JobService_CancelJob_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _JobService_TriggerNow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TriggerNowRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(JobServiceServer).TriggerNow(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: JobService_TriggerNow_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(JobServiceServer).TriggerNow(ctx, req.(*TriggerNowRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // JobService_ServiceDesc is the grpc.ServiceDesc for JobService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -218,18 +184,14 @@ var JobService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _JobService_CreateJob_Handler,
 		},
 		{
-			MethodName: "ModifyJob",
-			Handler:    _JobService_ModifyJob_Handler,
+			MethodName: "UpdateJob",
+			Handler:    _JobService_UpdateJob_Handler,
 		},
 		{
 			MethodName: "CancelJob",
 			Handler:    _JobService_CancelJob_Handler,
 		},
-		{
-			MethodName: "TriggerNow",
-			Handler:    _JobService_TriggerNow_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "internal/proto/job.proto",
+	Metadata: "proto/job.proto",
 }

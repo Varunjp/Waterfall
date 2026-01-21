@@ -3,44 +3,66 @@ package usecase
 import (
 	"context"
 	"job_service/internal/domain"
+	"job_service/internal/producer"
+	"time"
+
+	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
-type KafkaProducer interface {
-	Publish(topic string, key string, value []byte) error
+type JobUseCase interface {
+	Create(ctx context.Context, appID, jobType, payload string)(string, error)
+	Update(ctx context.Context, jobID, payload string) error 
+	Cancel(ctx context.Context, jobID string) error 
 }
 
-type IdempotencyStore interface {
-	IsProcessed(ctx context.Context,key string)(bool,error)
-	MarkProcessed(ctx context.Context,key string) error 
+type jobUsecase struct {
+	producer producer.Producer
+	logger *zap.Logger
 }
 
-type JobUsecase struct {
-	kafka 		KafkaProducer
-	idem 		IdempotencyStore
+func NewJobUsecase(p producer.Producer,l *zap.Logger) JobUseCase {
+	return &jobUsecase{producer: p, logger: l}
 }
 
-func NewJobUsecase(k KafkaProducer,i IdempotencyStore) *JobUsecase {
-	return &JobUsecase{kafka: k,idem: i}
-}
+func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string)(string, error) {
+	jobID := uuid.NewString()
 
-func (u *JobUsecase) CreateJob(ctx context.Context, job domain.Job, idemKey string) error {
-	ok, _ := u.idem.IsProcessed(ctx,idemKey)
-	if ok {
-		return nil 
+	event := domain.JobEvent {
+		JobID: jobID,
+		AppID: appID,
+		Type: jobType,
+		Payload: payload,
+		EventType: domain.JobCreated,
+		Timestamp: time.Now(),
 	}
 
-	err := u.kafka.Publish("job-requests",job.JobID,job.Payload)
+	err := u.producer.Publish(ctx,jobID,event)
 	if err != nil {
-		return err 
+		return "",err 
 	}
 
-	return u.idem.MarkProcessed(ctx,idemKey)
+	u.logger.Info("job created",zap.String("job_id",jobID))
+	return jobID,nil 
 }
 
-func (u *JobUsecase) TriggerNow(ctx context.Context, jobID string) error {
-	return u.kafka.Publish("job-trigger-now",jobID,[]byte("{}"))
+func (u *jobUsecase) Update(ctx context.Context, jobID, payload string) error {
+	event := domain.JobEvent {
+		JobID: jobID,
+		Payload: payload,
+		EventType: domain.JobUpdated,
+		Timestamp: time.Now(),
+	}
+
+	return u.producer.Publish(ctx,jobID,event)
 }
 
-func (u *JobUsecase) CancelJob(ctx context.Context, jobID string) error {
-	return u.kafka.Publish("job-cancel",jobID,[]byte("{}"))
+func (u *jobUsecase) Cancel(ctx context.Context, jobID string) error {
+	event := domain.JobEvent {
+		JobID: jobID,
+		EventType: domain.JobCanceled,
+		Timestamp: time.Now(),
+	}
+	// need to add redis call 
+	return u.producer.Publish(ctx, jobID, event)
 }

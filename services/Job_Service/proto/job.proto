@@ -6,29 +6,22 @@ option go_package = "internal/proto/jobpb";
 
 service JobService {
     rpc CreateJob(CreateJobRequest) returns (JobResponse);
-    rpc ModifyJob(ModifyJobRequest) returns (JobResponse);
+    rpc UpdateJob(UpdateJobRequest) returns (JobResponse);
     rpc CancelJob(CancelJobRequest) returns (JobResponse);
-    rpc TriggerNow(TriggerNowRequest) returns (JobResponse);
 }
 
 message CreateJobRequest {
-    string idempotencey_key = 1;
-    string job_type = 2;
-    string schedule_at = 3;
-    bytes payload = 4;
+    string app_id = 1;
+    string type = 2;
+    string payload = 3;
 }
 
-message ModifyJobRequest {
+message UpdateJobRequest {
     string job_id = 1;
-    string idempotency_key = 2;
-    bytes payload = 3;
+    string payload = 2;
 }
 
 message CancelJobRequest {
-    string job_id = 1;
-}
-
-message TriggerNowRequest {
     string job_id = 1;
 }
 
