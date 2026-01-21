@@ -8,7 +8,7 @@ const (
 	StatusCreated  JobStatus = "CREATED"
 	StatusCanceled JobStatus = "CANCELED"
 	StatusFailed   JobStatus = "FAILED"
-	StatusSuccess  JobStatus = "SUCCESS"
+	StatusSuccess  JobStatus = "COMPLETED"
 )
 
 type Job struct {
@@ -27,6 +27,8 @@ const (
 	JobCreated  JobEventType = "JOB_CREATED"
 	JobUpdated  JobEventType = "JOB_UPDATED"
 	JobCanceled JobEventType = "JOB_CANCELED"
+	JobFailed  JobEventType = "JOB_FAILED"
+	JobComplete JobEventType = "JOB_COMPLETED"
 )
 
 type JobEvent struct {
