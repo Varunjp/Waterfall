@@ -5,5 +5,6 @@ CREATE TABLE jobs (
     payload JSONB,
     status TEXT NOT NULL, 
     created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL 
+    updated_at TIMESTAMP NOT NULL,
+    schedule_at TIMESTAMP  
 )
