@@ -18,7 +18,7 @@ import (
 func main() {
 
 	if err := godotenv.Load(); err != nil {
-		log.Println("no .env file foudn, using system envs")
+		log.Println("no .env file found, using system envs")
 	}
 	
 	cfg := config.Load()
