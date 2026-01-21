@@ -35,7 +35,7 @@ func main() {
 	
 	jobpb.RegisterJobServiceServer(server,h)
 
-	lis, err := net.Listen("tcp",":"+cfg.JWTKey)
+	lis, err := net.Listen("tcp",":"+cfg.PORT)
 	if err != nil {
 		log.Fatal(err)
 	}

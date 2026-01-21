@@ -14,6 +14,6 @@ func Load() *Config {
 		KafkaBroker: []string{os.Getenv("KAFKA_BROKER")},
 		KafkaTopic: os.Getenv("KAFKA_JOB_TOPIC"),
 		DBURL: os.Getenv("DATABASE_URL"),
-		GroupID: "job-consumer-group",
+		GroupID: os.Getenv("KAFKA_CONSUMER_GROUP"),
 	}
 }

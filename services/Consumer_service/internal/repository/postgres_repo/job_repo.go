@@ -33,7 +33,7 @@ func (r *JobRepo) Insert(ctx context.Context, job domain.Job) error {
 
 func (r *JobRepo) UpdatePayload(ctx context.Context, jobID, payload string) error {
 	_,err := r.db.ExecContext(ctx,
-		`UPDATE jobs SET payload=$1, update_at=NOW() WHERE job_id=$2`,payload,jobID,
+		`UPDATE jobs SET payload=$1, updated_at=NOW() WHERE job_id=$2`,payload,jobID,
 	)
 	return err 
 }

@@ -1,0 +1,2 @@
+kafka-topics.sh --create \
+  --topic job_requests
