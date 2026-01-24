@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package scheduler;
+
+option go_package = "internal/grpc/schedulerpb";
+
+service SchedulerService {
+
+  rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse);
+  rpc WorkerHeartbeat(WorkerHeartbeatRequest) returns (Empty);
+
+  rpc PollJob(PollJobRequest) returns (PollJobResponse);
+  rpc JobHeartbeat(JobHeartbeatRequest) returns (Empty);
+  rpc CompleteJob(CompleteJobRequest) returns (Empty);
+
+  rpc PushJobLog(PushJobLogRequest) returns (Empty);
+}
+
+message RegisterWorkerRequest {
+  string worker_id = 1;
+  string app_id = 2;
+  repeated string capabilities = 3;
+
+  int32 max_concurrency = 4;
+  int32 heartbeat_interval_sec = 5;
+}
+
+message RegisterWorkerResponse {
+  bool accepted = 1;
+}
+
+message WorkerHeartbeatRequest {
+  string worker_id = 1;
+  int64 timestamp_unix = 2;
+}
+
+message PollJobRequest {
+  string worker_id = 1;
+  string app_id = 2;
+  repeated string capabilities = 3;
+}
+
+message PollJobResponse {
+  bool found = 1;
+  Job job = 2;
+}
+
+message Job {
+  string job_id = 1;
+  string app_id = 2;
+  string job_type = 3;
+  bytes payload = 4;
+
+  int32 attempt = 5;
+  int32 max_attempts = 6;
+}
+
+message JobHeartbeatRequest {
+  string job_id = 1;
+  string worker_id = 2;
+  string message = 4;
+
+  int64 timestamp_unix = 5;
+}
+
+message CompleteJobRequest {
+  string job_id = 1;
+  string worker_id = 2;
+  string app_id = 3;
+
+  JobResult result = 4;
+  string error_message = 5;
+  string stack_trace = 6;
+}
+
+enum JobResult {
+  JOB_RESULT_UNSPECIFIED = 0;
+  JOB_RESULT_SUCCESS = 1;
+  JOB_RESULT_FAILURE = 2;
+}
+
+message PushJobLogRequest {
+  string job_id = 1;
+  string worker_id = 2;
+
+  string status = 3;
+  string error_message = 4;
+  int32 attempt = 5;
+  int64 timestamp_unix = 6;
+}
+
+enum LogLevel {
+  LOG_LEVEL_UNSPECIFIED = 0;
+  LOG_LEVEL_DEBUG = 1;
+  LOG_LEVEL_INFO = 2;
+  LOG_LEVEL_WARN = 3;
+  LOG_LEVEL_ERROR = 4;
+}
+
+message Empty {}

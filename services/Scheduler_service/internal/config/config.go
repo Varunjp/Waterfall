@@ -3,17 +3,21 @@ package config
 import "os"
 
 type Config struct {
-	KafkaBrokers  []string
-	InputTopic    string
-	OutputTopic   string
-	ConsumerGroup string
+	ServiceName string 
+	GRPCPort 	string 
+	RedisURL    string 
+	KafkaBroker string
+	KafkaTopic  string 
+	AdminDBURL  string 
 }
 
 func Load() *Config {
 	return &Config{
-		KafkaBrokers: []string{os.Getenv("KAFKA_BROKER")},
-		InputTopic: os.Getenv("KAFKA_INPUT_TOPIC"),
-		OutputTopic: os.Getenv("KAFKA_OUTPUT_TOPIC"),
-		ConsumerGroup: os.Getenv("KAFKA_GROUP"),
+		ServiceName: os.Getenv("SERVICE_NAME"),
+		GRPCPort: os.Getenv("GRPC_PORT"),
+		RedisURL: os.Getenv("REDIS_URL"),
+		KafkaBroker: os.Getenv("KAFKA_BROKER"),
+		KafkaTopic: os.Getenv("KAFKA_TOPIC"),
+		AdminDBURL: os.Getenv("ADMIN_DB_URL"),
 	}
 }

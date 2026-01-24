@@ -1,15 +1,16 @@
 package domain
 
-type Job struct {
-	JobID   string `json:"job_id"`
-	AppID   string `json:"app_id"`
-	Type    string `json:"type"`
-	Payload string `json:"payload"`
-}
+import "time"
 
-type WorkerJob struct {
-	JobID   string `json:"job_id"`
-	AppID   string `json:"app_id"`
-	Type    string `json:"type"`
-	Payload string `json:"payload"`
+type Job struct {
+	JobID     	string
+	AppID     	string
+	Type      	string
+	Payload   	string
+	Status    	JobStatus
+	CreatedAt 	time.Time
+	UpdateAt 	time.Time
+	Retry 		int 
+	MaxRetries  int 
+	ScheduledAt time.Time
 }

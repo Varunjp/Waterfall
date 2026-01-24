@@ -16,6 +16,8 @@ type Job struct {
 	Payload    string
 	ScheduleAt time.Time
 	Status 		JobStatus
+	Retry 		int 
+	MaxRetries    int 
 }
 
 type QueueEvent struct {
@@ -23,4 +25,6 @@ type QueueEvent struct {
 	AppID 		string  `json:"app_id"`
 	Type 		string  `json:"type"`
 	Payload     string  `json:"payload"`
+	Retry 		int 	`json:"retry"`
+	MaxRetries  int 	`json:"max_retries"`
 }

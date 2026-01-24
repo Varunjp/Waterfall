@@ -15,9 +15,11 @@ func NewJobRepository(db *sql.DB) JobRepository {
 	return &jobRepo{db: db}
 }
 
+// Need improvment in query, need to include more logic
+
 func (r *jobRepo) FetchDueJobs(ctx context.Context, now, until time.Time)([]domain.Job,error) {
 	query := `
-		SELECT job_id, app_id, type, payload, schedule_at
+		SELECT job_id, app_id, type, payload, schedule_at,retry,max_retry
 		FROM jobs
 		WHERE status = 'SCHEDULED'
 		  AND schedule_at BETWEEN $1 AND $2
@@ -38,6 +40,8 @@ func (r *jobRepo) FetchDueJobs(ctx context.Context, now, until time.Time)([]doma
 			&j.Type,
 			&j.Payload,
 			&j.ScheduleAt,
+			&j.Retry,
+			&j.MaxRetries,
 		); err != nil {
 			return nil,err 
 		}

@@ -39,6 +39,8 @@ func (uc *WatchJobsUsecase) Run(ctx context.Context) error {
 			AppID: job.AppID,
 			Type: job.Type,
 			Payload: job.Payload,
+			Retry: job.Retry,
+			MaxRetries: job.MaxRetries,
 		}
 		if err := uc.producer.Publish(ctx, job.JobID, event); err != nil {
 			uc.logger.Error("kafka publish failed", 
