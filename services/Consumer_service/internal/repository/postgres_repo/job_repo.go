@@ -16,7 +16,7 @@ func NewJobRepository(db *sql.DB) *JobRepo {
 
 func (r *JobRepo) Insert(ctx context.Context, job domain.Job) error {
 	query := ` 
-	INSERT INTO jobs(job_id, app_id, type, payload, status, created_at, updated_at) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (job_id) DO NOTHING;
+	INSERT INTO jobs(job_id, app_id, type, payload, status, created_at, updated_at, schedule_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (job_id) DO NOTHING;
 	`
 	_,err := r.db.ExecContext(ctx, query,
 		job.JobID,
@@ -26,6 +26,7 @@ func (r *JobRepo) Insert(ctx context.Context, job domain.Job) error {
 		job.Status,
 		job.CreatedAt,
 		job.UpdateAt,
+		job.ScheduleAt,
 	)
 
 	return err 

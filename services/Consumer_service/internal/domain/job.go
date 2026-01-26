@@ -9,6 +9,7 @@ const (
 	StatusCanceled JobStatus = "CANCELED"
 	StatusFailed   JobStatus = "FAILED"
 	StatusSuccess  JobStatus = "COMPLETED"
+	StatusScheduled JobStatus = "SCHEDULED"
 )
 
 type Job struct {
@@ -19,6 +20,7 @@ type Job struct {
 	Status    	JobStatus
 	CreatedAt 	time.Time
 	UpdateAt 	time.Time
+	ScheduleAt  time.Time
 }
 
 type JobEventType string 

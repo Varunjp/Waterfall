@@ -59,3 +59,18 @@ func(r *AppRepo) UpdateStatus(appID, status string) error {
 	`,status,appID)
 	return err 
 }
+
+func (r *AppRepo)CreateFirst(user *entities.AppUser) error {
+
+	_, err := r.db.Exec(`
+		INSERT INTO app_users
+		(app_id, email, password_hash, role, status)
+		VALUES ($1,$2,$3,$4,$5)
+	`, user.AppID, user.Email, user.PasswordHash, user.Role, user.Status)
+
+	if err != nil {
+		return err 
+	}
+	
+	return nil 
+}

@@ -31,7 +31,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	
 	repo := repository.NewJobRepository(db)
 	producer := producer.NewKafkaProducer(cfg.KafkaBroker,cfg.KafkaTopic)
 	uc := usecase.NewWatchJobsUsecase(repo,producer,logg)

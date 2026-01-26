@@ -26,9 +26,10 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 			AppID: event.AppID,
 			Type: event.Type,
 			Payload: event.Payload,
-			Status: domain.StatusCreated,
+			Status: domain.StatusScheduled,
 			CreatedAt: event.Timestamp,
 			UpdateAt: event.Timestamp,
+			ScheduleAt: event.Timestamp,
 		}
 		return uc.repo.Insert(ctx,job)
 	case domain.JobUpdated:

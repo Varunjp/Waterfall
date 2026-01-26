@@ -46,8 +46,8 @@ func main() {
 	workerRegistry := repository.NewRedisWorkerRegistry(rdb)
 	quotaRepo := repository.NewRedisAdminQuotaRepo(rdb)
 
-	eventQueue := repository.NewKafkaJobEventQueue(cfg.KafkaBroker,cfg.KafkaTopic)
-	logQueue := repository.NewKafkaJobLogQueue(cfg.KafkaBroker,cfg.KafkaTopic)
+	eventQueue := repository.NewKafkaJobEventQueue(cfg.KafkaBroker,cfg.KafkaOutputTopic)
+	logQueue := repository.NewKafkaJobLogQueue(cfg.KafkaBroker,cfg.KafkaLogTopic)
 
 	schedulerMetrics := metrics.NewMetrics()
 
@@ -62,7 +62,7 @@ func main() {
 
 	jobReader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{cfg.KafkaBroker},
-		Topic:   "job-created",
+		Topic:   cfg.KafkaInputTopic,
 		GroupID: "scheduler-service",
 	})
 

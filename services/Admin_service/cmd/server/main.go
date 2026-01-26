@@ -8,16 +8,26 @@ import (
 	"admin_service/internal/transport/grpc/handlers"
 	"admin_service/internal/transport/grpc/interceptors"
 	"admin_service/internal/usecase/service"
+	"log"
 	"net"
 
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("failed to env")
+	}
 	cfg := config.Load()
 
 	dbConn := db.NewPostgres(cfg.DBUrl)
 	repo := postgres.NewAdminRepo(dbConn)
+
+	if err := config.BootstrapAdmin(repo); err != nil {
+		log.Fatal("admin bootstrap failed:",err)
+	}
+
 	usecase := service.NewAdminService(repo,cfg.JWTKey)
 	appRepo := postgres.NewAppRepo(dbConn)
 	appUsecase := service.NewAppService(appRepo)

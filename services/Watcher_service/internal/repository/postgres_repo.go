@@ -53,7 +53,7 @@ func (r *jobRepo) FetchDueJobs(ctx context.Context, now, until time.Time)([]doma
 
 func (r *jobRepo) MarkQueued(ctx context.Context, jobID string) error {
 	_,err := r.db.ExecContext(ctx,
-		`UPDATE jobs SET status='QUEUED' WHERE job_id=$1`,
+		`UPDATE jobs SET status='QUEUED' WHERE job_id=$1`,jobID,
 	)
 	return err 
 }

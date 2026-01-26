@@ -16,6 +16,11 @@ func RBACInterceptor() grpc.UnaryServerInterceptor {
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	 )(interface{},error) {
+
+		if publicMethods[info.FullMethod] {
+			return handler(ctx,req)
+		}
+
 		claims,ok := ctx.Value("claims").(jwt.MapClaims)
 		if !ok {
 			return nil, status.Error(codes.Unauthenticated,"claims missing")

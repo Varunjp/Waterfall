@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log"
 	"time"
 	"watcher_service/internal/domain"
 	"watcher_service/internal/producer"
@@ -25,11 +26,11 @@ func NewWatchJobsUsecase(
 }
 
 func (uc *WatchJobsUsecase) Run(ctx context.Context) error {
-	now := time.Now()
+	now := time.Now().Add(-20 * time.Second)
 	until := now.Add(5 * time.Minute)
-
 	jobs,err := uc.repo.FetchDueJobs(ctx,now,until)
 	if err != nil {
+		log.Println(err)
 		return err 
 	}
 
@@ -42,6 +43,7 @@ func (uc *WatchJobsUsecase) Run(ctx context.Context) error {
 			Retry: job.Retry,
 			MaxRetries: job.MaxRetries,
 		}
+
 		if err := uc.producer.Publish(ctx, job.JobID, event); err != nil {
 			uc.logger.Error("kafka publish failed", 
 				zap.String("job_id",job.JobID),
@@ -49,6 +51,7 @@ func (uc *WatchJobsUsecase) Run(ctx context.Context) error {
 			)
 			continue 
 		}
+
 		err := uc.repo.MarkQueued(ctx,job.JobID)
 		if err != nil {
 			uc.logger.Error("job update failed",

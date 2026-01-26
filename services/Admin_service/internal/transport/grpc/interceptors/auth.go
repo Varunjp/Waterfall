@@ -18,6 +18,11 @@ func AuthInterceptor(secret string) grpc.UnaryServerInterceptor {
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	)(interface{},error) {
+
+		if publicMethods[info.FullMethod] {
+			return handler(ctx,req)
+		}
+
 		md,ok := metadata.FromIncomingContext(ctx)
 		if !ok {
 			return nil,domainErr.ErrUnauthenticated
