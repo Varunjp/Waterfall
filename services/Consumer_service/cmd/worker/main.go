@@ -9,9 +9,15 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -26,9 +32,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
+	db.SetMaxOpenConns(20)
+	db.SetMaxIdleConns(10)
+	db.SetConnMaxLifetime(time.Hour)
 
 	repo := postgresrepo.NewJobRepository(db)
 	uc := usecase.NewConsumeJobUsecase(repo,logg)
+	jobrunUC := usecase.NewUpdateJobStatusUsecase(repo)
 
 	kafkaConsumer := consumer.NewKafkaConsumer(
 		cfg.KafkaBroker,
@@ -38,9 +49,40 @@ func main() {
 		logg,
 	)
 
-	log.Println("Kafka consumer started")
+	jobRunConsumer := consumer.NewJobRunConsumer(
+		cfg.KafkaBroker,
+		cfg.KafkaRunTopic,
+		cfg.RunGroupID,
+		jobrunUC,
+		logg,
+	)
 
-	if err := kafkaConsumer.Start(context.Background()); err != nil {
-		log.Fatal(err)
+	ctx,cancel := context.WithCancel(context.Background())
+	wg := &sync.WaitGroup{}
+
+	wg.Go(func() {
+		kafkaConsumer.Start(ctx)
+	})
+
+	wg.Go(func() {
+		jobRunConsumer.Start(ctx)
+	})
+
+	logg.Info("all Kafka consumer started")
+
+	quit := make(chan os.Signal,1)
+	signal.Notify(quit,os.Interrupt,syscall.SIGTERM)
+	
+	<-quit
+	logg.Info("shutdown signal received")
+
+	cancel()
+
+	if err := jobRunConsumer.Close(); err != nil {
+		logg.Error("consumer close failed",zap.Error(err))
 	}
+
+	wg.Wait()
+
+	logg.Info("consumer service stopped cleanly")
 }

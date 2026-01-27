@@ -5,6 +5,7 @@ import (
 	"consumer_service/internal/usecase"
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
@@ -38,23 +39,37 @@ func NewKafkaConsumer(
 }
 
 func (c *KafkaConsumer) Start(ctx context.Context) error {
+	c.logger.Info("job request consumer started")
 	for {
-		msg,err := c.reader.ReadMessage(ctx)
-		if err != nil {
-			return err 
-		}
+		select {
+		case <-ctx.Done():
+			c.logger.Info("job request consumer shutting down")
+			return nil 
+		default:
 
-		var event domain.JobEvent
-		if err := json.Unmarshal(msg.Value, &event); err != nil {
-			c.logger.Error("invalid message",zap.Error(err))
-			continue
-		}
+			msg,err := c.reader.ReadMessage(ctx)
+			if err != nil {
+				if errors.Is(err,context.Canceled) {
+					return nil 
+				}
+				c.logger.Info("kafka read failed ",zap.Error(err))
+				continue 
+			}
 
-		if err := c.usecase.Handle(ctx,event); err != nil {
-			c.logger.Error("failed to process job",
-				zap.String("job_id",event.JobID),
-				zap.Error(err),
-			)
+			var event domain.JobEvent
+			if err := json.Unmarshal(msg.Value, &event); err != nil {
+				c.logger.Error("invalid message",zap.Error(err))
+				continue
+			}
+
+			if err := c.usecase.Handle(ctx,event); err != nil {
+				c.logger.Error("failed to process job",
+					zap.String("job_id",event.JobID),
+					zap.Error(err),
+				)
+			}
+
 		}
+		
 	}
 }
