@@ -38,12 +38,12 @@ func (c *JobCreatedConsumer) Start(ctx context.Context) error {
 				log.Println("kafka read error:",err)
 				continue
 			}
-
+			
 			var evt JobCreatedEvent 
 			if err := json.Unmarshal(msg.Value,&evt); err != nil {
 				continue 
 			}
-
+			
 			job := domain.Job {
 				JobID: evt.JobID,
 				AppID: evt.AppID,
@@ -56,8 +56,6 @@ func (c *JobCreatedConsumer) Start(ctx context.Context) error {
 			if err := c.jobStore.SavePendingJob(job); err != nil {
 				log.Println("redis save error:",err)
 			}
-
 		}
-		
 	}
 }

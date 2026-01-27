@@ -17,6 +17,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/grpc"
@@ -24,7 +25,9 @@ import (
 )
 
 func main() {
-
+	if err := godotenv.Load(); err != nil {
+		log.Println("env not loaded")
+	}
 	cfg := config.Load()
 	
 	ctx,cancel := context.WithCancel(context.Background())
@@ -40,6 +43,7 @@ func main() {
 	
 	rdb := redis.NewClient(&redis.Options{
 		Addr: cfg.RedisURL,
+		DB: 0,
 	})
 
 	jobStore := repository.NewRedisJobStore(rdb)

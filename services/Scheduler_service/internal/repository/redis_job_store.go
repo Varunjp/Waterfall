@@ -40,7 +40,6 @@ func (r *RedisJobStore) SavePendingJob(job domain.Job) error {
 	if err != nil {
 		return err 
 	}
-
 	return r.rdb.RPush(
 		ctx,
 		r.pendingKey(job.AppID,job.Type),
@@ -68,7 +67,7 @@ func (r *RedisJobStore) PollJob(
 		60,
 		now,
 	).Result()
-
+	
 	if err != nil || res == nil {
 		return nil,err 
 	}

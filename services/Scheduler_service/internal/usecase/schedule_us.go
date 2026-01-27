@@ -59,6 +59,7 @@ func (s *SchedulerUsecase) AssignJob(
 
 	for _, jobType := range capabilities {
 		job,err := s.jobStore.PollJob(appID,jobType,workerID)
+
 		if err != nil || job == nil {
 			continue
 		}
