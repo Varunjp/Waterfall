@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	defaultLimit = 50
+	defaultLimit = 5000
 )
 
 type RedisAdminQuotaRepo struct {

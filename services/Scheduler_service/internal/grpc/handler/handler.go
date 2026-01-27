@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"fmt"
 	"scheduler_service/internal/domain"
 	pb "scheduler_service/internal/grpc/schedulerpb"
 	"scheduler_service/internal/usecase"
@@ -55,9 +54,7 @@ func (h *SchedulerHandler) PollJob(ctx context.Context, req *pb.PollJobRequest) 
 		req.AppId,
 		req.Capabilities,
 	)
-	// delete
-	fmt.Println("check job: ",job)
-	fmt.Println("check poll job err :",err)
+	
 	if err != nil {
 		if errors.Is(err, usecase.ErrNoJobAvailable) {
 			return &pb.PollJobResponse{Found: false},nil 
