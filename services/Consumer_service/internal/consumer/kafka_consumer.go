@@ -48,6 +48,7 @@ func (c *KafkaConsumer) Start(ctx context.Context) error {
 		default:
 
 			msg,err := c.reader.ReadMessage(ctx)
+		
 			if err != nil {
 				if errors.Is(err,context.Canceled) {
 					return nil 

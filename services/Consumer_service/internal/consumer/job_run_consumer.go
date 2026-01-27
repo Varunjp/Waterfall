@@ -40,6 +40,7 @@ func (c *JobRunConsumer) Start(ctx context.Context)error {
 			return nil 
 		default:
 			msg,err := c.reader.ReadMessage(ctx)
+
 			if err != nil {
 				if errors.Is(err,context.Canceled) {
 					return nil 
