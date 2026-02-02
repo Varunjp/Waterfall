@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"scheduler_service/internal/domain"
-	"scheduler_service/internal/repository/lua"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -47,37 +47,44 @@ func (r *RedisJobStore) SavePendingJob(job domain.Job) error {
 	).Err()
 }
 
-func (r *RedisJobStore) PollJob(
-	appID string,
-	jobType string,
-	workerID string,
-)(*domain.Job,error) {
+func (r *RedisJobStore) streamKey(appID, jobType string) string {
+	return fmt.Sprintf("stream:jobs:%s:%s",appID,jobType)
+}
 
+func (r *RedisJobStore) PushJob(job domain.Job) error {
 	ctx := context.Background()
+	data,_ := json.Marshal(job)
 
-	pendingKey := fmt.Sprintf("pending:%s:%s",appID,jobType)
-	runningKeyPrefix := "running:"
-	now := time.Now().Unix()
+	_,err := r.rdb.XAdd(ctx,&redis.XAddArgs{
+		Stream: r.streamKey(job.AppID,job.Type),
+		Values: map[string]any{
+			"job":data,
+		},
+	}).Result()
 
-	res, err := r.rdb.Eval(
+	return err 
+}
+
+func (r *RedisJobStore) EnsureGroup(appID, jobType, group string)error {
+	ctx := context.Background()
+	stream := r.streamKey(appID,jobType)
+
+	err := r.rdb.XGroupCreateMkStream(
 		ctx,
-		lua.PollJobLua,
-		[]string{pendingKey,runningKeyPrefix},
-		workerID,
-		60,
-		now,
-	).Result()
-	
-	if err != nil || res == nil {
-		return nil,err 
+		stream,
+		group,
+		"$",
+	).Err()
+
+	if err != nil && !isBusyGroupErr(err) {
+		return err 
 	}
 
-	var job domain.Job
-	err = json.Unmarshal([]byte(res.(string)),&job)
-	if err != nil {
-		return nil,err 
-	}
-	return &job,nil 
+	return nil 
+}
+
+func isBusyGroupErr(err error) bool {
+	return err != nil && strings.Contains(err.Error(),"BUSYGROUP")
 }
 
 func (r *RedisJobStore) RefershRunning(jobID string) error {
@@ -135,3 +142,40 @@ func (r *RedisJobStore) FindStalled(timeout time.Duration)([]domain.RunningJob,e
 
 	return stalled,nil 
 }
+
+func (r *RedisJobStore) ReadJob(ctx context.Context,appID, jobType, group, consumer string) (*domain.Job,string,error) {
+
+	stream := r.streamKey(appID,jobType)
+
+	res,err := r.rdb.XReadGroup(ctx,&redis.XReadGroupArgs{
+		Group: group,
+		Consumer: consumer,
+		Streams: []string{stream,">"},
+		Count: 1,
+		Block: 30 * time.Second,
+	}).Result()
+
+	if err != nil || len(res) == 0 || len(res[0].Messages) == 0 {
+		return nil,"",err
+	}
+
+	msg := res[0].Messages[0]
+	raw := msg.Values["job"].(string)
+
+	var job domain.Job
+	err = json.Unmarshal([]byte(raw),&job)
+
+	if err != nil {
+		return nil,"",err 
+	}
+
+	return &job,msg.ID,nil 
+}
+
+func (r *RedisJobStore) AckJob(appID,jobType,group,messageID string) error {
+	ctx := context.Background()
+	stream := r.streamKey(appID,jobType)
+
+	return r.rdb.XAck(ctx,stream,group,messageID).Err()
+}
+

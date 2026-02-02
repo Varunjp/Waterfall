@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"scheduler_service/internal/domain"
 	"scheduler_service/internal/metrics"
 	"scheduler_service/internal/repository"
@@ -45,41 +46,93 @@ func NewSchedulerUsecase(
 
 // call for grpc PollJob
 
-func (s *SchedulerUsecase) AssignJob(
-	ctx context.Context,
-	workerID string,
-	appID string, 
-	capabilities []string,
-)(*domain.Job,error) {
+// func (s *SchedulerUsecase) AssignJob(
+// 	ctx context.Context,
+// 	workerID string,
+// 	appID string, 
+// 	capabilities []string,
+// )(*domain.Job,error) {
 	
-	ok,err := s.quotaRepo.CanStart(appID)
+// 	ok,err := s.quotaRepo.CanStart(appID)
+// 	if err != nil || !ok {
+// 		return nil, ErrQuotaExceeded
+// 	}
+
+// 	for _, jobType := range capabilities {
+// 		job,err := s.jobStore.PollJob(appID,jobType,workerID)
+
+// 		if err != nil || job == nil {
+// 			continue
+// 		}
+
+// 		if _,err := s.workerReg.Acquire(appID, jobType); err != nil {
+// 			_ = s.jobStore.Requeue(job)
+// 			return nil,err 
+// 		}
+
+// 		_ = s.quotaRepo.Increment(appID)
+
+// 		_ = s.eventQueue.JobRunning(job.JobID,workerID)
+
+// 		s.metrics.JobsAssigned.Inc()
+// 		s.metrics.RunningJobs.Inc()
+
+// 		return job,nil 
+// 	}
+
+// 	return nil, ErrNoJobAvailable
+// }
+
+func (s *SchedulerUsecase) ConsumeJobForWorker(ctx context.Context, worker domain.Worker) (*domain.Job,string,error) {
+
+	ok,err := s.quotaRepo.CanStart(worker.AppID)
 	if err != nil || !ok {
-		return nil, ErrQuotaExceeded
+		return nil,"",ErrQuotaExceeded
 	}
 
-	for _, jobType := range capabilities {
-		job,err := s.jobStore.PollJob(appID,jobType,workerID)
+	for _,jobType := range worker.Capabilities {
 
-		if err != nil || job == nil {
-			continue
+		_ = s.jobStore.EnsureGroup(worker.AppID,jobType,"workers")
+
+		job,msgID,err := s.jobStore.ReadJob(
+			ctx,
+			worker.AppID,
+			jobType,
+			"workers",
+			worker.WorkerID,
+		)
+
+		if job == nil || err != nil {
+			//delete
+			fmt.Println("check error scheduler :",err)
+			fmt.Println("check jobs schduler:",job)
+			continue 
 		}
 
-		if _,err := s.workerReg.Acquire(appID, jobType); err != nil {
-			_ = s.jobStore.Requeue(job)
-			return nil,err 
-		}
-
-		_ = s.quotaRepo.Increment(appID)
-
-		_ = s.eventQueue.JobRunning(job.JobID,workerID)
-
+		_ = s.quotaRepo.Increment(worker.AppID)
 		s.metrics.JobsAssigned.Inc()
-		s.metrics.RunningJobs.Inc()
 
-		return job,nil 
+		return job,msgID,nil 
 	}
 
-	return nil, ErrNoJobAvailable
+	return nil,"",ErrNoJobAvailable
+}
+
+func (s *SchedulerUsecase) CompleteStreamJob(ctx context.Context,job domain.Job,streamID string, success bool) error {
+
+	err := s.jobStore.AckJob(job.AppID,job.Type,"workers",streamID)
+	if err != nil {
+		return err
+	}
+	_ = s.quotaRepo.Decrement(job.AppID)
+
+	if success {
+		s.metrics.JobsSuccess.Inc()
+		return s.eventQueue.JobSucceeded(job.JobID)
+	}
+
+	s.metrics.JobsFailed.Inc()
+	return s.eventQueue.JobFailed(job.JobID,"execution failed")
 }
 
 func (s *SchedulerUsecase) RegisterWorker(worker domain.Worker) error {
@@ -113,29 +166,29 @@ func (s *SchedulerUsecase) JobHeartbeat(
 
 // job completion
 
-func (s *SchedulerUsecase) CompleteJob(
-	ctx context.Context,
-	jobID string,
-	workerID string,
-	appID string,
-	success bool,
-	errorMsg string,
-) error {
+// func (s *SchedulerUsecase) CompleteJob(
+// 	ctx context.Context,
+// 	jobID string,
+// 	workerID string,
+// 	appID string,
+// 	success bool,
+// 	errorMsg string,
+// ) error {
 
-	_ = s.jobStore.DeleteRunning(jobID)
-	_ = s.workerReg.Release(workerID)
-	//_ = s.quotaRepo.Decrement(appID)
+// 	_ = s.jobStore.DeleteRunning(jobID)
+// 	_ = s.workerReg.Release(workerID)
+// 	//_ = s.quotaRepo.Decrement(appID)
 
-	s.metrics.RunningJobs.Dec()
+// 	s.metrics.RunningJobs.Dec()
 
-	if success {
-		s.metrics.JobsSuccess.Inc()
-		return s.eventQueue.JobSucceeded(jobID)
-	}
+// 	if success {
+// 		s.metrics.JobsSuccess.Inc()
+// 		return s.eventQueue.JobSucceeded(jobID)
+// 	}
 
-	s.metrics.JobsFailed.Inc()
-	return s.eventQueue.JobFailed(jobID,errorMsg)
-}
+// 	s.metrics.JobsFailed.Inc()
+// 	return s.eventQueue.JobFailed(jobID,errorMsg)
+// }
 
 func (s *SchedulerUsecase) StartStalledJobReaper(ctx context.Context) {
 	ticker := time.NewTicker(15 * time.Second)

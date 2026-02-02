@@ -53,8 +53,8 @@ func (c *JobCreatedConsumer) Start(ctx context.Context) error {
 				MaxRetries: evt.MaxRetries,
 			}
 
-			if err := c.jobStore.SavePendingJob(job); err != nil {
-				log.Println("redis save error:",err)
+			if err := c.jobStore.PushJob(job); err != nil {
+				log.Println("redis stream error:",err)
 			}
 		}
 	}

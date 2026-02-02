@@ -9,7 +9,8 @@ service SchedulerService {
   rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse);
   rpc WorkerHeartbeat(WorkerHeartbeatRequest) returns (Empty);
 
-  rpc PollJob(PollJobRequest) returns (PollJobResponse);
+  rpc WaitForJob(WaitForJobRequest) returns (WaitForJobResponse);
+
   rpc JobHeartbeat(JobHeartbeatRequest) returns (Empty);
   rpc CompleteJob(CompleteJobRequest) returns (Empty);
 
@@ -34,15 +35,16 @@ message WorkerHeartbeatRequest {
   int64 timestamp_unix = 2;
 }
 
-message PollJobRequest {
+message WaitForJobRequest {
   string worker_id = 1;
   string app_id = 2;
   repeated string capabilities = 3;
 }
 
-message PollJobResponse {
+message WaitForJobResponse {
   bool found = 1;
   Job job = 2;
+  string stream_id =3;
 }
 
 message Job {
@@ -67,10 +69,12 @@ message CompleteJobRequest {
   string job_id = 1;
   string worker_id = 2;
   string app_id = 3;
+  string job_type = 4;
 
-  JobResult result = 4;
-  string error_message = 5;
-  string stack_trace = 6;
+  JobResult result = 5;
+  string error_message = 6;
+  string stream_id = 7;
+  bool success = 8;
 }
 
 enum JobResult {

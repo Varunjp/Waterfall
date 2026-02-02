@@ -1,23 +1,25 @@
 package config
 
-import "os"
+import (
+	"os"
+)
 
 type Config struct {
+	WorkerID   string
+	AppID      string
+	Capabilities []string
+
 	SchedulerAddr string
-	WorkerID      string
-	AppID         string
-	Capabilitis   []string
 	HeartbeatSec  int
-	MaxConcurrentJobs int 
 }
 
 func Load() *Config {
+
 	return &Config{
-		SchedulerAddr: os.Getenv("SCHEDULER_ADDR"),
-		WorkerID: os.Getenv("WORKER_ID"),
-		AppID: os.Getenv("APP_ID"),
-		Capabilitis: []string{"email"},
-		HeartbeatSec: 10,
-		MaxConcurrentJobs: 5,
+		WorkerID:        os.Getenv("WORKER_ID"),
+		AppID:           os.Getenv("APP_ID"),
+		Capabilities:    []string{"email"}, // can parse CSV if needed
+		SchedulerAddr:   os.Getenv("SCHEDULER_ADDR"),
+		HeartbeatSec:    10,
 	}
 }

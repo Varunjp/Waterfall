@@ -3,24 +3,28 @@ package heartbeat
 import (
 	"context"
 	"time"
-	pb "worker_service/proto/schedulerpb"
+	"worker_service/internal/client"
+	"worker_service/internal/grpc/schedulerpb"
 )
-func Start(ctx context.Context, client pb.SchedulerServiceClient, jobID, workerID string, interval int) {
-	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 
-	go func() {
-		defer ticker.Stop()
-		for {
-			select {
-			case <-ticker.C:
-				client.JobHeartbeat(ctx,&pb.JobHeartbeatRequest{
-					JobId: jobID,
-					WorkerId: workerID,
-					Message: "running",
-				})
-			case <-ctx.Done():
-				return 
-			}
+func Start(
+	ctx context.Context,
+	scheduler *client.SchdeulerClient,
+	workerID string,
+	interval time.Duration,
+) {
+
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		select{
+		case <-ctx.Done():
+			return 
+		case <-ticker.C:
+			_,_ = scheduler.WorkerHeartbeat(ctx,&schedulerpb.WorkerHeartbeatRequest{
+				WorkerId: workerID,
+			})
 		}
-	}()
+	}
 }

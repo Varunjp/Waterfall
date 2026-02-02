@@ -297,7 +297,7 @@ func (x *WorkerHeartbeatRequest) GetTimestampUnix() int64 {
 	return 0
 }
 
-type PollJobRequest struct {
+type WaitForJobRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	WorkerId      string                 `protobuf:"bytes,1,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
 	AppId         string                 `protobuf:"bytes,2,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
@@ -306,20 +306,20 @@ type PollJobRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PollJobRequest) Reset() {
-	*x = PollJobRequest{}
+func (x *WaitForJobRequest) Reset() {
+	*x = WaitForJobRequest{}
 	mi := &file_proto_scheduler_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PollJobRequest) String() string {
+func (x *WaitForJobRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PollJobRequest) ProtoMessage() {}
+func (*WaitForJobRequest) ProtoMessage() {}
 
-func (x *PollJobRequest) ProtoReflect() protoreflect.Message {
+func (x *WaitForJobRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_scheduler_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -331,54 +331,55 @@ func (x *PollJobRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PollJobRequest.ProtoReflect.Descriptor instead.
-func (*PollJobRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use WaitForJobRequest.ProtoReflect.Descriptor instead.
+func (*WaitForJobRequest) Descriptor() ([]byte, []int) {
 	return file_proto_scheduler_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *PollJobRequest) GetWorkerId() string {
+func (x *WaitForJobRequest) GetWorkerId() string {
 	if x != nil {
 		return x.WorkerId
 	}
 	return ""
 }
 
-func (x *PollJobRequest) GetAppId() string {
+func (x *WaitForJobRequest) GetAppId() string {
 	if x != nil {
 		return x.AppId
 	}
 	return ""
 }
 
-func (x *PollJobRequest) GetCapabilities() []string {
+func (x *WaitForJobRequest) GetCapabilities() []string {
 	if x != nil {
 		return x.Capabilities
 	}
 	return nil
 }
 
-type PollJobResponse struct {
+type WaitForJobResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Found         bool                   `protobuf:"varint,1,opt,name=found,proto3" json:"found,omitempty"`
 	Job           *Job                   `protobuf:"bytes,2,opt,name=job,proto3" json:"job,omitempty"`
+	StreamId      string                 `protobuf:"bytes,3,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PollJobResponse) Reset() {
-	*x = PollJobResponse{}
+func (x *WaitForJobResponse) Reset() {
+	*x = WaitForJobResponse{}
 	mi := &file_proto_scheduler_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PollJobResponse) String() string {
+func (x *WaitForJobResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PollJobResponse) ProtoMessage() {}
+func (*WaitForJobResponse) ProtoMessage() {}
 
-func (x *PollJobResponse) ProtoReflect() protoreflect.Message {
+func (x *WaitForJobResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_scheduler_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -390,23 +391,30 @@ func (x *PollJobResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PollJobResponse.ProtoReflect.Descriptor instead.
-func (*PollJobResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use WaitForJobResponse.ProtoReflect.Descriptor instead.
+func (*WaitForJobResponse) Descriptor() ([]byte, []int) {
 	return file_proto_scheduler_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *PollJobResponse) GetFound() bool {
+func (x *WaitForJobResponse) GetFound() bool {
 	if x != nil {
 		return x.Found
 	}
 	return false
 }
 
-func (x *PollJobResponse) GetJob() *Job {
+func (x *WaitForJobResponse) GetJob() *Job {
 	if x != nil {
 		return x.Job
 	}
 	return nil
+}
+
+func (x *WaitForJobResponse) GetStreamId() string {
+	if x != nil {
+		return x.StreamId
+	}
+	return ""
 }
 
 type Job struct {
@@ -566,9 +574,11 @@ type CompleteJobRequest struct {
 	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
 	WorkerId      string                 `protobuf:"bytes,2,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
 	AppId         string                 `protobuf:"bytes,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
-	Result        JobResult              `protobuf:"varint,4,opt,name=result,proto3,enum=scheduler.JobResult" json:"result,omitempty"`
-	ErrorMessage  string                 `protobuf:"bytes,5,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
-	StackTrace    string                 `protobuf:"bytes,6,opt,name=stack_trace,json=stackTrace,proto3" json:"stack_trace,omitempty"`
+	JobType       string                 `protobuf:"bytes,4,opt,name=job_type,json=jobType,proto3" json:"job_type,omitempty"`
+	Result        JobResult              `protobuf:"varint,5,opt,name=result,proto3,enum=scheduler.JobResult" json:"result,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,6,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	StreamId      string                 `protobuf:"bytes,7,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
+	Success       bool                   `protobuf:"varint,8,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -624,6 +634,13 @@ func (x *CompleteJobRequest) GetAppId() string {
 	return ""
 }
 
+func (x *CompleteJobRequest) GetJobType() string {
+	if x != nil {
+		return x.JobType
+	}
+	return ""
+}
+
 func (x *CompleteJobRequest) GetResult() JobResult {
 	if x != nil {
 		return x.Result
@@ -638,11 +655,18 @@ func (x *CompleteJobRequest) GetErrorMessage() string {
 	return ""
 }
 
-func (x *CompleteJobRequest) GetStackTrace() string {
+func (x *CompleteJobRequest) GetStreamId() string {
 	if x != nil {
-		return x.StackTrace
+		return x.StreamId
 	}
 	return ""
+}
+
+func (x *CompleteJobRequest) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
 }
 
 type PushJobLogRequest struct {
@@ -780,14 +804,15 @@ const file_proto_scheduler_proto_rawDesc = "" +
 	"\baccepted\x18\x01 \x01(\bR\baccepted\"\\\n" +
 	"\x16WorkerHeartbeatRequest\x12\x1b\n" +
 	"\tworker_id\x18\x01 \x01(\tR\bworkerId\x12%\n" +
-	"\x0etimestamp_unix\x18\x02 \x01(\x03R\rtimestampUnix\"h\n" +
-	"\x0ePollJobRequest\x12\x1b\n" +
+	"\x0etimestamp_unix\x18\x02 \x01(\x03R\rtimestampUnix\"k\n" +
+	"\x11WaitForJobRequest\x12\x1b\n" +
 	"\tworker_id\x18\x01 \x01(\tR\bworkerId\x12\x15\n" +
 	"\x06app_id\x18\x02 \x01(\tR\x05appId\x12\"\n" +
-	"\fcapabilities\x18\x03 \x03(\tR\fcapabilities\"I\n" +
-	"\x0fPollJobResponse\x12\x14\n" +
+	"\fcapabilities\x18\x03 \x03(\tR\fcapabilities\"i\n" +
+	"\x12WaitForJobResponse\x12\x14\n" +
 	"\x05found\x18\x01 \x01(\bR\x05found\x12 \n" +
-	"\x03job\x18\x02 \x01(\v2\x0e.scheduler.JobR\x03job\"\xa5\x01\n" +
+	"\x03job\x18\x02 \x01(\v2\x0e.scheduler.JobR\x03job\x12\x1b\n" +
+	"\tstream_id\x18\x03 \x01(\tR\bstreamId\"\xa5\x01\n" +
 	"\x03Job\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x15\n" +
 	"\x06app_id\x18\x02 \x01(\tR\x05appId\x12\x19\n" +
@@ -799,15 +824,16 @@ const file_proto_scheduler_proto_rawDesc = "" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x1b\n" +
 	"\tworker_id\x18\x02 \x01(\tR\bworkerId\x12\x18\n" +
 	"\amessage\x18\x04 \x01(\tR\amessage\x12%\n" +
-	"\x0etimestamp_unix\x18\x05 \x01(\x03R\rtimestampUnix\"\xd3\x01\n" +
+	"\x0etimestamp_unix\x18\x05 \x01(\x03R\rtimestampUnix\"\x84\x02\n" +
 	"\x12CompleteJobRequest\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x1b\n" +
 	"\tworker_id\x18\x02 \x01(\tR\bworkerId\x12\x15\n" +
-	"\x06app_id\x18\x03 \x01(\tR\x05appId\x12,\n" +
-	"\x06result\x18\x04 \x01(\x0e2\x14.scheduler.JobResultR\x06result\x12#\n" +
-	"\rerror_message\x18\x05 \x01(\tR\ferrorMessage\x12\x1f\n" +
-	"\vstack_trace\x18\x06 \x01(\tR\n" +
-	"stackTrace\"\xc5\x01\n" +
+	"\x06app_id\x18\x03 \x01(\tR\x05appId\x12\x19\n" +
+	"\bjob_type\x18\x04 \x01(\tR\ajobType\x12,\n" +
+	"\x06result\x18\x05 \x01(\x0e2\x14.scheduler.JobResultR\x06result\x12#\n" +
+	"\rerror_message\x18\x06 \x01(\tR\ferrorMessage\x12\x1b\n" +
+	"\tstream_id\x18\a \x01(\tR\bstreamId\x12\x18\n" +
+	"\asuccess\x18\b \x01(\bR\asuccess\"\xc5\x01\n" +
 	"\x11PushJobLogRequest\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x1b\n" +
 	"\tworker_id\x18\x02 \x01(\tR\bworkerId\x12\x16\n" +
@@ -825,11 +851,12 @@ const file_proto_scheduler_proto_rawDesc = "" +
 	"\x0fLOG_LEVEL_DEBUG\x10\x01\x12\x12\n" +
 	"\x0eLOG_LEVEL_INFO\x10\x02\x12\x12\n" +
 	"\x0eLOG_LEVEL_WARN\x10\x03\x12\x13\n" +
-	"\x0fLOG_LEVEL_ERROR\x10\x042\xb3\x03\n" +
+	"\x0fLOG_LEVEL_ERROR\x10\x042\xbc\x03\n" +
 	"\x10SchedulerService\x12U\n" +
 	"\x0eRegisterWorker\x12 .scheduler.RegisterWorkerRequest\x1a!.scheduler.RegisterWorkerResponse\x12F\n" +
-	"\x0fWorkerHeartbeat\x12!.scheduler.WorkerHeartbeatRequest\x1a\x10.scheduler.Empty\x12@\n" +
-	"\aPollJob\x12\x19.scheduler.PollJobRequest\x1a\x1a.scheduler.PollJobResponse\x12@\n" +
+	"\x0fWorkerHeartbeat\x12!.scheduler.WorkerHeartbeatRequest\x1a\x10.scheduler.Empty\x12I\n" +
+	"\n" +
+	"WaitForJob\x12\x1c.scheduler.WaitForJobRequest\x1a\x1d.scheduler.WaitForJobResponse\x12@\n" +
 	"\fJobHeartbeat\x12\x1e.scheduler.JobHeartbeatRequest\x1a\x10.scheduler.Empty\x12>\n" +
 	"\vCompleteJob\x12\x1d.scheduler.CompleteJobRequest\x1a\x10.scheduler.Empty\x12<\n" +
 	"\n" +
@@ -855,8 +882,8 @@ var file_proto_scheduler_proto_goTypes = []any{
 	(*RegisterWorkerRequest)(nil),  // 2: scheduler.RegisterWorkerRequest
 	(*RegisterWorkerResponse)(nil), // 3: scheduler.RegisterWorkerResponse
 	(*WorkerHeartbeatRequest)(nil), // 4: scheduler.WorkerHeartbeatRequest
-	(*PollJobRequest)(nil),         // 5: scheduler.PollJobRequest
-	(*PollJobResponse)(nil),        // 6: scheduler.PollJobResponse
+	(*WaitForJobRequest)(nil),      // 5: scheduler.WaitForJobRequest
+	(*WaitForJobResponse)(nil),     // 6: scheduler.WaitForJobResponse
 	(*Job)(nil),                    // 7: scheduler.Job
 	(*JobHeartbeatRequest)(nil),    // 8: scheduler.JobHeartbeatRequest
 	(*CompleteJobRequest)(nil),     // 9: scheduler.CompleteJobRequest
@@ -864,17 +891,17 @@ var file_proto_scheduler_proto_goTypes = []any{
 	(*Empty)(nil),                  // 11: scheduler.Empty
 }
 var file_proto_scheduler_proto_depIdxs = []int32{
-	7,  // 0: scheduler.PollJobResponse.job:type_name -> scheduler.Job
+	7,  // 0: scheduler.WaitForJobResponse.job:type_name -> scheduler.Job
 	0,  // 1: scheduler.CompleteJobRequest.result:type_name -> scheduler.JobResult
 	2,  // 2: scheduler.SchedulerService.RegisterWorker:input_type -> scheduler.RegisterWorkerRequest
 	4,  // 3: scheduler.SchedulerService.WorkerHeartbeat:input_type -> scheduler.WorkerHeartbeatRequest
-	5,  // 4: scheduler.SchedulerService.PollJob:input_type -> scheduler.PollJobRequest
+	5,  // 4: scheduler.SchedulerService.WaitForJob:input_type -> scheduler.WaitForJobRequest
 	8,  // 5: scheduler.SchedulerService.JobHeartbeat:input_type -> scheduler.JobHeartbeatRequest
 	9,  // 6: scheduler.SchedulerService.CompleteJob:input_type -> scheduler.CompleteJobRequest
 	10, // 7: scheduler.SchedulerService.PushJobLog:input_type -> scheduler.PushJobLogRequest
 	3,  // 8: scheduler.SchedulerService.RegisterWorker:output_type -> scheduler.RegisterWorkerResponse
 	11, // 9: scheduler.SchedulerService.WorkerHeartbeat:output_type -> scheduler.Empty
-	6,  // 10: scheduler.SchedulerService.PollJob:output_type -> scheduler.PollJobResponse
+	6,  // 10: scheduler.SchedulerService.WaitForJob:output_type -> scheduler.WaitForJobResponse
 	11, // 11: scheduler.SchedulerService.JobHeartbeat:output_type -> scheduler.Empty
 	11, // 12: scheduler.SchedulerService.CompleteJob:output_type -> scheduler.Empty
 	11, // 13: scheduler.SchedulerService.PushJobLog:output_type -> scheduler.Empty

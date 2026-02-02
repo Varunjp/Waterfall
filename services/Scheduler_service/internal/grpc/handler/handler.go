@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"scheduler_service/internal/domain"
 	pb "scheduler_service/internal/grpc/schedulerpb"
 	"scheduler_service/internal/usecase"
@@ -47,33 +46,60 @@ func (h *SchedulerHandler) WorkerHeartbeat(ctx context.Context, req *pb.WorkerHe
 	return &pb.Empty{},nil 
 }
 
-func (h *SchedulerHandler) PollJob(ctx context.Context, req *pb.PollJobRequest) (*pb.PollJobResponse,error) {
-	job,err := h.uc.AssignJob(
-		ctx,
-		req.WorkerId,
-		req.AppId,
-		req.Capabilities,
-	)
+// func (h *SchedulerHandler) PollJob(ctx context.Context, req *pb.PollJobRequest) (*pb.PollJobResponse,error) {
+// 	job,err := h.uc.AssignJob(
+// 		ctx,
+// 		req.WorkerId,
+// 		req.AppId,
+// 		req.Capabilities,
+// 	)
 	
-	if err != nil {
-		if errors.Is(err, usecase.ErrNoJobAvailable) {
-			return &pb.PollJobResponse{Found: false},nil 
-		}
-		if errors.Is(err, usecase.ErrQuotaExceeded) {
-			return nil, status.Errorf(codes.ResourceExhausted,"quota exceeded")
-		}
-		return nil, status.Errorf(codes.Internal, "%s", err.Error())
+// 	if err != nil {
+// 		if errors.Is(err, usecase.ErrNoJobAvailable) {
+// 			return &pb.PollJobResponse{Found: false},nil 
+// 		}
+// 		if errors.Is(err, usecase.ErrQuotaExceeded) {
+// 			return nil, status.Errorf(codes.ResourceExhausted,"quota exceeded")
+// 		}
+// 		return nil, status.Errorf(codes.Internal, "%s", err.Error())
+// 	}
+
+// 	return &pb.PollJobResponse{
+// 		Found: true,
+// 		Job: &pb.Job{
+// 			JobId: job.JobID,
+// 			AppId: job.AppID,
+// 			JobType: job.Type,
+// 			Payload: []byte(job.Payload),
+// 			Attempt: int32(job.Retry),
+// 			MaxAttempts: int32(job.MaxRetries),
+// 		},
+// 	},nil 
+// }
+
+func (h *SchedulerHandler) WaitForJob(ctx context.Context,req *pb.WaitForJobRequest,)(*pb.WaitForJobResponse,error) {
+
+	job,msgID, err := h.uc.ConsumeJobForWorker(
+		ctx,
+		domain.Worker{
+			WorkerID: req.WorkerId,
+			AppID: req.AppId,
+			Capabilities: req.Capabilities,
+		},
+	)
+
+	if err != nil || job == nil {
+		return &pb.WaitForJobResponse{Found: false},nil 
 	}
 
-	return &pb.PollJobResponse{
-		Found: true,
+	return &pb.WaitForJobResponse{
+		Found:true,
+		StreamId: msgID,
 		Job: &pb.Job{
 			JobId: job.JobID,
 			AppId: job.AppID,
 			JobType: job.Type,
 			Payload: []byte(job.Payload),
-			Attempt: int32(job.Retry),
-			MaxAttempts: int32(job.MaxRetries),
 		},
 	},nil 
 }
@@ -94,15 +120,20 @@ func (h *SchedulerHandler) JobHeartbeat(ctx context.Context,req *pb.JobHeartbeat
 }
 
 func (h *SchedulerHandler) CompleteJob(ctx context.Context, req *pb.CompleteJobRequest) (*pb.Empty,error) {
-	success := req.Result == pb.JobResult_JOB_RESULT_SUCCESS
 
-	err := h.uc.CompleteJob(
+	success := req.Success
+
+	job := domain.Job{
+		JobID: req.JobId,
+		AppID: req.AppId,
+		Type: req.JobType,
+	}
+
+	err := h.uc.CompleteStreamJob(
 		ctx,
-		req.JobId,
-		req.WorkerId,
-		req.AppId,
+		job,
+		req.StreamId,
 		success,
-		req.ErrorMessage, 
 	)
 
 	if err != nil {
@@ -129,3 +160,4 @@ func (h *SchedulerHandler) PushJobLog(ctx context.Context, req *pb.PushJobLogReq
 
 	return &pb.Empty{},nil 
 }
+
