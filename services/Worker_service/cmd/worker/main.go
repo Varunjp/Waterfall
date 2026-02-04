@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -70,14 +69,11 @@ func main() {
 				Capabilities: cfg.Capabilities,
 			})
 
-			if err != nil || !resp.Found {
-				fmt.Println("error in worker: ",err)
-				fmt.Println("nothing found:",!resp.Found)
+			if err != nil {
+				log.Println("wait error :",err)
 				continue
 			}
 
-			fmt.Println("checking job",resp.Job)
-			
 			job := resp.Job
 			exec,ok := executor.Registry[job.JobType]
 			if !ok {
@@ -89,19 +85,20 @@ func main() {
 
 			if err != nil {
 				_,_ = scheduler.CompleteJob(ctx,&pb.CompleteJobRequest{
-				JobId: job.JobId,
-				AppId: job.AppId,
-				JobType: job.JobType,
-				WorkerId: cfg.WorkerID,
-				StreamId: resp.StreamId,
-				Success: false,
-				ErrorMessage: func()string{
-					if err != nil{
-						return err.Error()
-					}
-					return ""
-				}(),
-			})
+					JobId: job.JobId,
+					AppId: job.AppId,
+					JobType: job.JobType,
+					WorkerId: cfg.WorkerID,
+					StreamId: resp.StreamId,
+					Success: false,
+					ErrorMessage: func()string{
+						if err != nil{
+							return err.Error()
+						}
+						return ""
+					}(),
+				})
+				continue 
 			}
 
 			_,_ = scheduler.CompleteJob(ctx,&pb.CompleteJobRequest{

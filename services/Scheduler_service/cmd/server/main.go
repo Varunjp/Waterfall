@@ -3,141 +3,79 @@ package main
 import (
 	"context"
 	"log"
-	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"scheduler_service/internal/config"
 	"scheduler_service/internal/consumer"
-	"scheduler_service/internal/grpc/handler"
-	pb "scheduler_service/internal/grpc/schedulerpb"
+	grpcserver "scheduler_service/internal/grpc"
+	"scheduler_service/internal/logger"
 	"scheduler_service/internal/metrics"
+	"scheduler_service/internal/producer"
+	redisClient "scheduler_service/internal/redis"
 	"scheduler_service/internal/repository"
+	"scheduler_service/internal/scheduler"
 	"scheduler_service/internal/usecase"
 	"syscall"
-	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/redis/go-redis/v9"
-	"github.com/segmentio/kafka-go"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"go.uber.org/zap"
 )
 
 func main() {
+	
+	rootCtx,stop := signal.NotifyContext(
+		context.Background(),
+		os.Interrupt,
+		syscall.SIGTERM,
+	)
+	defer stop()
+
 	if err := godotenv.Load(); err != nil {
 		log.Println("env not loaded")
 	}
 	cfg := config.Load()
-	
-	ctx,cancel := context.WithCancel(context.Background())
-	defer cancel()
+	log := logger.NewLogger()
 
-	go func() {
-		sigCh := make(chan os.Signal,1)
-		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-		<-sigCh
-		log.Println("shutdown signal received")
-		cancel()
-	}()
-	
-	rdb := redis.NewClient(&redis.Options{
-		Addr: cfg.RedisURL,
-		DB: 0,
-	})
+	log.Info("scheduler starting")
 
-	jobStore := repository.NewRedisJobStore(rdb)
-	workerRegistry := repository.NewRedisWorkerRegistry(rdb)
-	quotaRepo := repository.NewRedisAdminQuotaRepo(rdb)
+	redisClient := redisClient.NewRedisClient(cfg.Redis.Addr)
+	adminRepo := repository.NewAdminDb(cfg.AdminDB.DSN)
 
-	eventQueue := repository.NewKafkaJobEventQueue(cfg.KafkaBroker,cfg.KafkaOutputTopic)
-	logQueue := repository.NewKafkaJobLogQueue(cfg.KafkaBroker,cfg.KafkaLogTopic)
+	kafkaConsumer := consumer.NewJobCreatedConsumer(cfg.Kafka.Brokers,cfg.Kafka.JobCreateTopic,cfg.Kafka.ConsumerGroup)
+	kafkaProducer := producer.NewKafkaProducer([]string{cfg.Kafka.Brokers},cfg.Kafka.JobUpdateTopic)
 
-	schedulerMetrics := metrics.NewMetrics()
+	metrics := metrics.NewMetrics()
 
-	schedulerUC := usecase.NewSchedulerUsecase(
-		jobStore,
-		workerRegistry,
-		quotaRepo,
-		eventQueue,
-		schedulerMetrics,
-		logQueue, 
+	assigner := usecase.NewAssigner(redisClient,adminRepo,metrics)
+	stallMonitor := usecase.NewStallMonitor(redisClient,kafkaProducer)
+
+	runner := scheduler.NewRunner(
+		kafkaConsumer,assigner,kafkaProducer,redisClient.Client,log,
 	)
 
-	jobReader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers: []string{cfg.KafkaBroker},
-		Topic:   cfg.KafkaInputTopic,
-		GroupID: "scheduler-service",
-	})
+	runtime := scheduler.NewRuntime(log)
 
-	jobConsumer := consumer.NewJobCreatedConsumer(jobReader, jobStore)
-	go func() {
-		if err := jobConsumer.Start(ctx); err != nil {
-			log.Println("job consumer stopped:", err)
-		}
-	}()
+	ctx := runtime.Start(
+		rootCtx,
+		runner.Run,
+		stallMonitor.Run,
 
-	go schedulerUC.StartStalledJobReaper(ctx)
-	
-	mux := http.NewServeMux()
-	metricsServer := &http.Server{
-		Addr: ":2112",
-		Handler: mux,
-	}
-
-	go func() {
-		log.Println("metrics listening on :2112")
-		if err := metricsServer.ListenAndServe(); err != http.ErrServerClosed {
-			log.Println("metrics server error:", err)
-		}
-	}()
-
-	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-
-	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(handler.GrpcUnaryInterceptor),
+		func(c context.Context) {
+			if err := grpcserver.Run(
+				c,
+				cfg.GRPC.Port,
+				redisClient.Client,
+				kafkaProducer,
+				log,
+			); err != nil {
+				log.Error("grpc server failed",zap.Error(err))
+			}
+		},
 	)
-
-	schedulerHandler := handler.NewSchedulerHandler(schedulerUC)
-	pb.RegisterSchedulerServiceServer(grpcServer, schedulerHandler)
-	
-	reflection.Register(grpcServer)
-
-	go func() {
-		log.Println("scheduler gRPC listening on :" + cfg.GRPCPort)
-		if err := grpcServer.Serve(lis); err != nil {
-			log.Println("grpc server stopped:", err)
-			cancel()
-		}
-	}()
 
 	<-ctx.Done()
 
-	log.Println("shutting down scheduler...")
-
-	shutdownCtx, shutdownCancel := context.WithTimeout(
-		context.Background(),
-		10*time.Second,
-	)
-	defer shutdownCancel()
-
-	grpcStopped := make(chan struct{})
-	go func() {
-		grpcServer.GracefulStop()
-		close(grpcStopped)
-	}()
-
-	select {
-	case <-grpcStopped:
-		log.Println("grpc stopped gracefully")
-	case <-shutdownCtx.Done():
-		log.Println("grpc shutdown timed out, forcing stop")
-		grpcServer.Stop()
-	}
-	_ = metricsServer.Shutdown(shutdownCtx)
-	_ = rdb.Close()
-	log.Println("scheduler stopped cleanly")
+	log.Info("shutdown signal received")
+	runtime.Stop()
+	log.Info("scheuler exited cleanly")
 }

@@ -3,14 +3,14 @@ package domain
 import "time"
 
 type Job struct {
-	JobID     	string
-	AppID     	string
-	Type      	string
-	Payload   	string
+	JobID     	string `json:"job_id"`
+	AppID     	string `json:"app_id"`
+	Type      	string `json:"job_type"`
+	Payload   	string `json:"payload"`
 	Status    	JobStatus
 	CreatedAt 	time.Time
 	UpdateAt 	time.Time
 	Retry 		int 
-	MaxRetries  int 
+	MaxRetries  int `json:"max_retries"`
 	ScheduledAt time.Time
 }

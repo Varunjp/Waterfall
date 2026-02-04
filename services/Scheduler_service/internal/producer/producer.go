@@ -3,5 +3,5 @@ package producer
 import "context"
 
 type Producer interface {
-	Publish(ctx context.Context, key string, value any) error 
+	Publish(ctx context.Context, value any) error 
 }
