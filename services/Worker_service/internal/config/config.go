@@ -2,24 +2,32 @@ package config
 
 import (
 	"os"
+	"strings"
 )
 
 type Config struct {
-	WorkerID   string
-	AppID      string
-	Capabilities []string
-
-	SchedulerAddr string
-	HeartbeatSec  int
+	AppID        string
+	WorkerID     string
+	JobTypes     []string
+	RedisAddr    string
+	SchedulerGRPC string
 }
 
 func Load() *Config {
 
 	return &Config{
-		WorkerID:        os.Getenv("WORKER_ID"),
-		AppID:           os.Getenv("APP_ID"),
-		Capabilities:    []string{"email"}, // can parse CSV if needed
-		SchedulerAddr:   os.Getenv("SCHEDULER_ADDR"),
-		HeartbeatSec:    10,
+		AppID:        must("APP_ID"),
+		WorkerID:     must("WORKER_ID"),
+		JobTypes:     strings.Split(must("JOB_TYPES"), ","),
+		RedisAddr:    must("REDIS_ADDR"),
+		SchedulerGRPC: must("SCHEDULER_GRPC_ADDR"),
 	}
+}
+
+func must(k string) string {
+	v := os.Getenv(k)
+	if v == "" {
+		panic("missing env: " + k)
+	}
+	return v
 }

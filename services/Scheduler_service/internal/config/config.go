@@ -55,7 +55,7 @@ func Load() Config {
 		},
 
 		Kafka: KafkaConfig{
-			Brokers:        mustEnv("KAFKA_BROKERS"),
+			Brokers:        mustEnv("KAFKA_BROKER"),
 			JobCreateTopic: mustEnv("KAFKA_JOB_CREATE_TOPIC"),
 			JobUpdateTopic: mustEnv("KAFKA_JOB_UPDATE_TOPIC"),
 			ConsumerGroup:  mustEnv("KAFKA_CONSUMER_GROUP"),

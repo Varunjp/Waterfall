@@ -23,8 +23,8 @@ type Assigner struct {
 	producer *producer.KafkaProducer
 }
 
-func NewAssigner(r *redisClient.Client,a *repository.AdminRepo, m *metrics.SchedulerMetrics) *Assigner {
-	return &Assigner{redis: r,adminRepo: a,metrics: m}
+func NewAssigner(r *redisClient.Client,a *repository.AdminRepo, m *metrics.SchedulerMetrics, p  *producer.KafkaProducer) *Assigner {
+	return &Assigner{redis: r,adminRepo: a,metrics: m, producer: p}
 }
 
 func (a *Assigner) Assign(ctx context.Context,job domain.Job) error {
@@ -36,8 +36,13 @@ func (a *Assigner) Assign(ctx context.Context,job domain.Job) error {
 	if limit == 0 {
 		return ErrQuotaExceeded
 	}
-
 	stream := fmt.Sprintf("stream:jobs:%s:%s",job.AppID,job.Type)
+	group  := fmt.Sprintf("workers:%s:%s", job.AppID, job.Type)
+
+	if err := redisClient.EnsureGroup(ctx,a.redis.Client,stream,group); err!= nil  {
+		return err 
+	}
+
 	key := fmt.Sprintf("concurrency:%s",job.AppID)
 
 	_,err = a.redis.EvalSha(
@@ -49,6 +54,8 @@ func (a *Assigner) Assign(ctx context.Context,job domain.Job) error {
 		job.Payload,
 		job.Retry,
 	).Result()
+	
+	a.metrics.RunningJobs.Inc()
 
 	if err != nil {
 		a.metrics.JobsFailed.Inc()

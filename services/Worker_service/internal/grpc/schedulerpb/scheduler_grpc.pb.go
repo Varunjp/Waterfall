@@ -19,291 +19,139 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SchedulerService_RegisterWorker_FullMethodName  = "/scheduler.SchedulerService/RegisterWorker"
-	SchedulerService_WorkerHeartbeat_FullMethodName = "/scheduler.SchedulerService/WorkerHeartbeat"
-	SchedulerService_WaitForJob_FullMethodName      = "/scheduler.SchedulerService/WaitForJob"
-	SchedulerService_JobHeartbeat_FullMethodName    = "/scheduler.SchedulerService/JobHeartbeat"
-	SchedulerService_CompleteJob_FullMethodName     = "/scheduler.SchedulerService/CompleteJob"
-	SchedulerService_PushJobLog_FullMethodName      = "/scheduler.SchedulerService/PushJobLog"
+	Scheduler_Heartbeat_FullMethodName    = "/scheduler.Scheduler/Heartbeat"
+	Scheduler_ReportResult_FullMethodName = "/scheduler.Scheduler/ReportResult"
 )
 
-// SchedulerServiceClient is the client API for SchedulerService service.
+// SchedulerClient is the client API for Scheduler service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type SchedulerServiceClient interface {
-	RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*RegisterWorkerResponse, error)
-	WorkerHeartbeat(ctx context.Context, in *WorkerHeartbeatRequest, opts ...grpc.CallOption) (*Empty, error)
-	WaitForJob(ctx context.Context, in *WaitForJobRequest, opts ...grpc.CallOption) (*WaitForJobResponse, error)
-	JobHeartbeat(ctx context.Context, in *JobHeartbeatRequest, opts ...grpc.CallOption) (*Empty, error)
-	CompleteJob(ctx context.Context, in *CompleteJobRequest, opts ...grpc.CallOption) (*Empty, error)
-	PushJobLog(ctx context.Context, in *PushJobLogRequest, opts ...grpc.CallOption) (*Empty, error)
+type SchedulerClient interface {
+	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*Ack, error)
+	ReportResult(ctx context.Context, in *JobResultRequest, opts ...grpc.CallOption) (*Ack, error)
 }
 
-type schedulerServiceClient struct {
+type schedulerClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewSchedulerServiceClient(cc grpc.ClientConnInterface) SchedulerServiceClient {
-	return &schedulerServiceClient{cc}
+func NewSchedulerClient(cc grpc.ClientConnInterface) SchedulerClient {
+	return &schedulerClient{cc}
 }
 
-func (c *schedulerServiceClient) RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*RegisterWorkerResponse, error) {
+func (c *schedulerClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*Ack, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RegisterWorkerResponse)
-	err := c.cc.Invoke(ctx, SchedulerService_RegisterWorker_FullMethodName, in, out, cOpts...)
+	out := new(Ack)
+	err := c.cc.Invoke(ctx, Scheduler_Heartbeat_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *schedulerServiceClient) WorkerHeartbeat(ctx context.Context, in *WorkerHeartbeatRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *schedulerClient) ReportResult(ctx context.Context, in *JobResultRequest, opts ...grpc.CallOption) (*Ack, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, SchedulerService_WorkerHeartbeat_FullMethodName, in, out, cOpts...)
+	out := new(Ack)
+	err := c.cc.Invoke(ctx, Scheduler_ReportResult_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *schedulerServiceClient) WaitForJob(ctx context.Context, in *WaitForJobRequest, opts ...grpc.CallOption) (*WaitForJobResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(WaitForJobResponse)
-	err := c.cc.Invoke(ctx, SchedulerService_WaitForJob_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *schedulerServiceClient) JobHeartbeat(ctx context.Context, in *JobHeartbeatRequest, opts ...grpc.CallOption) (*Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, SchedulerService_JobHeartbeat_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *schedulerServiceClient) CompleteJob(ctx context.Context, in *CompleteJobRequest, opts ...grpc.CallOption) (*Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, SchedulerService_CompleteJob_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *schedulerServiceClient) PushJobLog(ctx context.Context, in *PushJobLogRequest, opts ...grpc.CallOption) (*Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, SchedulerService_PushJobLog_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// SchedulerServiceServer is the server API for SchedulerService service.
-// All implementations must embed UnimplementedSchedulerServiceServer
+// SchedulerServer is the server API for Scheduler service.
+// All implementations must embed UnimplementedSchedulerServer
 // for forward compatibility.
-type SchedulerServiceServer interface {
-	RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error)
-	WorkerHeartbeat(context.Context, *WorkerHeartbeatRequest) (*Empty, error)
-	WaitForJob(context.Context, *WaitForJobRequest) (*WaitForJobResponse, error)
-	JobHeartbeat(context.Context, *JobHeartbeatRequest) (*Empty, error)
-	CompleteJob(context.Context, *CompleteJobRequest) (*Empty, error)
-	PushJobLog(context.Context, *PushJobLogRequest) (*Empty, error)
-	mustEmbedUnimplementedSchedulerServiceServer()
+type SchedulerServer interface {
+	Heartbeat(context.Context, *HeartbeatRequest) (*Ack, error)
+	ReportResult(context.Context, *JobResultRequest) (*Ack, error)
+	mustEmbedUnimplementedSchedulerServer()
 }
 
-// UnimplementedSchedulerServiceServer must be embedded to have
+// UnimplementedSchedulerServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedSchedulerServiceServer struct{}
+type UnimplementedSchedulerServer struct{}
 
-func (UnimplementedSchedulerServiceServer) RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RegisterWorker not implemented")
+func (UnimplementedSchedulerServer) Heartbeat(context.Context, *HeartbeatRequest) (*Ack, error) {
+	return nil, status.Error(codes.Unimplemented, "method Heartbeat not implemented")
 }
-func (UnimplementedSchedulerServiceServer) WorkerHeartbeat(context.Context, *WorkerHeartbeatRequest) (*Empty, error) {
-	return nil, status.Error(codes.Unimplemented, "method WorkerHeartbeat not implemented")
+func (UnimplementedSchedulerServer) ReportResult(context.Context, *JobResultRequest) (*Ack, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReportResult not implemented")
 }
-func (UnimplementedSchedulerServiceServer) WaitForJob(context.Context, *WaitForJobRequest) (*WaitForJobResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method WaitForJob not implemented")
-}
-func (UnimplementedSchedulerServiceServer) JobHeartbeat(context.Context, *JobHeartbeatRequest) (*Empty, error) {
-	return nil, status.Error(codes.Unimplemented, "method JobHeartbeat not implemented")
-}
-func (UnimplementedSchedulerServiceServer) CompleteJob(context.Context, *CompleteJobRequest) (*Empty, error) {
-	return nil, status.Error(codes.Unimplemented, "method CompleteJob not implemented")
-}
-func (UnimplementedSchedulerServiceServer) PushJobLog(context.Context, *PushJobLogRequest) (*Empty, error) {
-	return nil, status.Error(codes.Unimplemented, "method PushJobLog not implemented")
-}
-func (UnimplementedSchedulerServiceServer) mustEmbedUnimplementedSchedulerServiceServer() {}
-func (UnimplementedSchedulerServiceServer) testEmbeddedByValue()                          {}
+func (UnimplementedSchedulerServer) mustEmbedUnimplementedSchedulerServer() {}
+func (UnimplementedSchedulerServer) testEmbeddedByValue()                   {}
 
-// UnsafeSchedulerServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to SchedulerServiceServer will
+// UnsafeSchedulerServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SchedulerServer will
 // result in compilation errors.
-type UnsafeSchedulerServiceServer interface {
-	mustEmbedUnimplementedSchedulerServiceServer()
+type UnsafeSchedulerServer interface {
+	mustEmbedUnimplementedSchedulerServer()
 }
 
-func RegisterSchedulerServiceServer(s grpc.ServiceRegistrar, srv SchedulerServiceServer) {
-	// If the following call panics, it indicates UnimplementedSchedulerServiceServer was
+func RegisterSchedulerServer(s grpc.ServiceRegistrar, srv SchedulerServer) {
+	// If the following call panics, it indicates UnimplementedSchedulerServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&SchedulerService_ServiceDesc, srv)
+	s.RegisterService(&Scheduler_ServiceDesc, srv)
 }
 
-func _SchedulerService_RegisterWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterWorkerRequest)
+func _Scheduler_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HeartbeatRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SchedulerServiceServer).RegisterWorker(ctx, in)
+		return srv.(SchedulerServer).Heartbeat(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SchedulerService_RegisterWorker_FullMethodName,
+		FullMethod: Scheduler_Heartbeat_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServiceServer).RegisterWorker(ctx, req.(*RegisterWorkerRequest))
+		return srv.(SchedulerServer).Heartbeat(ctx, req.(*HeartbeatRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchedulerService_WorkerHeartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WorkerHeartbeatRequest)
+func _Scheduler_ReportResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JobResultRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SchedulerServiceServer).WorkerHeartbeat(ctx, in)
+		return srv.(SchedulerServer).ReportResult(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SchedulerService_WorkerHeartbeat_FullMethodName,
+		FullMethod: Scheduler_ReportResult_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServiceServer).WorkerHeartbeat(ctx, req.(*WorkerHeartbeatRequest))
+		return srv.(SchedulerServer).ReportResult(ctx, req.(*JobResultRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchedulerService_WaitForJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WaitForJobRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SchedulerServiceServer).WaitForJob(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SchedulerService_WaitForJob_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServiceServer).WaitForJob(ctx, req.(*WaitForJobRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SchedulerService_JobHeartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JobHeartbeatRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SchedulerServiceServer).JobHeartbeat(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SchedulerService_JobHeartbeat_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServiceServer).JobHeartbeat(ctx, req.(*JobHeartbeatRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SchedulerService_CompleteJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CompleteJobRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SchedulerServiceServer).CompleteJob(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SchedulerService_CompleteJob_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServiceServer).CompleteJob(ctx, req.(*CompleteJobRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SchedulerService_PushJobLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PushJobLogRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SchedulerServiceServer).PushJobLog(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SchedulerService_PushJobLog_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServiceServer).PushJobLog(ctx, req.(*PushJobLogRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// SchedulerService_ServiceDesc is the grpc.ServiceDesc for SchedulerService service.
+// Scheduler_ServiceDesc is the grpc.ServiceDesc for Scheduler service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var SchedulerService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "scheduler.SchedulerService",
-	HandlerType: (*SchedulerServiceServer)(nil),
+var Scheduler_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "scheduler.Scheduler",
+	HandlerType: (*SchedulerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "RegisterWorker",
-			Handler:    _SchedulerService_RegisterWorker_Handler,
+			MethodName: "Heartbeat",
+			Handler:    _Scheduler_Heartbeat_Handler,
 		},
 		{
-			MethodName: "WorkerHeartbeat",
-			Handler:    _SchedulerService_WorkerHeartbeat_Handler,
-		},
-		{
-			MethodName: "WaitForJob",
-			Handler:    _SchedulerService_WaitForJob_Handler,
-		},
-		{
-			MethodName: "JobHeartbeat",
-			Handler:    _SchedulerService_JobHeartbeat_Handler,
-		},
-		{
-			MethodName: "CompleteJob",
-			Handler:    _SchedulerService_CompleteJob_Handler,
-		},
-		{
-			MethodName: "PushJobLog",
-			Handler:    _SchedulerService_PushJobLog_Handler,
+			MethodName: "ReportResult",
+			Handler:    _Scheduler_ReportResult_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

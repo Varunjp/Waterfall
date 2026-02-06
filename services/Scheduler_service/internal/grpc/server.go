@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	schedulerpb "scheduler_service/internal/grpc/schedulerpb"
+	"scheduler_service/internal/metrics"
 	"scheduler_service/internal/producer"
 	"time"
 
@@ -16,12 +17,13 @@ type Server struct {
 	schedulerpb.UnimplementedSchedulerServer
 	redis *redis.Client
 	producer *producer.KafkaProducer
+	metrics *metrics.SchedulerMetrics
 	log *zap.Logger
 
 }
 
-func NewServer(redis *redis.Client,p *producer.KafkaProducer , log *zap.Logger) *Server {
-	return &Server{redis: redis,producer: p,log: log}
+func NewServer(redis *redis.Client,p *producer.KafkaProducer,m *metrics.SchedulerMetrics , log *zap.Logger) *Server {
+	return &Server{redis: redis,producer: p, metrics: m,log: log}
 }
 
 func (s *Server) Heartbeat(ctx context.Context, req *schedulerpb.HeartbeatRequest)(*schedulerpb.Ack,error) {
@@ -52,9 +54,12 @@ func (s *Server) ReportResult(ctx context.Context,req *schedulerpb.JobResultRequ
 
 	status := "COMPLETED"
 	if req.Status == schedulerpb.JobResultStatus_JOB_RESULT_FAILED {
+		s.metrics.JobsFailed.Inc()
 		status = "FAILED"
+	}else {
+		s.metrics.JobsSuccess.Inc()
 	}
-
+	s.metrics.RunningJobs.Dec()
 	event := map[string]any{
 		"job_id": jobID,
 		"app_id": appID,
@@ -75,14 +80,14 @@ func (s *Server) ReportResult(ctx context.Context,req *schedulerpb.JobResultRequ
 	return &schedulerpb.Ack{Ok: true},nil 
 }
 
-func Run(ctx context.Context,addr string,redis *redis.Client,producer *producer.KafkaProducer,log *zap.Logger) error {
+func Run(ctx context.Context,addr string,redis *redis.Client,producer *producer.KafkaProducer,m *metrics.SchedulerMetrics ,log *zap.Logger) error {
 	lis,err := net.Listen("tcp",addr)
 	if err != nil {
 		return err 
 	}
 
 	grpcServer := grpc.NewServer()
-	schedulerpb.RegisterSchedulerServer(grpcServer,NewServer(redis,producer,log))
+	schedulerpb.RegisterSchedulerServer(grpcServer,NewServer(redis,producer,m,log))
 
 	go func() {
 		<-ctx.Done()

@@ -19,10 +19,14 @@ func NewAdminDb(dsn string) *AdminRepo {
 
 func (r *AdminRepo) Concurrency(appID string)(int,error) {
 	var limit int 
-	err := r.db.QueryRow(
-		"SELECT limit FROM apps WHERE id = $1",appID,
-	).Scan(&limit)
-	return limit,err 
+	limit = 10000
+	// Logic : implement logic for job run
+
+	// err := r.db.QueryRow(
+	// 	"SELECT limit FROM apps WHERE id = $1",appID,
+	// ).Scan(&limit)
+
+	return limit,nil  
 }
 
 // Need to correct logic here for better limit check

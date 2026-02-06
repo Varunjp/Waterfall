@@ -1,0 +1,10 @@
+package domain
+
+type Job struct {
+	JobID      string `json:"job_id"`
+	AppID      string `json:"app_id"`
+	Type       string `json:"type"`
+	Payload    string `json:"payload"`
+	Retry      int    `json:"retry"`
+	MaxRetries int    `json:"max_retries"`
+}

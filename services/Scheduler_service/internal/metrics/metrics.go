@@ -34,7 +34,7 @@ func NewMetrics() *SchedulerMetrics {
 			prometheus.GaugeOpts{
 				Name: "scheduler_pending_jobs",
 			},
-			[]string{"job_id","job_type"},
+			[]string{"job_type"},
 		),
 		RunningJobs: prometheus.NewGauge(
 			prometheus.GaugeOpts{

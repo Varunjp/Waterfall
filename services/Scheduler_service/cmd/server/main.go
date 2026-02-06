@@ -44,9 +44,9 @@ func main() {
 	kafkaConsumer := consumer.NewJobCreatedConsumer(cfg.Kafka.Brokers,cfg.Kafka.JobCreateTopic,cfg.Kafka.ConsumerGroup)
 	kafkaProducer := producer.NewKafkaProducer([]string{cfg.Kafka.Brokers},cfg.Kafka.JobUpdateTopic)
 
-	metrics := metrics.NewMetrics()
+	metricsP := metrics.NewMetrics()
 
-	assigner := usecase.NewAssigner(redisClient,adminRepo,metrics)
+	assigner := usecase.NewAssigner(redisClient,adminRepo,metricsP,kafkaProducer)
 	stallMonitor := usecase.NewStallMonitor(redisClient,kafkaProducer)
 
 	runner := scheduler.NewRunner(
@@ -66,9 +66,22 @@ func main() {
 				cfg.GRPC.Port,
 				redisClient.Client,
 				kafkaProducer,
+				metricsP,
 				log,
 			); err != nil {
 				log.Error("grpc server failed",zap.Error(err))
+			}
+		},
+
+		func(c context.Context) {
+			if cfg.Metrics.Enabled {
+				if err := metrics.RunServer(
+					c,
+					cfg.Metrics.Port,
+					log,
+				); err != nil {
+					log.Error("metrics server failed",zap.Error(err))
+				}
 			}
 		},
 	)

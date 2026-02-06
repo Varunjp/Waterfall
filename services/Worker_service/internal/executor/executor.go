@@ -2,12 +2,19 @@ package executor
 
 import (
 	"context"
+	"fmt"
+	"time"
 )
 
-type JobExecutor func(ctx context.Context, payload []byte) error
+func Execute(ctx context.Context,payload string) error {
 
-var Registry = map[string]JobExecutor{}
+	// 
+	fmt.Println("work done:",payload)
 
-func Register(jobType string, fn JobExecutor) {
-	Registry[jobType] = fn
+	select {
+	case <-time.After(1 *time.Second):
+		return nil 
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }

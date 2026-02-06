@@ -5,12 +5,12 @@ import "time"
 type Job struct {
 	JobID     	string `json:"job_id"`
 	AppID     	string `json:"app_id"`
-	Type      	string `json:"job_type"`
+	Type      	string `json:"type"`
 	Payload   	string `json:"payload"`
 	Status    	JobStatus
 	CreatedAt 	time.Time
 	UpdateAt 	time.Time
-	Retry 		int 
+	Retry 		int `json:"retry"`
 	MaxRetries  int `json:"max_retries"`
-	ScheduledAt time.Time
+	
 }
