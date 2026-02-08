@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"job_search_service/internal/domain"
+	"dashboard_service/internal/domain"
 )
 
 type JobRepository interface {

@@ -1,0 +1,44 @@
+package repository
+
+import (
+	"context"
+	"dashboard_service/internal/domain"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+type logRepo struct {
+	db *pgxpool.Pool
+}
+
+func NewLogRepo(db *pgxpool.Pool) JobLogRepository {
+	return &logRepo{db: db}
+}
+
+func (r *logRepo) GetByJobID(ctx context.Context,jobID, appID string)([]domain.JobLog,error) {
+
+	query := `
+	SELECT l.timestamp,l.level,l.message
+	FROM job_logs l
+	JOIN jobs j ON j.job_id = l.job_id
+	WHERE l.job_id=$1 AND j.app_id=$2
+	ORDER BY l.timestamp ASC
+	`
+
+	args := []any{jobID,appID}
+
+	rows,err := r.db.Query(ctx,query,args...)
+
+	if err != nil {
+		return nil,err 
+	}
+	defer rows.Close()
+
+	var logs []domain.JobLog
+	for rows.Next() {
+		var l domain.JobLog
+		rows.Scan(&l.Timestamp,&l.Level,&l.Message)
+		logs = append(logs, l)
+	}
+	return logs,nil 
+}

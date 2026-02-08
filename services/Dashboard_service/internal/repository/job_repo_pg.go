@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"job_search_service/internal/domain"
+	"dashboard_service/internal/domain"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
