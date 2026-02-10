@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        v6.33.1
-// source: admin/app_user.proto
+// source: internal/proto/admin/app_user.proto
 
 package adminpb
 
@@ -22,6 +22,102 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type AppLoginRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppLoginRequest) Reset() {
+	*x = AppLoginRequest{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppLoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppLoginRequest) ProtoMessage() {}
+
+func (x *AppLoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppLoginRequest.ProtoReflect.Descriptor instead.
+func (*AppLoginRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *AppLoginRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *AppLoginRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type AppLoginResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppLoginResponse) Reset() {
+	*x = AppLoginResponse{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppLoginResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppLoginResponse) ProtoMessage() {}
+
+func (x *AppLoginResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppLoginResponse.ProtoReflect.Descriptor instead.
+func (*AppLoginResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *AppLoginResponse) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
 type CreateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
@@ -33,7 +129,7 @@ type CreateUserRequest struct {
 
 func (x *CreateUserRequest) Reset() {
 	*x = CreateUserRequest{}
-	mi := &file_admin_app_user_proto_msgTypes[0]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +141,7 @@ func (x *CreateUserRequest) String() string {
 func (*CreateUserRequest) ProtoMessage() {}
 
 func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_app_user_proto_msgTypes[0]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +154,7 @@ func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return file_admin_app_user_proto_rawDescGZIP(), []int{0}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateUserRequest) GetEmail() string {
@@ -91,7 +187,7 @@ type ListUsersRequest struct {
 
 func (x *ListUsersRequest) Reset() {
 	*x = ListUsersRequest{}
-	mi := &file_admin_app_user_proto_msgTypes[1]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -103,7 +199,7 @@ func (x *ListUsersRequest) String() string {
 func (*ListUsersRequest) ProtoMessage() {}
 
 func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_app_user_proto_msgTypes[1]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -116,7 +212,7 @@ func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
 func (*ListUsersRequest) Descriptor() ([]byte, []int) {
-	return file_admin_app_user_proto_rawDescGZIP(), []int{1}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListUsersRequest) GetAppId() string {
@@ -138,7 +234,7 @@ type AppUser struct {
 
 func (x *AppUser) Reset() {
 	*x = AppUser{}
-	mi := &file_admin_app_user_proto_msgTypes[2]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -150,7 +246,7 @@ func (x *AppUser) String() string {
 func (*AppUser) ProtoMessage() {}
 
 func (x *AppUser) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_app_user_proto_msgTypes[2]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -163,7 +259,7 @@ func (x *AppUser) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppUser.ProtoReflect.Descriptor instead.
 func (*AppUser) Descriptor() ([]byte, []int) {
-	return file_admin_app_user_proto_rawDescGZIP(), []int{2}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AppUser) GetId() string {
@@ -203,7 +299,7 @@ type ListUsersResponse struct {
 
 func (x *ListUsersResponse) Reset() {
 	*x = ListUsersResponse{}
-	mi := &file_admin_app_user_proto_msgTypes[3]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -215,7 +311,7 @@ func (x *ListUsersResponse) String() string {
 func (*ListUsersResponse) ProtoMessage() {}
 
 func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_app_user_proto_msgTypes[3]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -228,7 +324,7 @@ func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
 func (*ListUsersResponse) Descriptor() ([]byte, []int) {
-	return file_admin_app_user_proto_rawDescGZIP(), []int{3}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListUsersResponse) GetUsers() []*AppUser {
@@ -238,11 +334,16 @@ func (x *ListUsersResponse) GetUsers() []*AppUser {
 	return nil
 }
 
-var File_admin_app_user_proto protoreflect.FileDescriptor
+var File_internal_proto_admin_app_user_proto protoreflect.FileDescriptor
 
-const file_admin_app_user_proto_rawDesc = "" +
+const file_internal_proto_admin_app_user_proto_rawDesc = "" +
 	"\n" +
-	"\x14admin/app_user.proto\x12\x05admin\x1a\x1bgoogle/protobuf/empty.proto\"Y\n" +
+	"#internal/proto/admin/app_user.proto\x12\x05admin\x1a\x1bgoogle/protobuf/empty.proto\"C\n" +
+	"\x0fAppLoginRequest\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"5\n" +
+	"\x10AppLoginResponse\x12!\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\"Y\n" +
 	"\x11CreateUserRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
@@ -255,65 +356,70 @@ const file_admin_app_user_proto_rawDesc = "" +
 	"\x04role\x18\x03 \x01(\tR\x04role\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\tR\x06status\"9\n" +
 	"\x11ListUsersResponse\x12$\n" +
-	"\x05users\x18\x01 \x03(\v2\x0e.admin.AppUserR\x05users2\x90\x01\n" +
+	"\x05users\x18\x01 \x03(\v2\x0e.admin.AppUserR\x05users2\xcd\x01\n" +
 	"\x0eAppUserService\x12>\n" +
 	"\n" +
 	"CreateUser\x12\x18.admin.CreateUserRequest\x1a\x16.google.protobuf.Empty\x12>\n" +
-	"\tListUsers\x12\x17.admin.ListUsersRequest\x1a\x18.admin.ListUsersResponseB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
+	"\tListUsers\x12\x17.admin.ListUsersRequest\x1a\x18.admin.ListUsersResponse\x12;\n" +
+	"\bAppLogin\x12\x16.admin.AppLoginRequest\x1a\x17.admin.AppLoginResponseB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
 
 var (
-	file_admin_app_user_proto_rawDescOnce sync.Once
-	file_admin_app_user_proto_rawDescData []byte
+	file_internal_proto_admin_app_user_proto_rawDescOnce sync.Once
+	file_internal_proto_admin_app_user_proto_rawDescData []byte
 )
 
-func file_admin_app_user_proto_rawDescGZIP() []byte {
-	file_admin_app_user_proto_rawDescOnce.Do(func() {
-		file_admin_app_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_app_user_proto_rawDesc), len(file_admin_app_user_proto_rawDesc)))
+func file_internal_proto_admin_app_user_proto_rawDescGZIP() []byte {
+	file_internal_proto_admin_app_user_proto_rawDescOnce.Do(func() {
+		file_internal_proto_admin_app_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_internal_proto_admin_app_user_proto_rawDesc), len(file_internal_proto_admin_app_user_proto_rawDesc)))
 	})
-	return file_admin_app_user_proto_rawDescData
+	return file_internal_proto_admin_app_user_proto_rawDescData
 }
 
-var file_admin_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_admin_app_user_proto_goTypes = []any{
-	(*CreateUserRequest)(nil), // 0: admin.CreateUserRequest
-	(*ListUsersRequest)(nil),  // 1: admin.ListUsersRequest
-	(*AppUser)(nil),           // 2: admin.AppUser
-	(*ListUsersResponse)(nil), // 3: admin.ListUsersResponse
-	(*emptypb.Empty)(nil),     // 4: google.protobuf.Empty
+var file_internal_proto_admin_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_internal_proto_admin_app_user_proto_goTypes = []any{
+	(*AppLoginRequest)(nil),   // 0: admin.AppLoginRequest
+	(*AppLoginResponse)(nil),  // 1: admin.AppLoginResponse
+	(*CreateUserRequest)(nil), // 2: admin.CreateUserRequest
+	(*ListUsersRequest)(nil),  // 3: admin.ListUsersRequest
+	(*AppUser)(nil),           // 4: admin.AppUser
+	(*ListUsersResponse)(nil), // 5: admin.ListUsersResponse
+	(*emptypb.Empty)(nil),     // 6: google.protobuf.Empty
 }
-var file_admin_app_user_proto_depIdxs = []int32{
-	2, // 0: admin.ListUsersResponse.users:type_name -> admin.AppUser
-	0, // 1: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
-	1, // 2: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
-	4, // 3: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
-	3, // 4: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
+var file_internal_proto_admin_app_user_proto_depIdxs = []int32{
+	4, // 0: admin.ListUsersResponse.users:type_name -> admin.AppUser
+	2, // 1: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
+	3, // 2: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
+	0, // 3: admin.AppUserService.AppLogin:input_type -> admin.AppLoginRequest
+	6, // 4: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
+	5, // 5: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
+	1, // 6: admin.AppUserService.AppLogin:output_type -> admin.AppLoginResponse
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_admin_app_user_proto_init() }
-func file_admin_app_user_proto_init() {
-	if File_admin_app_user_proto != nil {
+func init() { file_internal_proto_admin_app_user_proto_init() }
+func file_internal_proto_admin_app_user_proto_init() {
+	if File_internal_proto_admin_app_user_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_app_user_proto_rawDesc), len(file_admin_app_user_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_app_user_proto_rawDesc), len(file_internal_proto_admin_app_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_admin_app_user_proto_goTypes,
-		DependencyIndexes: file_admin_app_user_proto_depIdxs,
-		MessageInfos:      file_admin_app_user_proto_msgTypes,
+		GoTypes:           file_internal_proto_admin_app_user_proto_goTypes,
+		DependencyIndexes: file_internal_proto_admin_app_user_proto_depIdxs,
+		MessageInfos:      file_internal_proto_admin_app_user_proto_msgTypes,
 	}.Build()
-	File_admin_app_user_proto = out.File
-	file_admin_app_user_proto_goTypes = nil
-	file_admin_app_user_proto_depIdxs = nil
+	File_internal_proto_admin_app_user_proto = out.File
+	file_internal_proto_admin_app_user_proto_goTypes = nil
+	file_internal_proto_admin_app_user_proto_depIdxs = nil
 }

@@ -10,10 +10,11 @@ import (
 
 type AppUserService struct {
 	repo repo.AppUserRepository
+	secret string 
 }
 
-func NewAppUserService(r repo.AppUserRepository) *AppUserService {
-	return &AppUserService{repo: r}
+func NewAppUserService(r repo.AppUserRepository,secret string) *AppUserService {
+	return &AppUserService{repo: r,secret: secret}
 }
 
 func (s *AppUserService) Create(email, password, role string) error {
@@ -39,4 +40,15 @@ func (s *AppUserService) Create(email, password, role string) error {
 
 func (s *AppUserService) List(appID string) ([]*entities.AppUser, error) {
 	return s.repo.FindByApp(appID)
+}
+
+func (s *AppUserService) Login(email,password string)(string,error) {
+	appUser,err := s.repo.FindByEmail(email)
+	if err != nil {
+		return "",err 
+	}
+	if err := security.Compare(appUser.PasswordHash,password); err != nil {
+		return "",err 
+	}
+	return security.GenerateJWT(s.secret,appUser.ID,appUser.Role,appUser.AppID)
 }

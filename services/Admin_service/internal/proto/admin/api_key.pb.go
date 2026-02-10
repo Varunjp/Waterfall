@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        v6.33.1
-// source: admin/api_key.proto
+// source: internal/proto/admin/api_key.proto
 
 package adminpb
 
@@ -32,7 +32,7 @@ type CreateApiKeyRequest struct {
 
 func (x *CreateApiKeyRequest) Reset() {
 	*x = CreateApiKeyRequest{}
-	mi := &file_admin_api_key_proto_msgTypes[0]
+	mi := &file_internal_proto_admin_api_key_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -44,7 +44,7 @@ func (x *CreateApiKeyRequest) String() string {
 func (*CreateApiKeyRequest) ProtoMessage() {}
 
 func (x *CreateApiKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_api_key_proto_msgTypes[0]
+	mi := &file_internal_proto_admin_api_key_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +57,7 @@ func (x *CreateApiKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateApiKeyRequest.ProtoReflect.Descriptor instead.
 func (*CreateApiKeyRequest) Descriptor() ([]byte, []int) {
-	return file_admin_api_key_proto_rawDescGZIP(), []int{0}
+	return file_internal_proto_admin_api_key_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *CreateApiKeyRequest) GetAppId() string {
@@ -83,7 +83,7 @@ type CreateApiKeyResponse struct {
 
 func (x *CreateApiKeyResponse) Reset() {
 	*x = CreateApiKeyResponse{}
-	mi := &file_admin_api_key_proto_msgTypes[1]
+	mi := &file_internal_proto_admin_api_key_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -95,7 +95,7 @@ func (x *CreateApiKeyResponse) String() string {
 func (*CreateApiKeyResponse) ProtoMessage() {}
 
 func (x *CreateApiKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_api_key_proto_msgTypes[1]
+	mi := &file_internal_proto_admin_api_key_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -108,7 +108,7 @@ func (x *CreateApiKeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateApiKeyResponse.ProtoReflect.Descriptor instead.
 func (*CreateApiKeyResponse) Descriptor() ([]byte, []int) {
-	return file_admin_api_key_proto_rawDescGZIP(), []int{1}
+	return file_internal_proto_admin_api_key_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CreateApiKeyResponse) GetApiKey() string {
@@ -127,7 +127,7 @@ type RevokeApiKeyRequest struct {
 
 func (x *RevokeApiKeyRequest) Reset() {
 	*x = RevokeApiKeyRequest{}
-	mi := &file_admin_api_key_proto_msgTypes[2]
+	mi := &file_internal_proto_admin_api_key_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -139,7 +139,7 @@ func (x *RevokeApiKeyRequest) String() string {
 func (*RevokeApiKeyRequest) ProtoMessage() {}
 
 func (x *RevokeApiKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_api_key_proto_msgTypes[2]
+	mi := &file_internal_proto_admin_api_key_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -152,7 +152,7 @@ func (x *RevokeApiKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeApiKeyRequest.ProtoReflect.Descriptor instead.
 func (*RevokeApiKeyRequest) Descriptor() ([]byte, []int) {
-	return file_admin_api_key_proto_rawDescGZIP(), []int{2}
+	return file_internal_proto_admin_api_key_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *RevokeApiKeyRequest) GetKeyId() string {
@@ -162,11 +162,11 @@ func (x *RevokeApiKeyRequest) GetKeyId() string {
 	return ""
 }
 
-var File_admin_api_key_proto protoreflect.FileDescriptor
+var File_internal_proto_admin_api_key_proto protoreflect.FileDescriptor
 
-const file_admin_api_key_proto_rawDesc = "" +
+const file_internal_proto_admin_api_key_proto_rawDesc = "" +
 	"\n" +
-	"\x13admin/api_key.proto\x12\x05admin\x1a\x1bgoogle/protobuf/empty.proto\"D\n" +
+	"\"internal/proto/admin/api_key.proto\x12\x05admin\x1a\x1bgoogle/protobuf/empty.proto\"D\n" +
 	"\x13CreateApiKeyRequest\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x16\n" +
 	"\x06scopes\x18\x02 \x03(\tR\x06scopes\"/\n" +
@@ -179,25 +179,25 @@ const file_admin_api_key_proto_rawDesc = "" +
 	"\x06Revoke\x12\x1a.admin.RevokeApiKeyRequest\x1a\x16.google.protobuf.EmptyB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
 
 var (
-	file_admin_api_key_proto_rawDescOnce sync.Once
-	file_admin_api_key_proto_rawDescData []byte
+	file_internal_proto_admin_api_key_proto_rawDescOnce sync.Once
+	file_internal_proto_admin_api_key_proto_rawDescData []byte
 )
 
-func file_admin_api_key_proto_rawDescGZIP() []byte {
-	file_admin_api_key_proto_rawDescOnce.Do(func() {
-		file_admin_api_key_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_api_key_proto_rawDesc), len(file_admin_api_key_proto_rawDesc)))
+func file_internal_proto_admin_api_key_proto_rawDescGZIP() []byte {
+	file_internal_proto_admin_api_key_proto_rawDescOnce.Do(func() {
+		file_internal_proto_admin_api_key_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_internal_proto_admin_api_key_proto_rawDesc), len(file_internal_proto_admin_api_key_proto_rawDesc)))
 	})
-	return file_admin_api_key_proto_rawDescData
+	return file_internal_proto_admin_api_key_proto_rawDescData
 }
 
-var file_admin_api_key_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_admin_api_key_proto_goTypes = []any{
+var file_internal_proto_admin_api_key_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_internal_proto_admin_api_key_proto_goTypes = []any{
 	(*CreateApiKeyRequest)(nil),  // 0: admin.CreateApiKeyRequest
 	(*CreateApiKeyResponse)(nil), // 1: admin.CreateApiKeyResponse
 	(*RevokeApiKeyRequest)(nil),  // 2: admin.RevokeApiKeyRequest
 	(*emptypb.Empty)(nil),        // 3: google.protobuf.Empty
 }
-var file_admin_api_key_proto_depIdxs = []int32{
+var file_internal_proto_admin_api_key_proto_depIdxs = []int32{
 	0, // 0: admin.ApiKeyService.Create:input_type -> admin.CreateApiKeyRequest
 	2, // 1: admin.ApiKeyService.Revoke:input_type -> admin.RevokeApiKeyRequest
 	1, // 2: admin.ApiKeyService.Create:output_type -> admin.CreateApiKeyResponse
@@ -209,26 +209,26 @@ var file_admin_api_key_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_admin_api_key_proto_init() }
-func file_admin_api_key_proto_init() {
-	if File_admin_api_key_proto != nil {
+func init() { file_internal_proto_admin_api_key_proto_init() }
+func file_internal_proto_admin_api_key_proto_init() {
+	if File_internal_proto_admin_api_key_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_api_key_proto_rawDesc), len(file_admin_api_key_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_api_key_proto_rawDesc), len(file_internal_proto_admin_api_key_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_admin_api_key_proto_goTypes,
-		DependencyIndexes: file_admin_api_key_proto_depIdxs,
-		MessageInfos:      file_admin_api_key_proto_msgTypes,
+		GoTypes:           file_internal_proto_admin_api_key_proto_goTypes,
+		DependencyIndexes: file_internal_proto_admin_api_key_proto_depIdxs,
+		MessageInfos:      file_internal_proto_admin_api_key_proto_msgTypes,
 	}.Build()
-	File_admin_api_key_proto = out.File
-	file_admin_api_key_proto_goTypes = nil
-	file_admin_api_key_proto_depIdxs = nil
+	File_internal_proto_admin_api_key_proto = out.File
+	file_internal_proto_admin_api_key_proto_goTypes = nil
+	file_internal_proto_admin_api_key_proto_depIdxs = nil
 }

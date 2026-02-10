@@ -13,12 +13,14 @@ type AppUserHandler struct {
 	usecase interface {
 		Create(string, string, string) error
 		List(string) ([]*entities.AppUser, error)
+		Login(email,password string)(string,error)
 	}
 }
 
 func NewAppUserHandler(u interface {
 	Create(string, string, string) error
 	List(string) ([]*entities.AppUser, error)
+	Login(email,password string)(string,error)
 }) *AppUserHandler {
 	return &AppUserHandler{usecase: u}
 }
@@ -46,4 +48,12 @@ func (h *AppUserHandler) ListUsers(ctx context.Context, req *pb.ListUsersRequest
 	}
 
 	return &pb.ListUsersResponse{Users: res}, nil
+}
+
+func (h *AppUserHandler) Login(ctx context.Context, req *pb.AppLoginRequest) (*pb.AppLoginResponse,error) {
+	token,err := h.usecase.Login(req.Email,req.Password)
+	if err != nil {
+		return nil,err 
+	}
+	return &pb.AppLoginResponse{AccessToken: token},nil 
 }

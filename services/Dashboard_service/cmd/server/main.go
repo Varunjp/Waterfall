@@ -41,7 +41,7 @@ func main() {
 		grpcclient.NewHandler(uc),
 	)
 
-	lis,err := net.Listen("tpc",cfg.ServiceAddr)
+	lis,err := net.Listen("tcp",cfg.ServiceAddr)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -30,10 +30,10 @@ func main() {
 
 	usecase := service.NewAdminService(repo,cfg.JWTKey)
 	appRepo := postgres.NewAppRepo(dbConn)
+	appUserRepo := postgres.NewAppUserRepo(dbConn)
 	appUsecase := service.NewAppService(appRepo)
 	appHandler := handlers.NewAppHandler(appUsecase)
-	appUserRepo := postgres.NewAppUserRepo(dbConn)
-	appUserUC := service.NewAppUserService(appUserRepo)
+	appUserUC := service.NewAppUserService(appUserRepo,cfg.JWTKey)
 	appUserHandler := handlers.NewAppUserHandler(appUserUC)
 
 	apiKeyRepo := postgres.NewApiKeyRepo(dbConn)

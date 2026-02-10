@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v6.33.1
-// source: admin/api_key.proto
+// source: internal/proto/admin/api_key.proto
 
 package adminpb
 
@@ -156,5 +156,5 @@ var ApiKeyService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/api_key.proto",
+	Metadata: "internal/proto/admin/api_key.proto",
 }

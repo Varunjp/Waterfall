@@ -52,3 +52,21 @@ func (r *AppUserRepo) FindByApp(appID string) ([]*entities.AppUser, error) {
 	}
 	return users, nil
 }
+
+func (r *AppUserRepo) FindByEmail(email string) (*entities.AppUser,error) {
+	row := r.db.QueryRow(
+		`SELECT id,app_id,email,password_hash,role,status,created_at
+		FROM app_users WHERE email = $1`,email,
+	)
+
+	var appUser entities.AppUser
+	err := row.Scan(&appUser.ID,&appUser.AppID,&appUser.PasswordHash,&appUser.Role,&appUser.Status,&appUser.CreatedAt)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil,nil 
+		}
+		return nil,err 
+	}
+	return &appUser,nil 
+}

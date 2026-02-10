@@ -15,7 +15,7 @@ type Config struct {
 
 func Load() *Config {
 	cfg := &Config{
-		ServiceAddr:  get("SERVICE_ADDR", ":9001"),
+		ServiceAddr:  get("SERVICE_ADDR", ":50053"),
 		DBDSN:        must("DB_DSN"),
 		JWTSecret:    must("JWT_SECRET"),
 		JobQueueAddr: must("JOB_QUEUE_ADDR"),

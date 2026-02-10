@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        v6.33.1
-// source: admin/email.proto
+// source: internal/proto/admin/email.proto
 
 package adminpb
 
@@ -33,7 +33,7 @@ type ConfigureEmailRequest struct {
 
 func (x *ConfigureEmailRequest) Reset() {
 	*x = ConfigureEmailRequest{}
-	mi := &file_admin_email_proto_msgTypes[0]
+	mi := &file_internal_proto_admin_email_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +45,7 @@ func (x *ConfigureEmailRequest) String() string {
 func (*ConfigureEmailRequest) ProtoMessage() {}
 
 func (x *ConfigureEmailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_email_proto_msgTypes[0]
+	mi := &file_internal_proto_admin_email_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *ConfigureEmailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigureEmailRequest.ProtoReflect.Descriptor instead.
 func (*ConfigureEmailRequest) Descriptor() ([]byte, []int) {
-	return file_admin_email_proto_rawDescGZIP(), []int{0}
+	return file_internal_proto_admin_email_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ConfigureEmailRequest) GetAppId() string {
@@ -82,11 +82,11 @@ func (x *ConfigureEmailRequest) GetFromEmail() string {
 	return ""
 }
 
-var File_admin_email_proto protoreflect.FileDescriptor
+var File_internal_proto_admin_email_proto protoreflect.FileDescriptor
 
-const file_admin_email_proto_rawDesc = "" +
+const file_internal_proto_admin_email_proto_rawDesc = "" +
 	"\n" +
-	"\x11admin/email.proto\x12\x05admin\x1a\x1bgoogle/protobuf/empty.proto\"i\n" +
+	" internal/proto/admin/email.proto\x12\x05admin\x1a\x1bgoogle/protobuf/empty.proto\"i\n" +
 	"\x15ConfigureEmailRequest\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x1a\n" +
 	"\bprovider\x18\x02 \x01(\tR\bprovider\x12\x1d\n" +
@@ -96,23 +96,23 @@ const file_admin_email_proto_rawDesc = "" +
 	"\tConfigure\x12\x1c.admin.ConfigureEmailRequest\x1a\x16.google.protobuf.EmptyB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
 
 var (
-	file_admin_email_proto_rawDescOnce sync.Once
-	file_admin_email_proto_rawDescData []byte
+	file_internal_proto_admin_email_proto_rawDescOnce sync.Once
+	file_internal_proto_admin_email_proto_rawDescData []byte
 )
 
-func file_admin_email_proto_rawDescGZIP() []byte {
-	file_admin_email_proto_rawDescOnce.Do(func() {
-		file_admin_email_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_email_proto_rawDesc), len(file_admin_email_proto_rawDesc)))
+func file_internal_proto_admin_email_proto_rawDescGZIP() []byte {
+	file_internal_proto_admin_email_proto_rawDescOnce.Do(func() {
+		file_internal_proto_admin_email_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_internal_proto_admin_email_proto_rawDesc), len(file_internal_proto_admin_email_proto_rawDesc)))
 	})
-	return file_admin_email_proto_rawDescData
+	return file_internal_proto_admin_email_proto_rawDescData
 }
 
-var file_admin_email_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_admin_email_proto_goTypes = []any{
+var file_internal_proto_admin_email_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_internal_proto_admin_email_proto_goTypes = []any{
 	(*ConfigureEmailRequest)(nil), // 0: admin.ConfigureEmailRequest
 	(*emptypb.Empty)(nil),         // 1: google.protobuf.Empty
 }
-var file_admin_email_proto_depIdxs = []int32{
+var file_internal_proto_admin_email_proto_depIdxs = []int32{
 	0, // 0: admin.EmailService.Configure:input_type -> admin.ConfigureEmailRequest
 	1, // 1: admin.EmailService.Configure:output_type -> google.protobuf.Empty
 	1, // [1:2] is the sub-list for method output_type
@@ -122,26 +122,26 @@ var file_admin_email_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_admin_email_proto_init() }
-func file_admin_email_proto_init() {
-	if File_admin_email_proto != nil {
+func init() { file_internal_proto_admin_email_proto_init() }
+func file_internal_proto_admin_email_proto_init() {
+	if File_internal_proto_admin_email_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_email_proto_rawDesc), len(file_admin_email_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_email_proto_rawDesc), len(file_internal_proto_admin_email_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_admin_email_proto_goTypes,
-		DependencyIndexes: file_admin_email_proto_depIdxs,
-		MessageInfos:      file_admin_email_proto_msgTypes,
+		GoTypes:           file_internal_proto_admin_email_proto_goTypes,
+		DependencyIndexes: file_internal_proto_admin_email_proto_depIdxs,
+		MessageInfos:      file_internal_proto_admin_email_proto_msgTypes,
 	}.Build()
-	File_admin_email_proto = out.File
-	file_admin_email_proto_goTypes = nil
-	file_admin_email_proto_depIdxs = nil
+	File_internal_proto_admin_email_proto = out.File
+	file_internal_proto_admin_email_proto_goTypes = nil
+	file_internal_proto_admin_email_proto_depIdxs = nil
 }

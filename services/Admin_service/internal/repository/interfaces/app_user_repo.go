@@ -5,4 +5,5 @@ import "admin_service/internal/domain/entities"
 type AppUserRepository interface {
 	Create(user *entities.AppUser) error
 	FindByApp(appID string) ([]*entities.AppUser, error)
+	FindByEmail(email string) (*entities.AppUser,error)
 }

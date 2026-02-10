@@ -2,9 +2,12 @@ package service
 
 import (
 	"admin_service/internal/domain/entities"
+	"admin_service/internal/infrastructure/security"
 	"admin_service/internal/pkg/validation"
 	repo "admin_service/internal/repository/interfaces"
 	"errors"
+	"log"
+	"time"
 )
 
 var (
@@ -37,11 +40,33 @@ func (s *AppService) Register(name,email string) error {
 		Tier: "free",
 	}
 
-	if err := s.repo.Create(app); err != nil {
+	appID,err := s.repo.Create(app);
+
+	if  err != nil {
 		return err 
 	}
 
 	// Logic: need to implement super user here
+	pass := name+time.Now().Format("dd/MM/YYYY")
+	hash,err := security.Hash(pass)
+
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	appUser := &entities.AppUser{
+		AppID: appID,
+		Email: email,
+		PasswordHash: hash,
+		Role: "super_admin",
+		Status: "active",
+	}
+
+	err = s.repo.CreateFirst(appUser)
+
+	if err != nil {
+		return err 
+	}
 
 	return nil 
 }

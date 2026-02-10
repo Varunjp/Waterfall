@@ -13,13 +13,30 @@ func NewAppRepo(db *sql.DB) *AppRepo {
 	return &AppRepo{db}
 }
 
-func (r *AppRepo) Create(app *entities.App) error {
-	_,err := r.db.Exec(`
-		INSERT INTO apps(app_name,app_email,status,tier)
-		VALUES($1,$2,$3,$4)
-	`,app.AppName,app.AppEmail,app.Status,app.Tier)
+func (r *AppRepo) Create(app *entities.App) (string,error) {
+	var appID string 
 
-	return err 
+	err := r.db.QueryRow(`
+		INSERT INTO apps (app_name, app_email, status, tier)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id
+	`,
+		app.AppName,
+		app.AppEmail,
+		app.Status,
+		app.Tier,
+	).Scan(&appID)
+
+	// _,err := r.db.Exec(`
+	// 	INSERT INTO apps(app_name,app_email,status,tier)
+	// 	VALUES($1,$2,$3,$4)
+	// `,app.AppName,app.AppEmail,app.Status,app.Tier)
+
+	if err != nil {
+		return "",err 
+	}
+
+	return appID,nil 
 }
 
 func (r *AppRepo) FindAll()([]*entities.App,error) {

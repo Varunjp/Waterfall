@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v6.33.1
-// source: admin/email.proto
+// source: internal/proto/admin/email.proto
 
 package adminpb
 
@@ -118,5 +118,5 @@ var EmailService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/email.proto",
+	Metadata: "internal/proto/admin/email.proto",
 }

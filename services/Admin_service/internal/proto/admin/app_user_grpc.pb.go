@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v6.33.1
-// source: admin/app_user.proto
+// source: internal/proto/admin/app_user.proto
 
 package adminpb
 
@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	AppUserService_CreateUser_FullMethodName = "/admin.AppUserService/CreateUser"
 	AppUserService_ListUsers_FullMethodName  = "/admin.AppUserService/ListUsers"
+	AppUserService_AppLogin_FullMethodName   = "/admin.AppUserService/AppLogin"
 )
 
 // AppUserServiceClient is the client API for AppUserService service.
@@ -30,6 +31,7 @@ const (
 type AppUserServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
+	AppLogin(ctx context.Context, in *AppLoginRequest, opts ...grpc.CallOption) (*AppLoginResponse, error)
 }
 
 type appUserServiceClient struct {
@@ -60,12 +62,23 @@ func (c *appUserServiceClient) ListUsers(ctx context.Context, in *ListUsersReque
 	return out, nil
 }
 
+func (c *appUserServiceClient) AppLogin(ctx context.Context, in *AppLoginRequest, opts ...grpc.CallOption) (*AppLoginResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AppLoginResponse)
+	err := c.cc.Invoke(ctx, AppUserService_AppLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppUserServiceServer is the server API for AppUserService service.
 // All implementations must embed UnimplementedAppUserServiceServer
 // for forward compatibility.
 type AppUserServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*emptypb.Empty, error)
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
+	AppLogin(context.Context, *AppLoginRequest) (*AppLoginResponse, error)
 	mustEmbedUnimplementedAppUserServiceServer()
 }
 
@@ -81,6 +94,9 @@ func (UnimplementedAppUserServiceServer) CreateUser(context.Context, *CreateUser
 }
 func (UnimplementedAppUserServiceServer) ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListUsers not implemented")
+}
+func (UnimplementedAppUserServiceServer) AppLogin(context.Context, *AppLoginRequest) (*AppLoginResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AppLogin not implemented")
 }
 func (UnimplementedAppUserServiceServer) mustEmbedUnimplementedAppUserServiceServer() {}
 func (UnimplementedAppUserServiceServer) testEmbeddedByValue()                        {}
@@ -139,6 +155,24 @@ func _AppUserService_ListUsers_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppUserService_AppLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppUserServiceServer).AppLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppUserService_AppLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppUserServiceServer).AppLogin(ctx, req.(*AppLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AppUserService_ServiceDesc is the grpc.ServiceDesc for AppUserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -154,7 +188,11 @@ var AppUserService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "ListUsers",
 			Handler:    _AppUserService_ListUsers_Handler,
 		},
+		{
+			MethodName: "AppLogin",
+			Handler:    _AppUserService_AppLogin_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/app_user.proto",
+	Metadata: "internal/proto/admin/app_user.proto",
 }
