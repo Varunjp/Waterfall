@@ -48,6 +48,7 @@ func main() {
 
 	assigner := usecase.NewAssigner(redisClient,adminRepo,metricsP,kafkaProducer)
 	stallMonitor := usecase.NewStallMonitor(redisClient,kafkaProducer)
+	resultProcess := usecase.NewJobResultProcess(adminRepo,metricsP,kafkaProducer,log,3)
 
 	runner := scheduler.NewRunner(
 		kafkaConsumer,assigner,kafkaProducer,redisClient.Client,log,
@@ -67,6 +68,7 @@ func main() {
 				redisClient.Client,
 				kafkaProducer,
 				metricsP,
+				resultProcess,
 				log,
 			); err != nil {
 				log.Error("grpc server failed",zap.Error(err))

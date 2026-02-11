@@ -155,6 +155,7 @@ type JobResultRequest struct {
 	ErrorMessage  string                 `protobuf:"bytes,5,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
 	Stacktrace    string                 `protobuf:"bytes,6,opt,name=stacktrace,proto3" json:"stacktrace,omitempty"`
 	Timestamp     int64                  `protobuf:"varint,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Retry         int32                  `protobuf:"varint,8,opt,name=retry,proto3" json:"retry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -238,6 +239,13 @@ func (x *JobResultRequest) GetTimestamp() int64 {
 	return 0
 }
 
+func (x *JobResultRequest) GetRetry() int32 {
+	if x != nil {
+		return x.Retry
+	}
+	return 0
+}
+
 type Ack struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
@@ -292,7 +300,7 @@ const file_proto_scheduler_proto_rawDesc = "" +
 	"\x06app_id\x18\x02 \x01(\tR\x05appId\x12\x1b\n" +
 	"\tworker_id\x18\x03 \x01(\tR\bworkerId\x12\x1a\n" +
 	"\bprogress\x18\x04 \x01(\x03R\bprogress\x12\x1c\n" +
-	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\"\xf4\x01\n" +
+	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\"\x8a\x02\n" +
 	"\x10JobResultRequest\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x15\n" +
 	"\x06app_id\x18\x02 \x01(\tR\x05appId\x12\x1b\n" +
@@ -302,7 +310,8 @@ const file_proto_scheduler_proto_rawDesc = "" +
 	"\n" +
 	"stacktrace\x18\x06 \x01(\tR\n" +
 	"stacktrace\x12\x1c\n" +
-	"\ttimestamp\x18\a \x01(\x03R\ttimestamp\"\x15\n" +
+	"\ttimestamp\x18\a \x01(\x03R\ttimestamp\x12\x14\n" +
+	"\x05retry\x18\b \x01(\x05R\x05retry\"\x15\n" +
 	"\x03Ack\x12\x0e\n" +
 	"\x02ok\x18\x01 \x01(\bR\x02ok*X\n" +
 	"\x0fJobResultStatus\x12\x16\n" +

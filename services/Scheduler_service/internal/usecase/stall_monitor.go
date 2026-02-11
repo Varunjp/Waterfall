@@ -76,10 +76,10 @@ func (s *StallMonitor) handlestall(ctx context.Context,jobID string) {
 
 		return 
 	}
-
 	s.producer.Publish(ctx,map[string]any{
 		"job_id": job.JobID,
-		"status": "RETRYING",
+		"status": "JOB_RETRYING",
+		"retry": job.Retry,
 	})
 
 	s.redis.LPush(ctx,"job:ingress",raw)

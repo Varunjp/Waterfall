@@ -28,6 +28,7 @@ message JobResultRequest {
   string stacktrace      = 6;
 
   int64 timestamp = 7;
+  int32 retry = 8;
 }
 
 enum JobResultStatus {

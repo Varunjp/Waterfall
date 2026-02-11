@@ -18,7 +18,7 @@ func NewConsumeJobUsecase(r interfaces.JobRepository, l *zap.Logger) *ConsumeJob
 }
 
 func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) error {
-
+	
 	switch event.EventType {
 	case domain.JobCreated:
 		job := domain.Job{
@@ -40,6 +40,8 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 		return uc.repo.UpdateStatus(ctx,event.JobID,domain.StatusFailed)
 	case domain.JobComplete:
 		return uc.repo.UpdateStatus(ctx,event.JobID,domain.StatusSuccess)
+	case domain.JobRetry:
+		return uc.repo.RetryJob(ctx,event.JobID,domain.StatusScheduled,event.Retry)
 	}
 
 	return nil 

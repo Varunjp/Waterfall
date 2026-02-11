@@ -51,7 +51,6 @@ func (r *Runner) Run(ctx context.Context) {
 				r.log.Error("kafka read failed",zap.Error(err))
 				continue
 			}
-
 			r.handleMessage(ctx,msg)
 		}
 	}
@@ -65,6 +64,7 @@ func (r *Runner) handleMessage(ctx context.Context,raw []byte) {
 	}
 
 	err := r.assigner.Assign(ctx,job)
+	
 	if err != nil {
 		r.handleAssignFailure(ctx,job,err)
 		return 

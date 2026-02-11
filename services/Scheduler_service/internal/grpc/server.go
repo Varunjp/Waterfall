@@ -3,6 +3,7 @@ package grpcserver
 import (
 	"context"
 	"net"
+	"scheduler_service/internal/domain"
 	schedulerpb "scheduler_service/internal/grpc/schedulerpb"
 	"scheduler_service/internal/metrics"
 	"scheduler_service/internal/producer"
@@ -18,12 +19,13 @@ type Server struct {
 	redis *redis.Client
 	producer *producer.KafkaProducer
 	metrics *metrics.SchedulerMetrics
+	jobResultProcess domain.JobResultUsecase
 	log *zap.Logger
 
 }
 
-func NewServer(redis *redis.Client,p *producer.KafkaProducer,m *metrics.SchedulerMetrics , log *zap.Logger) *Server {
-	return &Server{redis: redis,producer: p, metrics: m,log: log}
+func NewServer(redis *redis.Client,p *producer.KafkaProducer,m *metrics.SchedulerMetrics,j domain.JobResultUsecase , log *zap.Logger) *Server {
+	return &Server{redis: redis,producer: p, metrics: m, jobResultProcess: j,log: log}
 }
 
 func (s *Server) Heartbeat(ctx context.Context, req *schedulerpb.HeartbeatRequest)(*schedulerpb.Ack,error) {
@@ -60,34 +62,30 @@ func (s *Server) ReportResult(ctx context.Context,req *schedulerpb.JobResultRequ
 		s.metrics.JobsSuccess.Inc()
 	}
 	s.metrics.RunningJobs.Dec()
-	event := map[string]any{
-		"job_id": jobID,
-		"app_id": appID,
-		"status": status,
-		"error": req.ErrorMessage,
+
+	input := domain.JobResultInput{
+		JobID: jobID,
+		AppID: appID,
+		Status: status,
+		Retry: int(req.Retry),
+		ErrorMessage: req.ErrorMessage,
 	}
 
-	if err := s.producer.Publish(ctx,event); err != nil {
-		s.log.Error("failed to publish job result",zap.Error(err))
+	if err := s.jobResultProcess.ProcessJobResult(ctx,input); err != nil {
 		return &schedulerpb.Ack{Ok: false},err 
 	}
-
-	s.log.Info("job result processed",
-		zap.String("job_id",jobID),
-		zap.String("status",status),
-	)
 
 	return &schedulerpb.Ack{Ok: true},nil 
 }
 
-func Run(ctx context.Context,addr string,redis *redis.Client,producer *producer.KafkaProducer,m *metrics.SchedulerMetrics ,log *zap.Logger) error {
+func Run(ctx context.Context,addr string,redis *redis.Client,producer *producer.KafkaProducer,m *metrics.SchedulerMetrics, j domain.JobResultUsecase,log *zap.Logger) error {
 	lis,err := net.Listen("tcp",addr)
 	if err != nil {
 		return err 
 	}
 
 	grpcServer := grpc.NewServer()
-	schedulerpb.RegisterSchedulerServer(grpcServer,NewServer(redis,producer,m,log))
+	schedulerpb.RegisterSchedulerServer(grpcServer,NewServer(redis,producer,m,j,log))
 
 	go func() {
 		<-ctx.Done()

@@ -31,6 +31,7 @@ const (
 	JobCanceled JobEventType = "JOB_CANCELED"
 	JobFailed  JobEventType = "JOB_FAILED"
 	JobComplete JobEventType = "JOB_COMPLETED"
+	JobRetry   JobEventType = "JOB_RETRY"
 )
 
 type JobEvent struct {
@@ -40,4 +41,5 @@ type JobEvent struct {
 	Payload   string       `json:"payload"`
 	EventType JobEventType `json:"event_type"`
 	Timestamp time.Time    `json:"timestamp"`
+	Retry     int          `json:"retry"`
 }

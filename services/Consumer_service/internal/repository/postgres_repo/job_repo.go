@@ -46,3 +46,11 @@ func (r *JobRepo) UpdateStatus(ctx context.Context, jobID string, status domain.
 	)
 	return err 
 }
+
+func (r *JobRepo) RetryJob(ctx context.Context,jobID string, status domain.JobStatus, retry int) error {
+	_,err := r.db.ExecContext(ctx,
+		`UPDATE jobs SET status=$1,retry=$2, schedule_at=NOW() WHERE job_id=$3`,
+		status,retry,jobID,
+	)
+	return err 
+}
