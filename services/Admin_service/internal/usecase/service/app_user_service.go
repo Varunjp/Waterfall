@@ -42,7 +42,7 @@ func (s *AppUserService) List(appID string) ([]*entities.AppUser, error) {
 	return s.repo.FindByApp(appID)
 }
 
-func (s *AppUserService) Login(email,password string)(string,error) {
+func (s *AppUserService) AppLogin(email,password string)(string,error) {
 	appUser,err := s.repo.FindByEmail(email)
 	if err != nil {
 		return "",err 

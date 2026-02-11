@@ -2,9 +2,11 @@ package usecase
 
 import (
 	"context"
+	"dashboard_service/internal/auth"
 	"dashboard_service/internal/domain"
 	"dashboard_service/internal/queue"
 	"dashboard_service/internal/repository"
+	"log"
 
 	"github.com/google/uuid"
 )
@@ -20,26 +22,44 @@ func NewDashboardUsecase(j repository.JobRepository,l repository.JobLogRepositor
 }
 
 func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,offset int)([]domain.Job,error) {
-	appID := ctx.Value("app_id").(string)
+	
+	appID,err := auth.AppIDFromContext(ctx)
+	if err != nil {
+		log.Println(err.Error())
+		return nil,err 
+	}
 	return uc.jobs.ListByApp(ctx,appID,status,limit,offset)
 }
 
 func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context,limit,offset int)([]domain.Job,error) {
-	appID := ctx.Value("app_Id").(string)
+	appID,err := auth.AppIDFromContext(ctx)
+	if err != nil {
+		log.Println(err.Error())
+		return nil,err 
+	}
 	return uc.jobs.ListFailed(ctx,appID,limit,offset)
 }
 
 func (uc *DashboardUsecase) GetJobLogs(
 	ctx context.Context,jobID string,
 )([]domain.JobLog,error) {
-	appID := ctx.Value("app_id").(string)
+	appID,err := auth.AppIDFromContext(ctx)
+	if err != nil {
+		log.Println(err.Error())
+		return nil,err 
+	}
 	return uc.logs.GetByJobID(ctx,jobID,appID)
 }
 
 func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,error) {
 
-	role := ctx.Value("role").(string)
-	if role != "admin" {
+	role,err := auth.RoleFromContext(ctx)
+
+	if err != nil {
+		return "",err
+	}
+
+	if role == "viewer" {
 		return "",domain.ErrForbidden
 	}
 

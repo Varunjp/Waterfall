@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"dashboard_service/internal/domain"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -24,11 +25,10 @@ func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit,off
 
 	args := []any{appID}
 
-	if status != "" {
-		query += " AND status=$2"
-		args = append(args, status)
-	}
-
+	query += " AND status=$2"
+	status = strings.ToUpper(status)
+	args = append(args, status)
+	
 	query += " ORDER BY created_at DESC LIMIT $3 OFFSET $4"
 	args = append(args,limit,offset)
 

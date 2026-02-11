@@ -57,6 +57,7 @@ func main() {
 	pb.RegisterAppUserServiceServer(grpcServer, appUserHandler)
 	pb.RegisterApiKeyServiceServer(grpcServer, handlers.NewApiKeyHandler(apiKeyUC))
 	pb.RegisterEmailServiceServer(grpcServer, handlers.NewEmailHandler(emailUC))
-
+	
+	log.Println("admin service listening on",cfg.GrpcPort)
 	grpcServer.Serve(lis)
 }

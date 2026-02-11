@@ -60,7 +60,7 @@ func (r *AppUserRepo) FindByEmail(email string) (*entities.AppUser,error) {
 	)
 
 	var appUser entities.AppUser
-	err := row.Scan(&appUser.ID,&appUser.AppID,&appUser.PasswordHash,&appUser.Role,&appUser.Status,&appUser.CreatedAt)
+	err := row.Scan(&appUser.ID,&appUser.AppID,&appUser.Email,&appUser.PasswordHash,&appUser.Role,&appUser.Status,&appUser.CreatedAt)
 
 	if err != nil {
 		if err == sql.ErrNoRows {

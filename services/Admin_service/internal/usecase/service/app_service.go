@@ -47,7 +47,8 @@ func (s *AppService) Register(name,email string) error {
 	}
 
 	// Logic: need to implement super user here
-	pass := name+time.Now().Format("dd/MM/YYYY")
+	layout := "02/01/2006"
+	pass := name+time.Now().Format(layout)
 	hash,err := security.Hash(pass)
 
 	if err != nil {
