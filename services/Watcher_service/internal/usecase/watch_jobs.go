@@ -12,9 +12,9 @@ import (
 )
 
 type WatchJobsUsecase struct {
-	repo repository.JobRepository
+	repo     repository.JobRepository
 	producer producer.Producer
-	logger  *zap.Logger
+	logger   *zap.Logger
 }
 
 func NewWatchJobsUsecase(
@@ -28,38 +28,38 @@ func NewWatchJobsUsecase(
 func (uc *WatchJobsUsecase) Run(ctx context.Context) error {
 	now := time.Now().Add(-20 * time.Second)
 	until := now.Add(5 * time.Minute)
-	jobs,err := uc.repo.FetchDueJobs(ctx,now,until)
+	jobs, err := uc.repo.FetchDueJobs(ctx, now, until)
 	if err != nil {
 		log.Println(err)
-		return err 
+		return err
 	}
 
-	for _,job := range jobs {
-		event := domain.QueueEvent {
-			JobID: job.JobID,
-			AppID: job.AppID,
-			Type: job.Type,
-			Payload: job.Payload,
-			Retry: job.Retry,
+	for _, job := range jobs {
+		event := domain.QueueEvent{
+			JobID:      job.JobID,
+			AppID:      job.AppID,
+			Type:       job.Type,
+			Payload:    job.Payload,
+			Retry:      job.Retry,
 			MaxRetries: job.MaxRetries,
 		}
 
 		if err := uc.producer.Publish(ctx, job.JobID, event); err != nil {
-			uc.logger.Error("kafka publish failed", 
-				zap.String("job_id",job.JobID),
+			uc.logger.Error("kafka publish failed",
+				zap.String("job_id", job.JobID),
 				zap.Error(err),
 			)
-			continue 
+			continue
 		}
 
-		err := uc.repo.MarkQueued(ctx,job.JobID)
+		err := uc.repo.MarkQueued(ctx, job.JobID)
 		if err != nil {
 			uc.logger.Error("job update failed",
-				zap.String("job_id",job.JobID),
+				zap.String("job_id", job.JobID),
 				zap.Error(err),
 			)
 		}
-		uc.logger.Info("job queued", zap.String("job_id",job.JobID))
+		uc.logger.Info("job queued", zap.String("job_id", job.JobID))
 	}
-	return nil 
+	return nil
 }
