@@ -3,10 +3,13 @@ package main
 import (
 	"job_service/internal/config"
 	"job_service/internal/handler"
+	postgresclient "job_service/internal/infra/postgres"
 	"job_service/internal/logger"
 	"job_service/internal/middleware"
 	"job_service/internal/producer"
 	jobpb "job_service/internal/proto/jobpb"
+	"job_service/internal/queue"
+	"job_service/internal/repository"
 	"job_service/internal/usecase"
 	"log"
 	"net"
@@ -14,6 +17,8 @@ import (
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
+
+// discuss about jwt in job creation
 
 func main() {
 
@@ -24,10 +29,15 @@ func main() {
 	cfg := config.Load()
 
 	logg := logger.Newlogger()
+	db := postgresclient.MustConntect(cfg.DBDSN)
+	jobRepo := repository.NewJobRepo(db)
+	logRepo := repository.NewLogRepo(db)
+	queueProducer := queue.NewKafkaProducer([]string{cfg.KafkaBrokers[0]},cfg.Topic)
 
 	producer := producer.NewKafkaProducer(cfg.KafkaBrokers,cfg.KafkaTopic)
 	uc := usecase.NewJobUsecase(producer,logg)
-	h := handler.NewJobHandler(uc)
+	dc := usecase.NewDashboardUsecase(jobRepo,logRepo,queueProducer)
+	h := handler.NewJobHandler(uc,*dc)
 
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(middleware.APIKeyInterceptor(cfg.JWTKey)),

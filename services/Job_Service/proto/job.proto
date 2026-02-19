@@ -8,6 +8,11 @@ service JobService {
     rpc CreateJob(CreateJobRequest) returns (JobResponse);
     rpc UpdateJob(UpdateJobRequest) returns (JobResponse);
     rpc CancelJob(CancelJobRequest) returns (JobResponse);
+
+    rpc ListJobs(ListJobsRequest) returns (ListJobsResponse);
+    rpc ListFailedJobs(ListFailedJobsRequest) returns (ListJobsResponse);
+    rpc GetJobLogs(GetJobLogsRequest) returns (GetJobLogsResponse);
+    rpc RetryJob(RetryJobRequest) returns (RetryJobResponse);
 }
 
 message CreateJobRequest {
@@ -28,4 +33,55 @@ message CancelJobRequest {
 message JobResponse {
     string job_id = 1;
     string status = 2;
+}
+
+message ListJobsRequest {
+  string app_id = 1;
+  string status = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message ListFailedJobsRequest {
+  string app_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message Job {
+  string job_id = 1;
+  string app_id = 2;
+  string type = 3;
+  string status = 4;
+  string payload = 5;
+  int32 retry = 6;
+  int32 max_retry = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message ListJobsResponse {
+  repeated Job jobs = 1;
+}
+
+message GetJobLogsRequest {
+  string job_id = 1;
+}
+
+message JobLog {
+  string timestamp = 1;
+  string level = 2;
+  string message = 3;
+}
+
+message GetJobLogsResponse {
+  repeated JobLog logs = 1;
+}
+
+message RetryJobRequest {
+  string job_id = 1;
+}
+
+message RetryJobResponse {
+  string new_job_id = 1;
 }

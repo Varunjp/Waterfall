@@ -1,4 +1,4 @@
-package auth
+package middleware
 
 import (
 	"context"
@@ -36,4 +36,10 @@ func RoleFromContext(ctx context.Context) (string, error) {
 		return "", ErrMissingRole
 	}
 	return v.(string), nil
+}
+
+var publicMethods = map[string]bool{
+	"/job.JobService/CreateJob":  true,
+	"/job.JobService/UpdateJob":  true,
+	"/job.JobService/CancelJob":  true,
 }

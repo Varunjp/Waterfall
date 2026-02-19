@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"dashboard_service/internal/domain"
+	"job_service/internal/domain"
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"

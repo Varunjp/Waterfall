@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"dashboard_service/internal/auth"
-	"dashboard_service/internal/domain"
-	"dashboard_service/internal/queue"
-	"dashboard_service/internal/repository"
+	"job_service/internal/domain"
+	"job_service/internal/middleware"
+	"job_service/internal/queue"
+	"job_service/internal/repository"
 	"log"
 
 	"github.com/google/uuid"
@@ -23,7 +23,7 @@ func NewDashboardUsecase(j repository.JobRepository,l repository.JobLogRepositor
 
 func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,offset int)([]domain.Job,error) {
 	
-	appID,err := auth.AppIDFromContext(ctx)
+	appID,err := middleware.AppIDFromContext(ctx)
 	if err != nil {
 		log.Println(err.Error())
 		return nil,err 
@@ -32,7 +32,7 @@ func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,o
 }
 
 func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context,limit,offset int)([]domain.Job,error) {
-	appID,err := auth.AppIDFromContext(ctx)
+	appID,err := middleware.AppIDFromContext(ctx)
 	if err != nil {
 		log.Println(err.Error())
 		return nil,err 
@@ -43,7 +43,7 @@ func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context,limit,offset int)
 func (uc *DashboardUsecase) GetJobLogs(
 	ctx context.Context,jobID string,
 )([]domain.JobLog,error) {
-	appID,err := auth.AppIDFromContext(ctx)
+	appID,err := middleware.AppIDFromContext(ctx)
 	if err != nil {
 		log.Println(err.Error())
 		return nil,err 
@@ -53,7 +53,7 @@ func (uc *DashboardUsecase) GetJobLogs(
 
 func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,error) {
 
-	role,err := auth.RoleFromContext(ctx)
+	role,err := middleware.RoleFromContext(ctx)
 
 	if err != nil {
 		return "",err

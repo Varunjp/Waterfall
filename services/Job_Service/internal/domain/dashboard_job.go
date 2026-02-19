@@ -11,5 +11,5 @@ type Job struct {
 	Retry     int
 	MaxRetry  int
 	CreatedAt time.Time
-	UpdatedAt time.Time 
+	UpdatedAt time.Time
 }
