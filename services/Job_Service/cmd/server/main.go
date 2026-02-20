@@ -28,7 +28,11 @@ func main() {
 	
 	cfg := config.Load()
 
-	logg := logger.Newlogger()
+	logg,err := logger.Newlogger("job-service")
+	if err != nil {
+		panic(err)
+	}
+	
 	db := postgresclient.MustConntect(cfg.DBDSN)
 	jobRepo := repository.NewJobRepo(db)
 	logRepo := repository.NewLogRepo(db)
