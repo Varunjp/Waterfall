@@ -32,8 +32,12 @@ func main() {
 	cfg := config.Load()
 	validateConfig(cfg)
 
-	logg := logger.Newlogger()
-	defer logg.Sync() //nolint:errcheck
+	logg,err := logger.Newlogger("watcher-service")
+	defer logg.Sync() 
+	
+	if err != nil {
+		panic(err)
+	}
 
 	db, err := sql.Open("postgres", cfg.DBURL)
 	if err != nil {

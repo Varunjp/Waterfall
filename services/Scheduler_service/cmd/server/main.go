@@ -34,7 +34,11 @@ func main() {
 		log.Println("env not loaded")
 	}
 	cfg := config.Load()
-	log := logger.NewLogger()
+	log,err := logger.NewLogger("scheduler-service")
+
+	if err != nil {
+		panic(err)
+	}
 
 	log.Info("scheduler starting")
 
