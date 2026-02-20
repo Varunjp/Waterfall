@@ -1,5 +1,0 @@
-kafka-topics.sh --create \
-  --topic job_requests
-
-
-  docker exec -it redpanda rpk topic create scheduler_queue
