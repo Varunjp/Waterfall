@@ -112,3 +112,20 @@ func (r *jobRepo) RetryJob(ctx context.Context, jobID string, status domain.JobS
 	)
 	return err
 }
+
+func (r *jobRepo) JobLog(ctx context.Context,jobEvent domain.JobRunEvent) error {
+	query := `
+		INSERT INTO job_logs(job_id, attempt, status, error)
+		VALUES($1,$2,$3,$4);
+	`
+	_, err := r.db.ExecContext(
+		ctx,
+		query,
+		jobEvent.JobID,
+		jobEvent.Retry,
+		jobEvent.Status,
+		jobEvent.Error,
+	)
+
+	return err 
+}

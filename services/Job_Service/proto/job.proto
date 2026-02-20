@@ -70,8 +70,8 @@ message GetJobLogsRequest {
 
 message JobLog {
   string timestamp = 1;
-  string level = 2;
-  string message = 3;
+  string status = 2;
+  string errorMessage = 3;
 }
 
 message GetJobLogsResponse {

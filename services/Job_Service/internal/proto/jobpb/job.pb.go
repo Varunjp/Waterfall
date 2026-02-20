@@ -556,8 +556,8 @@ func (x *GetJobLogsRequest) GetJobId() string {
 type JobLog struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Timestamp     string                 `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Level         string                 `protobuf:"bytes,2,opt,name=level,proto3" json:"level,omitempty"`
-	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,3,opt,name=errorMessage,proto3" json:"errorMessage,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -599,16 +599,16 @@ func (x *JobLog) GetTimestamp() string {
 	return ""
 }
 
-func (x *JobLog) GetLevel() string {
+func (x *JobLog) GetStatus() string {
 	if x != nil {
-		return x.Level
+		return x.Status
 	}
 	return ""
 }
 
-func (x *JobLog) GetMessage() string {
+func (x *JobLog) GetErrorMessage() string {
 	if x != nil {
-		return x.Message
+		return x.ErrorMessage
 	}
 	return ""
 }
@@ -786,11 +786,11 @@ const file_proto_job_proto_rawDesc = "" +
 	"\x10ListJobsResponse\x12\x1c\n" +
 	"\x04jobs\x18\x01 \x03(\v2\b.job.JobR\x04jobs\"*\n" +
 	"\x11GetJobLogsRequest\x12\x15\n" +
-	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"V\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"b\n" +
 	"\x06JobLog\x12\x1c\n" +
-	"\ttimestamp\x18\x01 \x01(\tR\ttimestamp\x12\x14\n" +
-	"\x05level\x18\x02 \x01(\tR\x05level\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage\"5\n" +
+	"\ttimestamp\x18\x01 \x01(\tR\ttimestamp\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\"\n" +
+	"\ferrorMessage\x18\x03 \x01(\tR\ferrorMessage\"5\n" +
 	"\x12GetJobLogsResponse\x12\x1f\n" +
 	"\x04logs\x18\x01 \x03(\v2\v.job.JobLogR\x04logs\"(\n" +
 	"\x0fRetryJobRequest\x12\x15\n" +

@@ -19,7 +19,14 @@ func (uc *UpdateJobStatusUsecase) Handle(ctx context.Context, event domain.JobRu
 	if event.JobID == "" {
 		return errors.New("job_id missing")
 	}
-
+	
+	if event.Retry != 0  {
+		err := uc.jobRepo.JobLog(ctx,event)
+		if err != nil {
+			return err 
+		}
+	}
+	
 	if event.Status == string(domain.JobRetry) {
 		return uc.jobRepo.RetryJob(ctx, event.JobID, domain.StatusScheduled, event.Retry)
 	}

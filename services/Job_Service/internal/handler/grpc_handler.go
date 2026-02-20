@@ -81,8 +81,8 @@ func (h *JobHandler) GetJobLogs(ctx context.Context, req *jobpb.GetJobLogsReques
 	for _,l := range logs {
 		resp.Logs = append(resp.Logs, &jobpb.JobLog{
 			Timestamp: l.Timestamp.Format(time.RFC3339),
-			Level: l.Level,
-			Message: l.Message,
+			Status: l.Status,
+			ErrorMessage: l.ErrorMessage,
 		})
 	}
 

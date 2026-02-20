@@ -4,7 +4,7 @@ import "time"
 
 type JobLog struct {
 	JobID     string
-	Level     string
-	Message   string
+	Status     string
+	ErrorMessage   string
 	Timestamp time.Time
 }

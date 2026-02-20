@@ -57,6 +57,7 @@ func (u *jobUsecase) ProcessJobResult(ctx context.Context,input domain.JobResult
 			"job_id": input.JobID,
 			"app_id": input.AppID,
 			"status": input.Status,
+			"retry": input.Retry,
 			"error": input.ErrorMessage,
 		}
 

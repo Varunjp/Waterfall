@@ -18,13 +18,12 @@ func NewLogRepo(db *pgxpool.Pool) JobLogRepository {
 func (r *logRepo) GetByJobID(ctx context.Context,jobID, appID string)([]domain.JobLog,error) {
 
 	query := `
-	SELECT l.timestamp,l.level,l.message
+	SELECT l.created_at,l.status,l.error
 	FROM job_logs l
 	JOIN jobs j ON j.job_id = l.job_id
 	WHERE l.job_id=$1 AND j.app_id=$2
-	ORDER BY l.timestamp ASC
+	ORDER BY l.created_at ASC
 	`
-
 	args := []any{jobID,appID}
 
 	rows,err := r.db.Query(ctx,query,args...)
@@ -37,7 +36,7 @@ func (r *logRepo) GetByJobID(ctx context.Context,jobID, appID string)([]domain.J
 	var logs []domain.JobLog
 	for rows.Next() {
 		var l domain.JobLog
-		rows.Scan(&l.Timestamp,&l.Level,&l.Message)
+		rows.Scan(&l.Timestamp,&l.Status,&l.ErrorMessage)
 		logs = append(logs, l)
 	}
 	return logs,nil 
