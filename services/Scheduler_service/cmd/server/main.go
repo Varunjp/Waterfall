@@ -47,11 +47,12 @@ func main() {
 
 	kafkaConsumer := consumer.NewJobCreatedConsumer(cfg.Kafka.Brokers,cfg.Kafka.JobCreateTopic,cfg.Kafka.ConsumerGroup)
 	kafkaProducer := producer.NewKafkaProducer([]string{cfg.Kafka.Brokers},cfg.Kafka.JobUpdateTopic)
+	kafkaRunConsumer := consumer.NewJobCreatedConsumer(cfg.Kafka.Brokers,cfg.Kafka.JobStatusTopic,cfg.Kafka.ConsumerGroup)
 
 	metricsP := metrics.NewMetrics()
 
 	assigner := usecase.NewAssigner(redisClient,adminRepo,metricsP,kafkaProducer)
-	stallMonitor := usecase.NewStallMonitor(redisClient,kafkaProducer)
+	stallMonitor := usecase.NewStallMonitor(redisClient,kafkaRunConsumer,kafkaProducer)
 	resultProcess := usecase.NewJobResultProcess(adminRepo,metricsP,kafkaProducer,log,3)
 
 	runner := scheduler.NewRunner(

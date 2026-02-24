@@ -51,6 +51,52 @@ func (r *jobRepo) FetchDueJobs(ctx context.Context, now, until time.Time) ([]dom
 	return jobs, nil
 }
 
+func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
+	now := time.Now()
+	startOfDay := time.Date(
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		0, 0, 0, 0,
+		now.Location(),
+	)
+	endOfDay := startOfDay.Add(24*time.Hour - time.Nanosecond)
+
+	query := `
+		SELECT job_id, app_id, type, payload, schedule_at,retry,max_retry
+		FROM jobs
+		WHERE status = 'RUNNING'
+		AND schedule_at >= $1 AND schedule_at < $2
+		FOR UPDATE SKIP LOCKED;
+	`
+
+	rows, err := r.db.QueryContext(ctx,query,startOfDay,endOfDay)
+
+	if err != nil {
+		return nil,err 
+	}
+	defer rows.Close()
+	var jobs []domain.Job
+
+	for rows.Next() {
+		var j domain.Job
+		if err := rows.Scan(
+			&j.JobID,
+			&j.AppID,
+			&j.Type,
+			&j.Payload,
+			&j.ScheduleAt,
+			&j.Retry,
+			&j.MaxRetries,
+		); err != nil {
+			return nil, err
+		}
+		jobs = append(jobs, j)
+	}
+
+	return jobs,nil 
+}
+
 func (r *jobRepo) MarkQueued(ctx context.Context, jobID string) error {
 	_, err := r.db.ExecContext(
 		ctx,

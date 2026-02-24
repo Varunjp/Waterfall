@@ -3,19 +3,24 @@ package usecase
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"scheduler_service/internal/consumer"
 	"scheduler_service/internal/domain"
 	"scheduler_service/internal/producer"
 	redisClient "scheduler_service/internal/redis"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type StallMonitor struct {
 	redis *redisClient.Client
+	runnerConsumer *consumer.JobCreatedConsumer
 	producer *producer.KafkaProducer
 }
 
-func NewStallMonitor(r *redisClient.Client, p *producer.KafkaProducer) *StallMonitor {
-	return &StallMonitor{r,p}
+func NewStallMonitor(r *redisClient.Client, rc *consumer.JobCreatedConsumer ,p *producer.KafkaProducer) *StallMonitor {
+	return &StallMonitor{redis: r,runnerConsumer: rc,producer: p}
 }
 
 func (s *StallMonitor) Run(ctx context.Context) {
@@ -27,27 +32,44 @@ func (s *StallMonitor) Run(ctx context.Context) {
 		case <-ctx.Done():
 			return 
 		case <-ticker.C:
-			s.scan(ctx)
+			msg,err := s.runnerConsumer.Read(ctx)
+			if err != nil {
+				if ctx.Err() != nil {
+					return 
+				}
+				log.Println("kafka read failed",err)
+				continue
+			}
+
+			s.scan(ctx,msg)
 		}
 	}
 }
 
-func (s *StallMonitor) scan(ctx context.Context) {
-	keys,_ := s.redis.Keys(ctx,"heartbeat:*").Result()
+func (s *StallMonitor) scan(ctx context.Context,raw []byte) {
+
+	var job domain.Job
+	if err := json.Unmarshal(raw,&job); err != nil {
+		log.Println("invalid job payload",err)
+		return 
+	}
+
+	hbKey := "heartbeat:"+job.JobID
+	ts,err := s.redis.Get(ctx,hbKey).Int64()
+
+	if err == redis.Nil {
+		s.handlestall(ctx,job.JobID)
+		return 
+	}
+
+	if err != nil {
+		return 
+	}
 
 	now := time.Now().Unix()
 
-	for _,hbKey := range keys {
-		jobID := hbKey[len("heartbeat:"):]
-
-		ts,err := s.redis.Get(ctx,hbKey).Int64()
-		if err != nil {
-			continue 
-		}
-
-		if now-ts > 30 {
-			s.handlestall(ctx,jobID)
-		}
+	if now-ts > 30 {
+		s.handlestall(ctx,job.JobID)
 	}
 }
 
@@ -78,7 +100,7 @@ func (s *StallMonitor) handlestall(ctx context.Context,jobID string) {
 	}
 	s.producer.Publish(ctx,map[string]any{
 		"job_id": job.JobID,
-		"status": "JOB_RETRYING",
+		"status": "JOB_RETRY",
 		"retry": job.Retry,
 	})
 

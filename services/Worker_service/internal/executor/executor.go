@@ -9,6 +9,7 @@ import (
 func Execute(ctx context.Context,payload string) error {
 
 	// 
+	fmt.Println("Work started")
 	time.Sleep(time.Second * 3)
 	// err := errors.New("TESTING error")
 

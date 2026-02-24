@@ -51,7 +51,8 @@ func main() {
 
 	repo := repository.NewJobRepository(db)
 	queueProducer := producer.NewKafkaProducer(cfg.KafkaBroker, cfg.KafkaTopic)
-	watchUC := usecase.NewWatchJobsUsecase(repo, queueProducer, logg)
+	jobStatusProducer := producer.NewKafkaProducer(cfg.KafkaBroker,cfg.JobStatusTopic)
+	watchUC := usecase.NewWatchJobsUsecase(repo, queueProducer,jobStatusProducer, logg)
 
 	jobEventUC := usecase.NewConsumeJobUsecase(repo, logg)
 	jobEventConsumer := consumer.NewKafkaConsumer(

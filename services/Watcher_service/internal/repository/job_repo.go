@@ -14,4 +14,5 @@ type JobRepository interface {
 	UpdateStatus(ctx context.Context, jobID string, status domain.JobStatus) error
 	RetryJob(ctx context.Context, jobID string, status domain.JobStatus, retry int) error
 	JobLog(ctx context.Context,jobEvent domain.JobRunEvent) error
+	RunningJobs(ctx context.Context)([]domain.Job,error)
 }

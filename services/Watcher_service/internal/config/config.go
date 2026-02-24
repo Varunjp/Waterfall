@@ -12,6 +12,7 @@ type Config struct {
 	JobTopic      string
 	JobGroupID    string
 	JobRunTopic   string
+	JobStatusTopic string 
 	JobRunGroupID string
 	PollInterval  int
 }
@@ -34,6 +35,7 @@ func Load() *Config {
 			os.Getenv("KAFKA_RUN_TOPIC"),
 			os.Getenv("KAFAK_RUN_TOPIC"),
 		),
+		JobStatusTopic: os.Getenv("KAFKA_JOB_STATUS_TOPIC"),
 		JobRunGroupID: firstNonEmpty(
 			os.Getenv("KAFKA_RUN_GROUP_ID"),
 			os.Getenv("KAFAK_RUN_GROUPID"),
