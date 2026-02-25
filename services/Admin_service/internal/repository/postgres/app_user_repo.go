@@ -64,7 +64,7 @@ func (r *AppUserRepo) FindByEmail(email string) (*entities.AppUser,error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil,nil 
+			return nil,err 
 		}
 		return nil,err 
 	}

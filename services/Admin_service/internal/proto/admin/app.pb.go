@@ -74,6 +74,50 @@ func (x *RegisterAppRequest) GetAppEmail() string {
 	return ""
 }
 
+type RegisterAppResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppId         string                 `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegisterAppResponse) Reset() {
+	*x = RegisterAppResponse{}
+	mi := &file_internal_proto_admin_app_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterAppResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterAppResponse) ProtoMessage() {}
+
+func (x *RegisterAppResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterAppResponse.ProtoReflect.Descriptor instead.
+func (*RegisterAppResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RegisterAppResponse) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
 type ListAppsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -82,7 +126,7 @@ type ListAppsRequest struct {
 
 func (x *ListAppsRequest) Reset() {
 	*x = ListAppsRequest{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[1]
+	mi := &file_internal_proto_admin_app_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -94,7 +138,7 @@ func (x *ListAppsRequest) String() string {
 func (*ListAppsRequest) ProtoMessage() {}
 
 func (x *ListAppsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[1]
+	mi := &file_internal_proto_admin_app_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +151,7 @@ func (x *ListAppsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAppsRequest.ProtoReflect.Descriptor instead.
 func (*ListAppsRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{1}
+	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{2}
 }
 
 type ListAppsResponse struct {
@@ -119,7 +163,7 @@ type ListAppsResponse struct {
 
 func (x *ListAppsResponse) Reset() {
 	*x = ListAppsResponse{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[2]
+	mi := &file_internal_proto_admin_app_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -131,7 +175,7 @@ func (x *ListAppsResponse) String() string {
 func (*ListAppsResponse) ProtoMessage() {}
 
 func (x *ListAppsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[2]
+	mi := &file_internal_proto_admin_app_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -144,7 +188,7 @@ func (x *ListAppsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAppsResponse.ProtoReflect.Descriptor instead.
 func (*ListAppsResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{2}
+	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListAppsResponse) GetApps() []*App {
@@ -167,7 +211,7 @@ type App struct {
 
 func (x *App) Reset() {
 	*x = App{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[3]
+	mi := &file_internal_proto_admin_app_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -179,7 +223,7 @@ func (x *App) String() string {
 func (*App) ProtoMessage() {}
 
 func (x *App) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[3]
+	mi := &file_internal_proto_admin_app_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -192,7 +236,7 @@ func (x *App) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use App.ProtoReflect.Descriptor instead.
 func (*App) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{3}
+	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *App) GetAppId() string {
@@ -239,7 +283,7 @@ type BlockAppRequest struct {
 
 func (x *BlockAppRequest) Reset() {
 	*x = BlockAppRequest{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[4]
+	mi := &file_internal_proto_admin_app_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -251,7 +295,7 @@ func (x *BlockAppRequest) String() string {
 func (*BlockAppRequest) ProtoMessage() {}
 
 func (x *BlockAppRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[4]
+	mi := &file_internal_proto_admin_app_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -264,7 +308,7 @@ func (x *BlockAppRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlockAppRequest.ProtoReflect.Descriptor instead.
 func (*BlockAppRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{4}
+	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *BlockAppRequest) GetAppId() string {
@@ -281,7 +325,9 @@ const file_internal_proto_admin_app_proto_rawDesc = "" +
 	"\x1einternal/proto/admin/app.proto\x12\x05admin\x1a\x1bgoogle/protobuf/empty.proto\"L\n" +
 	"\x12RegisterAppRequest\x12\x19\n" +
 	"\bapp_name\x18\x01 \x01(\tR\aappName\x12\x1b\n" +
-	"\tapp_email\x18\x02 \x01(\tR\bappEmail\"\x11\n" +
+	"\tapp_email\x18\x02 \x01(\tR\bappEmail\",\n" +
+	"\x13RegisterAppResponse\x12\x15\n" +
+	"\x06app_id\x18\x01 \x01(\tR\x05appId\"\x11\n" +
 	"\x0fListAppsRequest\"2\n" +
 	"\x10ListAppsResponse\x12\x1e\n" +
 	"\x04apps\x18\x01 \x03(\v2\n" +
@@ -293,10 +339,10 @@ const file_internal_proto_admin_app_proto_rawDesc = "" +
 	"\x06status\x18\x04 \x01(\tR\x06status\x12\x12\n" +
 	"\x04tier\x18\x05 \x01(\tR\x04tier\"(\n" +
 	"\x0fBlockAppRequest\x12\x15\n" +
-	"\x06app_id\x18\x01 \x01(\tR\x05appId2\x85\x02\n" +
+	"\x06app_id\x18\x01 \x01(\tR\x05appId2\x89\x02\n" +
 	"\n" +
-	"AppService\x12@\n" +
-	"\vRegisterApp\x12\x19.admin.RegisterAppRequest\x1a\x16.google.protobuf.Empty\x12;\n" +
+	"AppService\x12D\n" +
+	"\vRegisterApp\x12\x19.admin.RegisterAppRequest\x1a\x1a.admin.RegisterAppResponse\x12;\n" +
 	"\bListApps\x12\x16.admin.ListAppsRequest\x1a\x17.admin.ListAppsResponse\x12:\n" +
 	"\bBlockApp\x12\x16.admin.BlockAppRequest\x1a\x16.google.protobuf.Empty\x12<\n" +
 	"\n" +
@@ -314,25 +360,26 @@ func file_internal_proto_admin_app_proto_rawDescGZIP() []byte {
 	return file_internal_proto_admin_app_proto_rawDescData
 }
 
-var file_internal_proto_admin_app_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_internal_proto_admin_app_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_internal_proto_admin_app_proto_goTypes = []any{
-	(*RegisterAppRequest)(nil), // 0: admin.RegisterAppRequest
-	(*ListAppsRequest)(nil),    // 1: admin.ListAppsRequest
-	(*ListAppsResponse)(nil),   // 2: admin.ListAppsResponse
-	(*App)(nil),                // 3: admin.App
-	(*BlockAppRequest)(nil),    // 4: admin.BlockAppRequest
-	(*emptypb.Empty)(nil),      // 5: google.protobuf.Empty
+	(*RegisterAppRequest)(nil),  // 0: admin.RegisterAppRequest
+	(*RegisterAppResponse)(nil), // 1: admin.RegisterAppResponse
+	(*ListAppsRequest)(nil),     // 2: admin.ListAppsRequest
+	(*ListAppsResponse)(nil),    // 3: admin.ListAppsResponse
+	(*App)(nil),                 // 4: admin.App
+	(*BlockAppRequest)(nil),     // 5: admin.BlockAppRequest
+	(*emptypb.Empty)(nil),       // 6: google.protobuf.Empty
 }
 var file_internal_proto_admin_app_proto_depIdxs = []int32{
-	3, // 0: admin.ListAppsResponse.apps:type_name -> admin.App
+	4, // 0: admin.ListAppsResponse.apps:type_name -> admin.App
 	0, // 1: admin.AppService.RegisterApp:input_type -> admin.RegisterAppRequest
-	1, // 2: admin.AppService.ListApps:input_type -> admin.ListAppsRequest
-	4, // 3: admin.AppService.BlockApp:input_type -> admin.BlockAppRequest
-	4, // 4: admin.AppService.UnblockApp:input_type -> admin.BlockAppRequest
-	5, // 5: admin.AppService.RegisterApp:output_type -> google.protobuf.Empty
-	2, // 6: admin.AppService.ListApps:output_type -> admin.ListAppsResponse
-	5, // 7: admin.AppService.BlockApp:output_type -> google.protobuf.Empty
-	5, // 8: admin.AppService.UnblockApp:output_type -> google.protobuf.Empty
+	2, // 2: admin.AppService.ListApps:input_type -> admin.ListAppsRequest
+	5, // 3: admin.AppService.BlockApp:input_type -> admin.BlockAppRequest
+	5, // 4: admin.AppService.UnblockApp:input_type -> admin.BlockAppRequest
+	1, // 5: admin.AppService.RegisterApp:output_type -> admin.RegisterAppResponse
+	3, // 6: admin.AppService.ListApps:output_type -> admin.ListAppsResponse
+	6, // 7: admin.AppService.BlockApp:output_type -> google.protobuf.Empty
+	6, // 8: admin.AppService.UnblockApp:output_type -> google.protobuf.Empty
 	5, // [5:9] is the sub-list for method output_type
 	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -351,7 +398,7 @@ func file_internal_proto_admin_app_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_app_proto_rawDesc), len(file_internal_proto_admin_app_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

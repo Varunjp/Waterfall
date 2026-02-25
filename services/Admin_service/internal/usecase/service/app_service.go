@@ -2,6 +2,7 @@ package service
 
 import (
 	"admin_service/internal/domain/entities"
+	domainErr "admin_service/internal/domain/errors"
 	"admin_service/internal/infrastructure/security"
 	"admin_service/internal/pkg/validation"
 	repo "admin_service/internal/repository/interfaces"
@@ -23,14 +24,14 @@ func NewAppService(r repo.AppRepository) *AppService {
 	return &AppService{repo: r}
 }
 
-func (s *AppService) Register(name,email string) error {
+func (s *AppService) Register(name,email string) (string,error) {
 	
 	if !validation.IsVaildEmail(email) {
-		return ErrInvalidEmail
+		return "",ErrInvalidEmail
 	}
 
 	if !validation.IsValidName(name) {
-		return ErrInvaildName
+		return "",ErrInvaildName
 	}
 
 	app := &entities.App{
@@ -43,7 +44,10 @@ func (s *AppService) Register(name,email string) error {
 	appID,err := s.repo.Create(app);
 
 	if  err != nil {
-		return err 
+		if errors.Is(err, domainErr.ErrAppEmailAlreadyExists) {
+			return "",domainErr.ErrAppEmailAlreadyExists
+		}
+		return "",err 
 	}
 
 	// Logic: need to implement super user here
@@ -66,10 +70,10 @@ func (s *AppService) Register(name,email string) error {
 	err = s.repo.CreateFirst(appUser)
 
 	if err != nil {
-		return err 
+		return "",err 
 	}
 
-	return nil 
+	return appID,nil 
 }
 
 func (s *AppService) List()([]*entities.App,error) {

@@ -7,7 +7,7 @@ option go_package = "internal/proto/admin;adminpb";
 import "google/protobuf/empty.proto";
 
 service AppService {
-  rpc RegisterApp(RegisterAppRequest) returns (google.protobuf.Empty);
+  rpc RegisterApp(RegisterAppRequest) returns (RegisterAppResponse);
   rpc ListApps(ListAppsRequest) returns (ListAppsResponse);
   rpc BlockApp(BlockAppRequest) returns (google.protobuf.Empty);
   rpc UnblockApp(BlockAppRequest) returns (google.protobuf.Empty);
@@ -16,6 +16,10 @@ service AppService {
 message RegisterAppRequest {
   string app_name = 1;
   string app_email = 2;
+}
+
+message RegisterAppResponse {
+  string app_id = 1;
 }
 
 message ListAppsRequest {}

@@ -30,7 +30,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AppServiceClient interface {
-	RegisterApp(ctx context.Context, in *RegisterAppRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RegisterApp(ctx context.Context, in *RegisterAppRequest, opts ...grpc.CallOption) (*RegisterAppResponse, error)
 	ListApps(ctx context.Context, in *ListAppsRequest, opts ...grpc.CallOption) (*ListAppsResponse, error)
 	BlockApp(ctx context.Context, in *BlockAppRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UnblockApp(ctx context.Context, in *BlockAppRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -44,9 +44,9 @@ func NewAppServiceClient(cc grpc.ClientConnInterface) AppServiceClient {
 	return &appServiceClient{cc}
 }
 
-func (c *appServiceClient) RegisterApp(ctx context.Context, in *RegisterAppRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *appServiceClient) RegisterApp(ctx context.Context, in *RegisterAppRequest, opts ...grpc.CallOption) (*RegisterAppResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
+	out := new(RegisterAppResponse)
 	err := c.cc.Invoke(ctx, AppService_RegisterApp_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (c *appServiceClient) UnblockApp(ctx context.Context, in *BlockAppRequest, 
 // All implementations must embed UnimplementedAppServiceServer
 // for forward compatibility.
 type AppServiceServer interface {
-	RegisterApp(context.Context, *RegisterAppRequest) (*emptypb.Empty, error)
+	RegisterApp(context.Context, *RegisterAppRequest) (*RegisterAppResponse, error)
 	ListApps(context.Context, *ListAppsRequest) (*ListAppsResponse, error)
 	BlockApp(context.Context, *BlockAppRequest) (*emptypb.Empty, error)
 	UnblockApp(context.Context, *BlockAppRequest) (*emptypb.Empty, error)
@@ -102,7 +102,7 @@ type AppServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAppServiceServer struct{}
 
-func (UnimplementedAppServiceServer) RegisterApp(context.Context, *RegisterAppRequest) (*emptypb.Empty, error) {
+func (UnimplementedAppServiceServer) RegisterApp(context.Context, *RegisterAppRequest) (*RegisterAppResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RegisterApp not implemented")
 }
 func (UnimplementedAppServiceServer) ListApps(context.Context, *ListAppsRequest) (*ListAppsResponse, error) {

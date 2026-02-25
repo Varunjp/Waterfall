@@ -11,7 +11,7 @@ import (
 type AppHandler struct {
 	pb.UnimplementedAppServiceServer 
 	usecase interface {
-		Register(string,string)error 
+		Register(string,string)(string,error) 
 		List()([]*entities.App,error)
 		Block(string)error 
 		Unblock(string)error 
@@ -19,7 +19,7 @@ type AppHandler struct {
 }
 
 func NewAppHandler(u interface{
-	Register(string,string)error 
+	Register(string,string)(string,error) 
 	List() ([]*entities.App, error)
 	Block(string) error
 	Unblock(string) error
@@ -27,9 +27,9 @@ func NewAppHandler(u interface{
 	return &AppHandler{usecase: u}
 }
 
-func (h *AppHandler) RegisterApp(ctx context.Context, req *pb.RegisterAppRequest) (*emptypb.Empty,error) {
-	err := h.usecase.Register(req.AppName,req.AppEmail)
-	return &emptypb.Empty{},err 
+func (h *AppHandler) RegisterApp(ctx context.Context, req *pb.RegisterAppRequest) (*pb.RegisterAppResponse,error) {
+	app_id,err := h.usecase.Register(req.AppName,req.AppEmail)
+	return &pb.RegisterAppResponse{AppId: app_id},err 
 }
 
 func (h *AppHandler) ListApps(ctx context.Context,_ *pb.ListAppsRequest)(*pb.ListAppsResponse,error) {

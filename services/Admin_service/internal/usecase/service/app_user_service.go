@@ -45,10 +45,10 @@ func (s *AppUserService) List(appID string) ([]*entities.AppUser, error) {
 func (s *AppUserService) AppLogin(email,password string)(string,error) {
 	appUser,err := s.repo.FindByEmail(email)
 	if err != nil {
-		return "",err 
+		return "",domainErr.ErrInvalidCredentials
 	}
 	if err := security.Compare(appUser.PasswordHash,password); err != nil {
-		return "",err 
+		return "",domainErr.ErrInvalidCredentials
 	}
 	return security.GenerateJWT(s.secret,appUser.ID,appUser.Role,appUser.AppID)
 }

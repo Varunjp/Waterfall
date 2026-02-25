@@ -2,7 +2,11 @@ package postgres
 
 import (
 	"admin_service/internal/domain/entities"
+	domainerr "admin_service/internal/domain/errors"
 	"database/sql"
+	"errors"
+
+	"github.com/lib/pq"
 )
 
 type AppRepo struct {
@@ -19,7 +23,7 @@ func (r *AppRepo) Create(app *entities.App) (string,error) {
 	err := r.db.QueryRow(`
 		INSERT INTO apps (app_name, app_email, status, tier)
 		VALUES ($1, $2, $3, $4)
-		RETURNING id
+		RETURNING app_id
 	`,
 		app.AppName,
 		app.AppEmail,
@@ -27,12 +31,20 @@ func (r *AppRepo) Create(app *entities.App) (string,error) {
 		app.Tier,
 	).Scan(&appID)
 
-	// _,err := r.db.Exec(`
-	// 	INSERT INTO apps(app_name,app_email,status,tier)
-	// 	VALUES($1,$2,$3,$4)
-	// `,app.AppName,app.AppEmail,app.Status,app.Tier)
-
 	if err != nil {
+		var pqErr *pq.Error  
+
+		if errors.As(err, &pqErr) {
+			if pqErr.Code == "23505" {
+				switch pqErr.Constraint {
+				case "emaill_unique":
+					return "", domainerr.ErrAppEmailAlreadyExists
+				case "name_unique":
+					return "",domainerr.ErrAppNameAlreadyExists
+				}
+			}
+		}
+
 		return "",err 
 	}
 
