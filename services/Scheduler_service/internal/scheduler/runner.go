@@ -72,7 +72,7 @@ func (r *Runner) handleMessage(ctx context.Context,raw []byte) {
 
 	r.presistRunningJob(ctx,job)
 
-	r.emitJobUpdate(ctx,job,"RUNNING","")
+	//r.emitJobUpdate(ctx,job,"RUNNING","")
 }
 
 func (r *Runner) handleAssignFailure(ctx context.Context,job domain.Job,err error) {

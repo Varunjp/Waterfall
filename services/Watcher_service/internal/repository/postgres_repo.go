@@ -22,10 +22,12 @@ func (r *jobRepo) FetchDueJobs(ctx context.Context, now, until time.Time) ([]dom
 		SELECT job_id, app_id, type, payload, schedule_at,retry,max_retry
 		FROM jobs
 		WHERE status = 'SCHEDULED'
-		  AND schedule_at BETWEEN $1 AND $2
+		  AND schedule_at <= NOW()
+		ORDER BY schedule_at ASC
+		LIMIT 100
 		FOR UPDATE SKIP LOCKED; 
 	`
-	rows, err := r.db.QueryContext(ctx, query, now, until)
+	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}

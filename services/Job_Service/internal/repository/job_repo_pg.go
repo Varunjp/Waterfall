@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"job_service/internal/domain"
 	"strings"
 
@@ -22,15 +23,19 @@ func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit,off
 	FROM jobs
 	WHERE app_id=$1
 	`
-
-	args := []any{appID}
-
-	query += " AND status=$2"
-	status = strings.ToUpper(status)
-	args = append(args, status)
 	
-	query += " ORDER BY created_at DESC LIMIT $3 OFFSET $4"
-	args = append(args,limit,offset)
+	args := []any{appID}
+	argPos := 2
+
+	if status != "" {
+		status = strings.ToUpper(status)
+		query += fmt.Sprintf(" AND status = $%d", argPos)
+		args = append(args, status)
+		argPos++
+	}
+
+	query += fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", argPos, argPos+1)
+	args = append(args, limit, offset)
 
 	rows,err := r.db.Query(ctx,query,args...)
 	if err != nil {

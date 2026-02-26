@@ -62,10 +62,10 @@ func (a *Assigner) Assign(ctx context.Context,job domain.Job) error {
 		return err 
 	}
 
-	a.producer.Publish(ctx,map[string]any{
-		"job_id":job.JobID,
-		"status": "RUNNING",
-	})
+	// a.producer.Publish(ctx,map[string]any{
+	// 	"job_id":job.JobID,
+	// 	"status": "RUNNING",
+	// })
 
 	a.metrics.JobsAssigned.Inc()
 	return nil 

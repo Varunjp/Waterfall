@@ -29,10 +29,6 @@ func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,o
 		return nil,err 
 	}
 
-	if status == "" {
-		status = "COMPLETED"
-	}
-
 	return uc.jobs.ListByApp(ctx,appID,status,limit,offset)
 }
 
