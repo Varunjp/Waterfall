@@ -161,12 +161,13 @@ func (r *jobRepo) UpdateStatus(ctx context.Context, jobID string, status domain.
 	return err
 }
 
-func (r *jobRepo) RetryJob(ctx context.Context, jobID string, status domain.JobStatus, retry int) error {
+func (r *jobRepo) RetryJob(ctx context.Context, jobID string, status domain.JobStatus, retry int,nextRun time.Time) error {
 	_, err := r.db.ExecContext(
 		ctx,
-		`UPDATE jobs SET status=$1,retry=$2, schedule_at=NOW() WHERE job_id=$3`,
+		`UPDATE jobs SET status=$1,retry=$2, schedule_at=$3 WHERE job_id=$4`,
 		status,
 		retry,
+		nextRun,
 		jobID,
 	)
 	return err

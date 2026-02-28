@@ -8,4 +8,5 @@ type JobRunEvent struct {
 	Retry      int        `json:"retry"`
 	Error      *string    `json:"error,omitempty"`
 	FinishedAt *time.Time `json:"finished_at,omitempty"`
+	NextRun    *time.Time `json:"next_run,omitempty"`
 }

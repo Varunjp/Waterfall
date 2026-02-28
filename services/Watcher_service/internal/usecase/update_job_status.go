@@ -28,7 +28,7 @@ func (uc *UpdateJobStatusUsecase) Handle(ctx context.Context, event domain.JobRu
 	}
 	
 	if event.Status == string(domain.JobRetry) {
-		return uc.jobRepo.RetryJob(ctx, event.JobID, domain.StatusScheduled, event.Retry)
+		return uc.jobRepo.RetryJob(ctx, event.JobID, domain.StatusScheduled, event.Retry,*event.NextRun)
 	}
 
 	return uc.jobRepo.UpdateStatus(ctx, event.JobID, domain.JobStatus(event.Status))

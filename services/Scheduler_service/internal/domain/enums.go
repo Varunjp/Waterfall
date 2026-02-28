@@ -7,4 +7,5 @@ const (
 	JobRunning JobStatus = "RUNNING"
 	JobFailed  JobStatus = "FAILED"
 	JobSuccess JobStatus = "SUCCESS"
+	JobRetry   JobStatus = "JOB_RETRY"
 )

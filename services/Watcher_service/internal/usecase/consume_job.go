@@ -42,7 +42,7 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 	case domain.JobComplete:
 		return uc.repo.UpdateStatus(ctx, event.JobID, domain.StatusSuccess)
 	case domain.JobRetry:
-		return uc.repo.RetryJob(ctx, event.JobID, domain.StatusScheduled, event.Retry)
+		return uc.repo.RetryJob(ctx, event.JobID, domain.StatusScheduled, event.Retry,event.Timestamp)
 	case domain.ManualRetry:
 		return uc.repo.JobManualRetry(ctx,event.JobID,domain.StatusManualRetry)
 	}
