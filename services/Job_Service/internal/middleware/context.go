@@ -43,3 +43,9 @@ var publicMethods = map[string]bool{
 	"/job.JobService/UpdateJob":  true,
 	"/job.JobService/CancelJob":  true,
 }
+
+var appAdmin = map[string]bool {
+	"/job.JobService/ListFailedJobs":true,
+}
+
+var appAdminRole string = "platform_admin"

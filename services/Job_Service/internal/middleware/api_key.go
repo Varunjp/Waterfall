@@ -69,7 +69,7 @@ func APIKeyInterceptor(jwtSecret string) grpc.UnaryServerInterceptor {
 			)
 		}
 
-		if claims.AppID == "" {
+		if claims.AppID == "" && claims.Role != appAdminRole{
 			return nil,status.Error(
 				codes.PermissionDenied,
 				"missing app_id claim",
@@ -80,6 +80,13 @@ func APIKeyInterceptor(jwtSecret string) grpc.UnaryServerInterceptor {
 			return nil, status.Error(
 				codes.PermissionDenied,
 				"missing role claim",
+			)
+		}
+
+		if appAdmin[info.FullMethod] && claims.Role != appAdminRole{
+			return nil,status.Error(
+				codes.PermissionDenied,
+				"not app admin", 
 			)
 		}
 

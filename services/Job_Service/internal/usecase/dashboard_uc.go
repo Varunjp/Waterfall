@@ -31,12 +31,7 @@ func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,o
 }
 
 func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context,limit,offset int)([]domain.Job,error) {
-	appID,err := middleware.AppIDFromContext(ctx)
-	if err != nil {
-		log.Println(err.Error())
-		return nil,err 
-	}
-	return uc.jobs.ListFailed(ctx,appID,limit,offset)
+	return uc.jobs.ListFailed(ctx,limit,offset)
 }
 
 func (uc *DashboardUsecase) GetJobLogs(
@@ -48,6 +43,10 @@ func (uc *DashboardUsecase) GetJobLogs(
 		return nil,err 
 	}
 	return uc.logs.GetByJobID(ctx,jobID,appID)
+}
+
+func (uc *DashboardUsecase) GetJobAdminLogs(ctx context.Context,jobID string)([]domain.JobLog,error) {
+	return uc.logs.GetByJobIdAdmin(ctx,jobID)
 }
 
 func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,error) {

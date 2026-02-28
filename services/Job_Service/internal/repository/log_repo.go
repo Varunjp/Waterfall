@@ -7,4 +7,5 @@ import (
 
 type JobLogRepository interface {
 	GetByJobID(ctx context.Context, jobID, appID string) ([]domain.JobLog, error)
+	GetByJobIdAdmin(ctx context.Context,jobID string)([]domain.JobLog,error)
 }

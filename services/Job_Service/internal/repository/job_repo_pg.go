@@ -57,8 +57,35 @@ func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit,off
 	return jobs,nil 
 }
 
-func (r *jobRepo) ListFailed(ctx context.Context, appID string,limit,offset int) ([]domain.Job,error) {
-	return r.ListByApp(ctx,appID,"FAILED",limit,offset)
+func (r *jobRepo) ListFailed(ctx context.Context,limit,offset int) ([]domain.Job,error) {
+
+	query := `
+	SELECT job_id, app_id, type, payload, status, retry, max_retry, created_at,updated_at
+	FROM jobs
+	WHERE status = 'FAILED' OR status = 'DQL'
+	ORDER BY created_at DESC LIMIT $1 OFFSET $2
+	`
+	args := []any{}
+	args = append(args, limit, offset)
+
+	rows,err := r.db.Query(ctx,query,args...)
+	if err != nil {
+		return nil,err 
+	}
+	defer rows.Close()
+
+	var jobs []domain.Job
+	for rows.Next() {
+		var j domain.Job
+		if err := rows.Scan(
+			&j.JobID,&j.AppID,&j.Type,&j.Payload,&j.Status,&j.Retry,&j.MaxRetry,&j.CreatedAt,&j.UpdatedAt,
+		); err != nil {
+			return nil,err 
+		}
+		jobs = append(jobs, j)
+	}
+
+	return jobs,nil
 }
 
 func (r *jobRepo) GetByID(ctx context.Context,jobID string)(*domain.Job,error) {

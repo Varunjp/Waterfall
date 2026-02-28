@@ -89,6 +89,24 @@ func (h *JobHandler) GetJobLogs(ctx context.Context, req *jobpb.GetJobLogsReques
 	return resp,nil 
 }
 
+func (h *JobHandler) GetJobAdminLogs(ctx context.Context,req *jobpb.GetJobLogsAdminRequest)(*jobpb.GetJobLogsResponse,error) {
+	logs,err := h.dc.GetJobAdminLogs(ctx,req.JobId)
+	if err != nil {
+		return nil,err 
+	}
+
+	resp := &jobpb.GetJobLogsResponse{}
+	for _,l := range logs {
+		resp.Logs = append(resp.Logs, &jobpb.JobLog{
+			Timestamp: l.Timestamp.Format(time.RFC3339),
+			Status: l.Status,
+			ErrorMessage: l.ErrorMessage,
+		})
+	}
+
+	return resp,nil
+}
+
 func (h *JobHandler) RetryJob(ctx context.Context, req *jobpb.RetryJobRequest)(*jobpb.RetryJobResponse,error) {
 
 	id,err := h.dc.RetryJob(ctx,req.JobId)
