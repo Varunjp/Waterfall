@@ -53,6 +53,7 @@ func (a *Assigner) Assign(ctx context.Context,job domain.Job) error {
 		job.JobID,
 		job.Payload,
 		job.Retry,
+		job.ManualRetry,
 	).Result()
 	
 	a.metrics.RunningJobs.Inc()

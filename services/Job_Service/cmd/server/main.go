@@ -36,7 +36,7 @@ func main() {
 	db := postgresclient.MustConntect(cfg.DBDSN)
 	jobRepo := repository.NewJobRepo(db)
 	logRepo := repository.NewLogRepo(db)
-	queueProducer := queue.NewKafkaProducer([]string{cfg.KafkaBrokers[0]},cfg.Topic)
+	queueProducer := queue.NewKafkaProducer([]string{cfg.KafkaBrokers[0]},cfg.KafkaTopic)
 
 	producer := producer.NewKafkaProducer(cfg.KafkaBrokers,cfg.KafkaTopic)
 	uc := usecase.NewJobUsecase(producer,logg)

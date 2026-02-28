@@ -21,8 +21,15 @@ func (r *jobRepo) FetchDueJobs(ctx context.Context, now, until time.Time) ([]dom
 	query := `
 		SELECT job_id, app_id, type, payload, schedule_at,retry,max_retry
 		FROM jobs
-		WHERE status = 'SCHEDULED'
-		  AND schedule_at <= NOW()
+		WHERE 
+			(
+				status = 'SCHEDULED' 
+				AND schedule_at <= NOW()
+			)
+			OR 
+			(
+				status = 'MANUAL_RETRY'
+			)
 		ORDER BY schedule_at ASC
 		LIMIT 100
 		FOR UPDATE SKIP LOCKED; 
@@ -65,10 +72,12 @@ func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
 	endOfDay := startOfDay.Add(24*time.Hour - time.Nanosecond)
 
 	query := `
-		SELECT job_id, app_id, type, payload, schedule_at,retry,max_retry
+		SELECT job_id, app_id, type, payload, schedule_at,retry,max_retry,manual_retry
 		FROM jobs
-		WHERE status = 'RUNNING'
-		AND schedule_at >= $1 AND schedule_at < $2
+		WHERE
+			status = 'RUNNING'
+			AND schedule_at >= $1 
+			AND schedule_at < $2
 		FOR UPDATE SKIP LOCKED;
 	`
 
@@ -90,6 +99,7 @@ func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
 			&j.ScheduleAt,
 			&j.Retry,
 			&j.MaxRetries,
+			&j.ManualRetry,
 		); err != nil {
 			return nil, err
 		}
@@ -100,6 +110,7 @@ func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
 }
 
 func (r *jobRepo) MarkQueued(ctx context.Context, jobID string) error {
+
 	_, err := r.db.ExecContext(
 		ctx,
 		`UPDATE jobs SET status='QUEUED' WHERE job_id=$1`,
@@ -176,4 +187,15 @@ func (r *jobRepo) JobLog(ctx context.Context,jobEvent domain.JobRunEvent) error 
 	)
 
 	return err 
+}
+
+func (r *jobRepo) JobManualRetry(ctx context.Context,jobID string, status domain.JobStatus) error {
+	
+	_, err := r.db.ExecContext(
+		ctx,
+		`UPDATE jobs SET manual_retry=manual_retry+1, status=$1, updated_at=NOW() WHERE job_id=$2`,
+		status,
+		jobID,
+	)
+	return err
 }

@@ -7,8 +7,6 @@ import (
 	"job_service/internal/queue"
 	"job_service/internal/repository"
 	"log"
-
-	"github.com/google/uuid"
 )
 
 type DashboardUsecase struct {
@@ -55,7 +53,7 @@ func (uc *DashboardUsecase) GetJobLogs(
 func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,error) {
 
 	role,err := middleware.RoleFromContext(ctx)
-
+	
 	if err != nil {
 		return "",err
 	}
@@ -65,27 +63,24 @@ func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,er
 	}
 
 	job, err := uc.jobs.GetByID(ctx,jobID)
+
 	if err != nil {
 		return "",err 
 	}
 
-	if job.Retry >= job.MaxRetry {
-		return "",domain.ErrMaxRetryExceeded
-	}
-
-	newJobID := uuid.NewString()
-
 	err = uc.queue.Publish(ctx, queue.JobEvent{
-		JobID: newJobID,
+		JobID: job.JobID,
 		AppID: job.AppID,
 		Type: job.Type,
+		Status: string(domain.JobRetry),
 		Payload: string(job.Payload),
-		EventType: queue.JobCreated,
+		EventType: queue.JobRetry,
+		ManualRetry: job.ManualRetry,
 	})
 
 	if err != nil {
 		return "",err 
 	}
 
-	return newJobID,nil 
+	return job.JobID,nil 
 }

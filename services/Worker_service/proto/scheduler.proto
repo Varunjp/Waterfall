@@ -29,6 +29,7 @@ message JobResultRequest {
 
   int64 timestamp = 7;
   int32 retry = 8;
+  int32 manual_retry = 9;
 }
 
 enum JobResultStatus {

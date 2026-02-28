@@ -27,7 +27,7 @@ func NewWatchJobsUsecase(
 }
 
 func (uc *WatchJobsUsecase) Run(ctx context.Context) error {
-	now := time.Now().Add(-20 * time.Second)
+	now := time.Now()
 	until := now.Add(5 * time.Minute)
 	jobs, err := uc.repo.FetchDueJobs(ctx, now, until)
 	if err != nil {
@@ -45,6 +45,7 @@ func (uc *WatchJobsUsecase) Run(ctx context.Context) error {
 			Payload:    job.Payload,
 			Retry:      job.Retry,
 			MaxRetries: job.MaxRetries,
+			ManualRetry: job.ManualRetry,
 		}
 
 		if err := uc.producer.Publish(ctx, job.JobID, event); err != nil {
@@ -81,6 +82,7 @@ func (uc *WatchJobsUsecase) Run(ctx context.Context) error {
 			Payload:    job.Payload,
 			Retry:      job.Retry,
 			MaxRetries: job.MaxRetries,
+			ManualRetry: job.ManualRetry,
 		}
 
 		if err := uc.jobStatusproducer.Publish(ctx, job.JobID, event); err != nil {

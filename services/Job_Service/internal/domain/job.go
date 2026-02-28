@@ -8,6 +8,7 @@ const (
 	JobCreated  JobEventType = "JOB_CREATED"
 	JobUpdated  JobEventType = "JOB_UPDATED"
 	JobCanceled JobEventType = "JOB_CANCELED"
+	JobRetry    JobEventType = "MANUAL_RETRY"
 )
 
 type JobEvent struct {

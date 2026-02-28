@@ -33,7 +33,7 @@ func (c *Client) Heartbeat(ctx context.Context, jobID,appID,workerID string, pro
 	})
 }
 
-func (c *Client) ReportResult(ctx context.Context,jobID,appID,workerID string,success bool,errMsg string, retry int) {
+func (c *Client) ReportResult(ctx context.Context,jobID,appID,workerID string,success bool,errMsg string, retry int,manual_retry int) {
 	status := pb.JobResultStatus_JOB_RESULT_SUCCESS
 	if !success {
 		status = pb.JobResultStatus_JOB_RESULT_FAILED
@@ -46,6 +46,7 @@ func (c *Client) ReportResult(ctx context.Context,jobID,appID,workerID string,su
 		Status: status,
 		ErrorMessage: errMsg,
 		Retry: int32(retry),
+		ManualRetry: int32(manual_retry),
 		Timestamp: time.Now().Unix(),
 	})
 }

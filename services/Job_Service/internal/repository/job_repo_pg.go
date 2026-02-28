@@ -63,12 +63,13 @@ func (r *jobRepo) ListFailed(ctx context.Context, appID string,limit,offset int)
 
 func (r *jobRepo) GetByID(ctx context.Context,jobID string)(*domain.Job,error) {
 	query := `
-	SELECT job_id,app_id, type, payload, status, retry, max_retry, create_at, updated_at
+	SELECT job_id,app_id, type, payload, status, retry, max_retry, created_at, updated_at,manual_retry
 	FROM jobs WHERE job_id=$1
 	`
+
 	var j domain.Job
 	err := r.db.QueryRow(ctx,query,jobID).Scan(
-		&j.JobID,&j.AppID,&j.Type,&j.Payload,&j.Status,&j.Retry,&j.MaxRetry,&j.CreatedAt,&j.UpdatedAt,
+		&j.JobID,&j.AppID,&j.Type,&j.Payload,&j.Status,&j.Retry,&j.MaxRetry,&j.CreatedAt,&j.UpdatedAt,&j.ManualRetry,
 	)
 
 	if err != nil {

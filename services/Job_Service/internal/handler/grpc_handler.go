@@ -90,7 +90,9 @@ func (h *JobHandler) GetJobLogs(ctx context.Context, req *jobpb.GetJobLogsReques
 }
 
 func (h *JobHandler) RetryJob(ctx context.Context, req *jobpb.RetryJobRequest)(*jobpb.RetryJobResponse,error) {
+
 	id,err := h.dc.RetryJob(ctx,req.JobId)
+
 	if err != nil {
 		return nil,err 
 	}

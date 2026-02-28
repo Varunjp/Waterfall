@@ -11,4 +11,5 @@ type RunningJob struct {
 	LastBeat  time.Time
 	Retry     int
 	MaxRetry  int
+	ManualRetry int 
 }

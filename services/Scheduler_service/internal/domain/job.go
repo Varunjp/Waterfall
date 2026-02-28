@@ -12,4 +12,5 @@ type Job struct {
 	UpdateAt 	time.Time
 	Retry 		int `json:"retry"`
 	MaxRetries  int `json:"max_retries"`
+	ManualRetry int `json:"manual_retry"`
 }

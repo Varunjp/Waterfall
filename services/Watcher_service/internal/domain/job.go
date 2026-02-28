@@ -5,12 +5,15 @@ import "time"
 type JobStatus string
 
 const (
-	StatusCreated   JobStatus = "CREATED"
-	StatusCanceled  JobStatus = "CANCELED"
-	StatusFailed    JobStatus = "FAILED"
-	StatusSuccess   JobStatus = "COMPLETED"
-	StatusScheduled JobStatus = "SCHEDULED"
-	StatusQueued    JobStatus = "QUEUED"
+	StatusCreated   	JobStatus = "CREATED"
+	StatusCanceled  	JobStatus = "CANCELED"
+	StatusFailed    	JobStatus = "FAILED"
+	StatusSuccess   	JobStatus = "COMPLETED"
+	StatusScheduled 	JobStatus = "SCHEDULED"
+	StatusQueued    	JobStatus = "QUEUED"
+	StatusManualRetry 	JobStatus = "MANUAL_RETRY"
+	StatusPending     	JobStatus = "PENDING"
+	StatusRunning     	JobStatus = "RUNNING"
 )
 
 type Job struct {
@@ -24,13 +27,15 @@ type Job struct {
 	Status     JobStatus
 	Retry      int
 	MaxRetries int
+	ManualRetry int 
 }
 
 type QueueEvent struct {
-	JobID      string `json:"job_id"`
-	AppID      string `json:"app_id"`
-	Type       string `json:"type"`
-	Payload    string `json:"payload"`
-	Retry      int    `json:"retry"`
-	MaxRetries int    `json:"max_retries"`
+	JobID      	string `json:"job_id"`
+	AppID      	string `json:"app_id"`
+	Type       	string `json:"type"`
+	Payload    	string `json:"payload"`
+	Retry      	int    `json:"retry"`
+	MaxRetries 	int    `json:"max_retries"`
+	ManualRetry int    `json:"manual_retry"`
 }

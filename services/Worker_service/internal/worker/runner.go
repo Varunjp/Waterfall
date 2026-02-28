@@ -25,7 +25,7 @@ type Runner struct {
 
 type GRPC interface {
 	Heartbeat(ctx context.Context, jobID, appID, workerID string, progress int64)
-	ReportResult(ctx context.Context, jobID, appID, workerID string, success bool, errMsg string, retry int)
+	ReportResult(ctx context.Context, jobID, appID, workerID string, success bool, errMsg string, retry int,manual_retry int)
 }
 
 func NewRunner(redis *redis.Client, grpc GRPC, appID, workerID string, jobTypes []string) *Runner {
@@ -107,9 +107,9 @@ func (r *Runner) handleJob(ctx context.Context, stream, group, msgID string, job
 	err := executor.Execute(ctx, job.Payload)
 
 	if err != nil {
-		r.grpc.ReportResult(ctx, job.JobID, r.appID, r.workerID, false, err.Error(), job.Retry)
+		r.grpc.ReportResult(ctx, job.JobID, r.appID, r.workerID, false, err.Error(), job.Retry,job.ManualRetry)
 	} else {
-		r.grpc.ReportResult(ctx, job.JobID, r.appID, r.workerID, true, "", job.Retry)
+		r.grpc.ReportResult(ctx, job.JobID, r.appID, r.workerID, true, "", job.Retry,job.ManualRetry)
 	}
 
 	r.redis.XAck(stream, group, msgID)

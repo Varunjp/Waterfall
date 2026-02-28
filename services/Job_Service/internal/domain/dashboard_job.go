@@ -10,6 +10,7 @@ type Job struct {
 	Status    string
 	Retry     int
 	MaxRetry  int
+	ManualRetry int 
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

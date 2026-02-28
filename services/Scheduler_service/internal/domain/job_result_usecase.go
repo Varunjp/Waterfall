@@ -7,6 +7,7 @@ type JobResultInput struct {
 	AppID        string
 	Status       string
 	Retry        int
+	ManualRetry  int 
 	ErrorMessage string
 }
 
