@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 	"watcher_service/internal/domain"
 	"watcher_service/internal/repository"
 
@@ -18,7 +19,6 @@ func NewConsumeJobUsecase(r repository.JobRepository, l *zap.Logger) *ConsumeJob
 }
 
 func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) error {
-
 	switch event.EventType {
 	case domain.JobCreated:
 		job := domain.Job{
@@ -26,12 +26,18 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 			AppID:      event.AppID,
 			Type:       event.Type,
 			Payload:    event.Payload,
-			Status:     domain.StatusScheduled,
-			CreatedAt:  event.Timestamp,
-			UpdatedAt:  event.Timestamp,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
 			ScheduleAt: event.Timestamp,
 			ManualRetry: 0,
 		}
+
+		if event.Timestamp.After(time.Now()) {
+			job.Status = domain.StatusPending
+		}else {
+			job.Status = domain.StatusScheduled
+		}
+
 		return uc.repo.Insert(ctx, job)
 	case domain.JobUpdated:
 		return uc.repo.UpdatePayload(ctx, event.JobID, event.Payload)

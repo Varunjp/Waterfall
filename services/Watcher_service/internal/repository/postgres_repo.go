@@ -30,6 +30,11 @@ func (r *jobRepo) FetchDueJobs(ctx context.Context, now, until time.Time) ([]dom
 			(
 				status = 'MANUAL_RETRY'
 			)
+			OR
+			(	
+				status = 'PENDING'
+				AND schedule_at <= NOW()
+			)
 		ORDER BY schedule_at ASC
 		LIMIT 100
 		FOR UPDATE SKIP LOCKED; 
@@ -75,9 +80,17 @@ func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
 		SELECT job_id, app_id, type, payload, schedule_at,retry,max_retry,manual_retry
 		FROM jobs
 		WHERE
-			status = 'RUNNING'
-			AND schedule_at >= $1 
-			AND schedule_at < $2
+			(
+				status = 'RUNNING'
+				AND schedule_at >= $1 
+				AND schedule_at < $2
+			)
+			OR 
+			(
+				status = 'QUEUED'
+				AND schedule_at >= $1 
+				AND schedule_at < $2
+			)
 		FOR UPDATE SKIP LOCKED;
 	`
 

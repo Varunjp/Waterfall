@@ -11,7 +11,7 @@ import (
 )
 
 type JobUseCase interface {
-	Create(ctx context.Context, appID, jobType, payload string)(string, error)
+	Create(ctx context.Context, appID, jobType, payload string, scheduleAt *time.Time)(string, error)
 	Update(ctx context.Context, jobID, payload string) error 
 	Cancel(ctx context.Context, jobID string) error 
 }
@@ -25,7 +25,7 @@ func NewJobUsecase(p producer.Producer,l *zap.Logger) JobUseCase {
 	return &jobUsecase{producer: p, logger: l}
 }
 
-func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string)(string, error) {
+func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string, scheduleAt *time.Time)(string, error) {
 	jobID := uuid.NewString()
 
 	event := domain.JobEvent {
@@ -34,9 +34,14 @@ func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string)
 		Type: jobType,
 		Payload: payload,
 		EventType: domain.JobCreated,
-		Timestamp: time.Now(),
 	}
 
+	if scheduleAt != nil && scheduleAt.After(time.Now()) {
+		event.Timestamp = *scheduleAt
+	}else {
+		event.Timestamp = time.Now()
+	}
+	
 	err := u.producer.Publish(ctx,jobID,event)
 	if err != nil {
 		return "",err 

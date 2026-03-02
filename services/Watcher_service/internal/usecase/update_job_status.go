@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"time"
 	"watcher_service/internal/domain"
 	"watcher_service/internal/repository"
 )
@@ -26,9 +27,15 @@ func (uc *UpdateJobStatusUsecase) Handle(ctx context.Context, event domain.JobRu
 			return err 
 		}
 	}
-	
+
 	if event.Status == string(domain.JobRetry) {
-		return uc.jobRepo.RetryJob(ctx, event.JobID, domain.StatusScheduled, event.Retry,*event.NextRun)
+		var nr time.Time 
+		if event.NextRun != nil {
+			nr = *event.NextRun
+		}else {
+			nr = time.Now()
+		}
+		return uc.jobRepo.RetryJob(ctx, event.JobID, domain.StatusScheduled, event.Retry,nr)
 	}
 
 	return uc.jobRepo.UpdateStatus(ctx, event.JobID, domain.JobStatus(event.Status))

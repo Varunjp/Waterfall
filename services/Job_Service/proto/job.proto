@@ -4,6 +4,8 @@ package job;
 
 option go_package = "internal/proto/jobpb";
 
+import "google/protobuf/timestamp.proto";
+
 service JobService {
     rpc CreateJob(CreateJobRequest) returns (JobResponse);
     rpc UpdateJob(UpdateJobRequest) returns (JobResponse);
@@ -20,6 +22,7 @@ message CreateJobRequest {
     string app_id = 1;
     string type = 2;
     string payload = 3;
+    google.protobuf.Timestamp schedule_at = 4;
 }
 
 message UpdateJobRequest {

@@ -3,3 +3,6 @@
 
 **/logs
 **/.log
+
+**/tmp
+**/.air.toml

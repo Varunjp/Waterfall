@@ -19,7 +19,8 @@ func NewJobHandler(uc usecase.JobUseCase, dc usecase.DashboardUsecase) *JobHandl
 }
 
 func (h *JobHandler) CreateJob(ctx context.Context, r *jobpb.CreateJobRequest)(*jobpb.JobResponse, error) {
-	jobID, err := h.uc.Create(ctx, r.AppId, r.Type, r.Payload)
+	sch := r.ScheduleAt.AsTime()
+	jobID, err := h.uc.Create(ctx, r.AppId, r.Type, r.Payload,&sch)
 	if err != nil {
 		return nil, err 
 	}
