@@ -153,14 +153,26 @@ func (r *jobRepo) Insert(ctx context.Context, job domain.Job) error {
 	return err
 }
 
-func (r *jobRepo) UpdatePayload(ctx context.Context, jobID, payload string) error {
-	_, err := r.db.ExecContext(
-		ctx,
-		`UPDATE jobs SET payload=$1, updated_at=NOW() WHERE job_id=$2`,
-		payload,
-		jobID,
-	)
-	return err
+func (r *jobRepo) UpdatePayload(ctx context.Context, jobID, payload string) (bool,error) {
+
+	query := `
+		UPDATE jobs
+		SET payload=$1,updated_at=NOW()
+		WHERE job_id=$2
+		AND status IN ('SCHEDULED','QUEUED','PENDING')
+		RETURNING job_id;
+	`
+
+	var id string 
+	err := r.db.QueryRowContext(ctx,query,payload,jobID).Scan(&id)
+
+	if err == sql.ErrNoRows {
+		return false,nil 
+	}
+	if err != nil {
+		return false,err 
+	}
+	return true,nil 
 }
 
 func (r *jobRepo) UpdateStatus(ctx context.Context, jobID string, status domain.JobStatus) error {
@@ -211,4 +223,25 @@ func (r *jobRepo) JobManualRetry(ctx context.Context,jobID string, status domain
 		jobID,
 	)
 	return err
+}
+
+func (r *jobRepo) CancelJob(ctx context.Context,jobID string) (bool,error) {
+
+	query := `UPDATE jobs
+		SET status = 'CANCELLED',
+			updated_at = NOW()
+		WHERE job_id = $1
+		AND status IN ('SCHEDULED','QUEUED','PENDING')
+		RETURNING job_id;
+		`
+	var id string 
+	err := r.db.QueryRowContext(ctx,query,jobID).Scan(&id)
+
+	if err == sql.ErrNoRows {
+		return false,nil 
+	}
+	if err != nil {
+		return false,err 
+	}
+	return true,nil 
 }

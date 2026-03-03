@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"time"
 	"watcher_service/internal/domain"
 	"watcher_service/internal/repository"
@@ -40,9 +41,23 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 
 		return uc.repo.Insert(ctx, job)
 	case domain.JobUpdated:
-		return uc.repo.UpdatePayload(ctx, event.JobID, event.Payload)
+		updated,err := uc.repo.UpdatePayload(ctx, event.JobID, event.Payload)
+		if err != nil {
+			return err 
+		}
+		if !updated {
+			return errors.New("job cannot updated (already running or finished)")
+		}
+		return nil 
 	case domain.JobCanceled:
-		return uc.repo.UpdateStatus(ctx, event.JobID, domain.StatusCanceled)
+		updated,err := uc.repo.CancelJob(ctx, event.JobID)
+		if err != nil {
+			return err 
+		}
+		if !updated {
+			return errors.New("job cannot be cancelled (already running or finished)")
+		}
+		return nil 
 	case domain.JobFailed:
 		return uc.repo.UpdateStatus(ctx, event.JobID, domain.StatusFailed)
 	case domain.JobComplete:
