@@ -240,10 +240,9 @@ func (x *JobResponse) GetStatus() string {
 
 type ListJobsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AppId         string                 `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
-	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
-	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
-	Offset        int32                  `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -276,13 +275,6 @@ func (x *ListJobsRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListJobsRequest.ProtoReflect.Descriptor instead.
 func (*ListJobsRequest) Descriptor() ([]byte, []int) {
 	return file_proto_job_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *ListJobsRequest) GetAppId() string {
-	if x != nil {
-		return x.AppId
-	}
-	return ""
 }
 
 func (x *ListJobsRequest) GetStatus() string {
@@ -808,12 +800,11 @@ const file_proto_job_proto_rawDesc = "" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"<\n" +
 	"\vJobResponse\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status\"n\n" +
-	"\x0fListJobsRequest\x12\x15\n" +
-	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x04 \x01(\x05R\x06offset\"E\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\"W\n" +
+	"\x0fListJobsRequest\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x03 \x01(\x05R\x06offset\"E\n" +
 	"\x15ListFailedJobsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\xea\x01\n" +
