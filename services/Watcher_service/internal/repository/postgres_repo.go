@@ -93,7 +93,6 @@ func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
 			)
 		FOR UPDATE SKIP LOCKED;
 	`
-
 	rows, err := r.db.QueryContext(ctx,query,startOfDay,endOfDay)
 
 	if err != nil {
