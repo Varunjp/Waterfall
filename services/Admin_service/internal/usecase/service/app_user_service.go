@@ -5,6 +5,7 @@ import (
 	"admin_service/internal/domain/enums"
 	domainErr "admin_service/internal/domain/errors"
 	"admin_service/internal/infrastructure/security"
+	"admin_service/internal/pkg/validation"
 	repo "admin_service/internal/repository/interfaces"
 )
 
@@ -43,6 +44,11 @@ func (s *AppUserService) List(appID string) ([]*entities.AppUser, error) {
 }
 
 func (s *AppUserService) AppLogin(email,password string)(string,error) {
+	
+	if !validation.IsVaildEmail(email) {
+		return "",domainErr.ErrInvalidCredentials
+	}
+	
 	appUser,err := s.repo.FindByEmail(email)
 	if err != nil {
 		return "",domainErr.ErrInvalidCredentials
