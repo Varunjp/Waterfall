@@ -132,6 +132,7 @@ func mapJobs(jobs []domain.Job) *jobpb.ListJobsResponse {
 			MaxRetry: int32(j.MaxRetry),
 			CreatedAt: j.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: j.UpdatedAt.Format(time.RFC3339),
+			ManualRetry: int32(j.ManualRetry),
 		})
 	}
 

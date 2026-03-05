@@ -60,6 +60,7 @@ message Job {
   int32 max_retry = 7;
   string created_at = 8;
   string updated_at = 9;
+  int32 manual_retry =10;
 }
 
 message ListJobsResponse {

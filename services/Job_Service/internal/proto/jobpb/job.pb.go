@@ -361,6 +361,7 @@ type Job struct {
 	MaxRetry      int32                  `protobuf:"varint,7,opt,name=max_retry,json=maxRetry,proto3" json:"max_retry,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	ManualRetry   int32                  `protobuf:"varint,10,opt,name=manual_retry,json=manualRetry,proto3" json:"manual_retry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -456,6 +457,13 @@ func (x *Job) GetUpdatedAt() string {
 		return x.UpdatedAt
 	}
 	return ""
+}
+
+func (x *Job) GetManualRetry() int32 {
+	if x != nil {
+		return x.ManualRetry
+	}
+	return 0
 }
 
 type ListJobsResponse struct {
@@ -807,7 +815,7 @@ const file_proto_job_proto_rawDesc = "" +
 	"\x06offset\x18\x03 \x01(\x05R\x06offset\"E\n" +
 	"\x15ListFailedJobsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\xea\x01\n" +
+	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\x8d\x02\n" +
 	"\x03Job\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x15\n" +
 	"\x06app_id\x18\x02 \x01(\tR\x05appId\x12\x12\n" +
@@ -819,7 +827,9 @@ const file_proto_job_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\b \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\t \x01(\tR\tupdatedAt\"0\n" +
+	"updated_at\x18\t \x01(\tR\tupdatedAt\x12!\n" +
+	"\fmanual_retry\x18\n" +
+	" \x01(\x05R\vmanualRetry\"0\n" +
 	"\x10ListJobsResponse\x12\x1c\n" +
 	"\x04jobs\x18\x01 \x03(\v2\b.job.JobR\x04jobs\"*\n" +
 	"\x11GetJobLogsRequest\x12\x15\n" +

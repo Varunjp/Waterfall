@@ -19,7 +19,7 @@ func NewJobRepo(db *pgxpool.Pool) JobRepository {
 
 func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit,offset int)([]domain.Job,error) {
 	query := `
-	SELECT job_id, app_id, type, payload, status, retry, max_retry, created_at,updated_at
+	SELECT job_id, app_id, type, payload, status, retry, max_retry, created_at,updated_at,manual_retry
 	FROM jobs
 	WHERE app_id=$1
 	`
@@ -47,7 +47,7 @@ func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit,off
 	for rows.Next() {
 		var j domain.Job
 		if err := rows.Scan(
-			&j.JobID,&j.AppID,&j.Type,&j.Payload,&j.Status,&j.Retry,&j.MaxRetry,&j.CreatedAt,&j.UpdatedAt,
+			&j.JobID,&j.AppID,&j.Type,&j.Payload,&j.Status,&j.Retry,&j.MaxRetry,&j.CreatedAt,&j.UpdatedAt,&j.ManualRetry,
 		); err != nil {
 			return nil,err 
 		}
