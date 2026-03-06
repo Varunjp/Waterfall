@@ -9,7 +9,7 @@ var MethodPermissions = map[string][]string{
 	"/admin.AppService/UnblockApp":  {"platform_admin"},
 
 	// App management
-	"/admin.AppUserService/CreateUser": {"super_admin", "admin"},
+	"/admin.AppUserService/CreateUser": {"super_admin"},
 	"/admin.AppUserService/ListUsers":  {"super_admin", "admin", "viewer"},
 }
 

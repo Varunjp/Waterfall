@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"admin_service/internal/domain/entities"
+	"context"
 	"database/sql"
 )
 
@@ -69,4 +70,17 @@ func (r *AppUserRepo) FindByEmail(email string) (*entities.AppUser,error) {
 		return nil,err 
 	}
 	return &appUser,nil 
+}
+
+func (r *AppUserRepo) UpdatePassword(ctx context.Context,email,passhash string) error {
+
+	query := `UPDATE app_users SET password_hash = $1 WHERE email = $2`
+	args := []any{passhash,email}
+
+	_,err := r.db.QueryContext(ctx,query,args...)
+	if err != nil {
+		return err 
+	}
+
+	return nil 
 }

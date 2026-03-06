@@ -20,9 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AppUserService_CreateUser_FullMethodName = "/admin.AppUserService/CreateUser"
-	AppUserService_ListUsers_FullMethodName  = "/admin.AppUserService/ListUsers"
-	AppUserService_AppLogin_FullMethodName   = "/admin.AppUserService/AppLogin"
+	AppUserService_CreateUser_FullMethodName             = "/admin.AppUserService/CreateUser"
+	AppUserService_ListUsers_FullMethodName              = "/admin.AppUserService/ListUsers"
+	AppUserService_AppLogin_FullMethodName               = "/admin.AppUserService/AppLogin"
+	AppUserService_RequestResetPassword_FullMethodName   = "/admin.AppUserService/RequestResetPassword"
+	AppUserService_VerifyPasswordResetOtp_FullMethodName = "/admin.AppUserService/VerifyPasswordResetOtp"
+	AppUserService_ResetPassword_FullMethodName          = "/admin.AppUserService/ResetPassword"
 )
 
 // AppUserServiceClient is the client API for AppUserService service.
@@ -32,6 +35,9 @@ type AppUserServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
 	AppLogin(ctx context.Context, in *AppLoginRequest, opts ...grpc.CallOption) (*AppLoginResponse, error)
+	RequestResetPassword(ctx context.Context, in *RequestResetPasswordRequest, opts ...grpc.CallOption) (*RequestResetPasswordResponse, error)
+	VerifyPasswordResetOtp(ctx context.Context, in *VerifyPasswordResetOtpRequest, opts ...grpc.CallOption) (*VerifyPasswordResetOtpResponse, error)
+	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
 }
 
 type appUserServiceClient struct {
@@ -72,6 +78,36 @@ func (c *appUserServiceClient) AppLogin(ctx context.Context, in *AppLoginRequest
 	return out, nil
 }
 
+func (c *appUserServiceClient) RequestResetPassword(ctx context.Context, in *RequestResetPasswordRequest, opts ...grpc.CallOption) (*RequestResetPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RequestResetPasswordResponse)
+	err := c.cc.Invoke(ctx, AppUserService_RequestResetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appUserServiceClient) VerifyPasswordResetOtp(ctx context.Context, in *VerifyPasswordResetOtpRequest, opts ...grpc.CallOption) (*VerifyPasswordResetOtpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifyPasswordResetOtpResponse)
+	err := c.cc.Invoke(ctx, AppUserService_VerifyPasswordResetOtp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appUserServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResetPasswordResponse)
+	err := c.cc.Invoke(ctx, AppUserService_ResetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppUserServiceServer is the server API for AppUserService service.
 // All implementations must embed UnimplementedAppUserServiceServer
 // for forward compatibility.
@@ -79,6 +115,9 @@ type AppUserServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*emptypb.Empty, error)
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
 	AppLogin(context.Context, *AppLoginRequest) (*AppLoginResponse, error)
+	RequestResetPassword(context.Context, *RequestResetPasswordRequest) (*RequestResetPasswordResponse, error)
+	VerifyPasswordResetOtp(context.Context, *VerifyPasswordResetOtpRequest) (*VerifyPasswordResetOtpResponse, error)
+	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
 	mustEmbedUnimplementedAppUserServiceServer()
 }
 
@@ -97,6 +136,15 @@ func (UnimplementedAppUserServiceServer) ListUsers(context.Context, *ListUsersRe
 }
 func (UnimplementedAppUserServiceServer) AppLogin(context.Context, *AppLoginRequest) (*AppLoginResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AppLogin not implemented")
+}
+func (UnimplementedAppUserServiceServer) RequestResetPassword(context.Context, *RequestResetPasswordRequest) (*RequestResetPasswordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RequestResetPassword not implemented")
+}
+func (UnimplementedAppUserServiceServer) VerifyPasswordResetOtp(context.Context, *VerifyPasswordResetOtpRequest) (*VerifyPasswordResetOtpResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyPasswordResetOtp not implemented")
+}
+func (UnimplementedAppUserServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResetPassword not implemented")
 }
 func (UnimplementedAppUserServiceServer) mustEmbedUnimplementedAppUserServiceServer() {}
 func (UnimplementedAppUserServiceServer) testEmbeddedByValue()                        {}
@@ -173,6 +221,60 @@ func _AppUserService_AppLogin_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppUserService_RequestResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RequestResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppUserServiceServer).RequestResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppUserService_RequestResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppUserServiceServer).RequestResetPassword(ctx, req.(*RequestResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppUserService_VerifyPasswordResetOtp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyPasswordResetOtpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppUserServiceServer).VerifyPasswordResetOtp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppUserService_VerifyPasswordResetOtp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppUserServiceServer).VerifyPasswordResetOtp(ctx, req.(*VerifyPasswordResetOtpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppUserService_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppUserServiceServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppUserService_ResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppUserServiceServer).ResetPassword(ctx, req.(*ResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AppUserService_ServiceDesc is the grpc.ServiceDesc for AppUserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,6 +293,18 @@ var AppUserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AppLogin",
 			Handler:    _AppUserService_AppLogin_Handler,
+		},
+		{
+			MethodName: "RequestResetPassword",
+			Handler:    _AppUserService_RequestResetPassword_Handler,
+		},
+		{
+			MethodName: "VerifyPasswordResetOtp",
+			Handler:    _AppUserService_VerifyPasswordResetOtp_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _AppUserService_ResetPassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -10,6 +10,12 @@ service AppUserService {
   rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty);
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
   rpc AppLogin(AppLoginRequest) returns (AppLoginResponse);
+ 
+  rpc RequestResetPassword(RequestResetPasswordRequest) returns (RequestResetPasswordResponse);
+  rpc VerifyPasswordResetOtp(VerifyPasswordResetOtpRequest)
+      returns (VerifyPasswordResetOtpResponse);
+  rpc ResetPassword(ResetPasswordRequest)
+      returns (ResetPasswordResponse);
 }
 
 message AppLoginRequest {
@@ -19,6 +25,32 @@ message AppLoginRequest {
 
 message AppLoginResponse {
   string access_token = 1;
+}
+
+message RequestResetPasswordRequest {
+  string email = 1;
+}
+
+message RequestResetPasswordResponse {
+  string message = 1;
+}
+
+message VerifyPasswordResetOtpRequest {
+  string email = 1;
+  string otp = 2;
+}
+
+message VerifyPasswordResetOtpResponse {
+  string reset_token = 1;
+}
+
+message ResetPasswordRequest {
+  string reset_token = 1;
+  string new_password = 2;
+}
+
+message ResetPasswordResponse {
+  string message = 1;
 }
 
 message CreateUserRequest {

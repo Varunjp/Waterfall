@@ -14,6 +14,9 @@ type AppUserHandler struct {
 		Create(string, string, string) error
 		List(string) ([]*entities.AppUser, error)
 		AppLogin(email,password string)(string,error)
+		RequestPasswordReset(ctx context.Context,email string) error
+		VerifyOtp(ctx context.Context,email,otp string)(string,error)
+		ResetPassword(ctx context.Context,token,password string) error
 	}
 }
 
@@ -21,6 +24,9 @@ func NewAppUserHandler(u interface {
 	Create(string, string, string) error
 	List(string) ([]*entities.AppUser, error)
 	AppLogin(email,password string)(string,error)
+	RequestPasswordReset(ctx context.Context,email string) error
+	VerifyOtp(ctx context.Context,email,otp string)(string,error)
+	ResetPassword(ctx context.Context,token,password string) error
 }) *AppUserHandler {
 	return &AppUserHandler{usecase: u}
 }
@@ -56,4 +62,39 @@ func (h *AppUserHandler) AppLogin(ctx context.Context, req *pb.AppLoginRequest) 
 		return nil,err 
 	}
 	return &pb.AppLoginResponse{AccessToken: token},nil 
+}
+
+func (h *AppUserHandler) RequestPasswordReset(ctx context.Context, req *pb.RequestResetPasswordRequest)(*pb.RequestResetPasswordResponse,error) {
+	err := h.usecase.RequestPasswordReset(ctx,req.Email)
+	if err != nil {
+		return nil,err 
+	}
+
+	return &pb.RequestResetPasswordResponse{
+		Message: "OTP sent to email",
+	},nil 
+}
+
+func (h *AppUserHandler) VerifyPasswordResetOtp(ctx context.Context,req *pb.VerifyPasswordResetOtpRequest)(*pb.VerifyPasswordResetOtpResponse,error) {
+
+	token,err := h.usecase.VerifyOtp(ctx,req.Email,req.Otp)
+	if err != nil {
+		return nil ,err 
+	}
+
+	return &pb.VerifyPasswordResetOtpResponse{
+		ResetToken: token,
+	},nil 
+}
+
+func (h *AppUserHandler) ResetPassword(ctx context.Context,req *pb.ResetPasswordRequest) (*pb.ResetPasswordResponse,error) {
+	err := h.usecase.ResetPassword(ctx,req.ResetToken,req.NewPassword)
+
+	if err != nil {
+		return  nil,err 
+	}
+
+	return &pb.ResetPasswordResponse{
+		Message: "password updated",
+	},nil 
 }

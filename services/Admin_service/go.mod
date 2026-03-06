@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.11.2
 	golang.org/x/net v0.48.0 // indirect
