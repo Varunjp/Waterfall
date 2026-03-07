@@ -94,6 +94,7 @@ type UpdateJobRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
 	Payload       string                 `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
+	ScheduleAt    *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=schedule_at,json=scheduleAt,proto3" json:"schedule_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -140,6 +141,13 @@ func (x *UpdateJobRequest) GetPayload() string {
 		return x.Payload
 	}
 	return ""
+}
+
+func (x *UpdateJobRequest) GetScheduleAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ScheduleAt
+	}
+	return nil
 }
 
 type CancelJobRequest struct {
@@ -359,9 +367,10 @@ type Job struct {
 	Payload       string                 `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
 	Retry         int32                  `protobuf:"varint,6,opt,name=retry,proto3" json:"retry,omitempty"`
 	MaxRetry      int32                  `protobuf:"varint,7,opt,name=max_retry,json=maxRetry,proto3" json:"max_retry,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	ManualRetry   int32                  `protobuf:"varint,10,opt,name=manual_retry,json=manualRetry,proto3" json:"manual_retry,omitempty"`
+	ScheduleAt    string                 `protobuf:"bytes,8,opt,name=schedule_at,json=scheduleAt,proto3" json:"schedule_at,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	ManualRetry   int32                  `protobuf:"varint,11,opt,name=manual_retry,json=manualRetry,proto3" json:"manual_retry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -445,6 +454,13 @@ func (x *Job) GetMaxRetry() int32 {
 	return 0
 }
 
+func (x *Job) GetScheduleAt() string {
+	if x != nil {
+		return x.ScheduleAt
+	}
+	return ""
+}
+
 func (x *Job) GetCreatedAt() string {
 	if x != nil {
 		return x.CreatedAt
@@ -469,6 +485,9 @@ func (x *Job) GetManualRetry() int32 {
 type ListJobsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Jobs          []*Job                 `protobuf:"bytes,1,rep,name=jobs,proto3" json:"jobs,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -508,6 +527,27 @@ func (x *ListJobsResponse) GetJobs() []*Job {
 		return x.Jobs
 	}
 	return nil
+}
+
+func (x *ListJobsResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *ListJobsResponse) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *ListJobsResponse) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
 }
 
 type GetJobLogsRequest struct {
@@ -800,10 +840,12 @@ const file_proto_job_proto_rawDesc = "" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x18\n" +
 	"\apayload\x18\x03 \x01(\tR\apayload\x12;\n" +
 	"\vschedule_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"scheduleAt\"C\n" +
+	"scheduleAt\"\x80\x01\n" +
 	"\x10UpdateJobRequest\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x18\n" +
-	"\apayload\x18\x02 \x01(\tR\apayload\")\n" +
+	"\apayload\x18\x02 \x01(\tR\apayload\x12;\n" +
+	"\vschedule_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"scheduleAt\")\n" +
 	"\x10CancelJobRequest\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"<\n" +
 	"\vJobResponse\x12\x15\n" +
@@ -815,7 +857,7 @@ const file_proto_job_proto_rawDesc = "" +
 	"\x06offset\x18\x03 \x01(\x05R\x06offset\"E\n" +
 	"\x15ListFailedJobsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\x8d\x02\n" +
+	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\xae\x02\n" +
 	"\x03Job\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x15\n" +
 	"\x06app_id\x18\x02 \x01(\tR\x05appId\x12\x12\n" +
@@ -823,15 +865,20 @@ const file_proto_job_proto_rawDesc = "" +
 	"\x06status\x18\x04 \x01(\tR\x06status\x12\x18\n" +
 	"\apayload\x18\x05 \x01(\tR\apayload\x12\x14\n" +
 	"\x05retry\x18\x06 \x01(\x05R\x05retry\x12\x1b\n" +
-	"\tmax_retry\x18\a \x01(\x05R\bmaxRetry\x12\x1d\n" +
+	"\tmax_retry\x18\a \x01(\x05R\bmaxRetry\x12\x1f\n" +
+	"\vschedule_at\x18\b \x01(\tR\n" +
+	"scheduleAt\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\b \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\t \x01(\tR\tupdatedAt\x12!\n" +
-	"\fmanual_retry\x18\n" +
-	" \x01(\x05R\vmanualRetry\"0\n" +
+	"updated_at\x18\n" +
+	" \x01(\tR\tupdatedAt\x12!\n" +
+	"\fmanual_retry\x18\v \x01(\x05R\vmanualRetry\"t\n" +
 	"\x10ListJobsResponse\x12\x1c\n" +
-	"\x04jobs\x18\x01 \x03(\v2\b.job.JobR\x04jobs\"*\n" +
+	"\x04jobs\x18\x01 \x03(\v2\b.job.JobR\x04jobs\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x04 \x01(\x05R\x06offset\"*\n" +
 	"\x11GetJobLogsRequest\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"/\n" +
 	"\x16GetJobLogsAdminRequest\x12\x15\n" +
@@ -891,29 +938,30 @@ var file_proto_job_proto_goTypes = []any{
 }
 var file_proto_job_proto_depIdxs = []int32{
 	14, // 0: job.CreateJobRequest.schedule_at:type_name -> google.protobuf.Timestamp
-	6,  // 1: job.ListJobsResponse.jobs:type_name -> job.Job
-	10, // 2: job.GetJobLogsResponse.logs:type_name -> job.JobLog
-	0,  // 3: job.JobService.CreateJob:input_type -> job.CreateJobRequest
-	1,  // 4: job.JobService.UpdateJob:input_type -> job.UpdateJobRequest
-	2,  // 5: job.JobService.CancelJob:input_type -> job.CancelJobRequest
-	4,  // 6: job.JobService.ListJobs:input_type -> job.ListJobsRequest
-	5,  // 7: job.JobService.ListFailedJobs:input_type -> job.ListFailedJobsRequest
-	8,  // 8: job.JobService.GetJobLogs:input_type -> job.GetJobLogsRequest
-	9,  // 9: job.JobService.GetJobAdminLogs:input_type -> job.GetJobLogsAdminRequest
-	12, // 10: job.JobService.RetryJob:input_type -> job.RetryJobRequest
-	3,  // 11: job.JobService.CreateJob:output_type -> job.JobResponse
-	3,  // 12: job.JobService.UpdateJob:output_type -> job.JobResponse
-	3,  // 13: job.JobService.CancelJob:output_type -> job.JobResponse
-	7,  // 14: job.JobService.ListJobs:output_type -> job.ListJobsResponse
-	7,  // 15: job.JobService.ListFailedJobs:output_type -> job.ListJobsResponse
-	11, // 16: job.JobService.GetJobLogs:output_type -> job.GetJobLogsResponse
-	11, // 17: job.JobService.GetJobAdminLogs:output_type -> job.GetJobLogsResponse
-	13, // 18: job.JobService.RetryJob:output_type -> job.RetryJobResponse
-	11, // [11:19] is the sub-list for method output_type
-	3,  // [3:11] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	14, // 1: job.UpdateJobRequest.schedule_at:type_name -> google.protobuf.Timestamp
+	6,  // 2: job.ListJobsResponse.jobs:type_name -> job.Job
+	10, // 3: job.GetJobLogsResponse.logs:type_name -> job.JobLog
+	0,  // 4: job.JobService.CreateJob:input_type -> job.CreateJobRequest
+	1,  // 5: job.JobService.UpdateJob:input_type -> job.UpdateJobRequest
+	2,  // 6: job.JobService.CancelJob:input_type -> job.CancelJobRequest
+	4,  // 7: job.JobService.ListJobs:input_type -> job.ListJobsRequest
+	5,  // 8: job.JobService.ListFailedJobs:input_type -> job.ListFailedJobsRequest
+	8,  // 9: job.JobService.GetJobLogs:input_type -> job.GetJobLogsRequest
+	9,  // 10: job.JobService.GetJobAdminLogs:input_type -> job.GetJobLogsAdminRequest
+	12, // 11: job.JobService.RetryJob:input_type -> job.RetryJobRequest
+	3,  // 12: job.JobService.CreateJob:output_type -> job.JobResponse
+	3,  // 13: job.JobService.UpdateJob:output_type -> job.JobResponse
+	3,  // 14: job.JobService.CancelJob:output_type -> job.JobResponse
+	7,  // 15: job.JobService.ListJobs:output_type -> job.ListJobsResponse
+	7,  // 16: job.JobService.ListFailedJobs:output_type -> job.ListJobsResponse
+	11, // 17: job.JobService.GetJobLogs:output_type -> job.GetJobLogsResponse
+	11, // 18: job.JobService.GetJobAdminLogs:output_type -> job.GetJobLogsResponse
+	13, // 19: job.JobService.RetryJob:output_type -> job.RetryJobResponse
+	12, // [12:20] is the sub-list for method output_type
+	4,  // [4:12] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_proto_job_proto_init() }

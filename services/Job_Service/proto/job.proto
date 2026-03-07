@@ -28,6 +28,7 @@ message CreateJobRequest {
 message UpdateJobRequest {
     string job_id = 1;
     string payload = 2;
+    google.protobuf.Timestamp schedule_at = 3;
 }
 
 message CancelJobRequest {
@@ -58,13 +59,17 @@ message Job {
   string payload = 5;
   int32 retry = 6;
   int32 max_retry = 7;
-  string created_at = 8;
-  string updated_at = 9;
-  int32 manual_retry =10;
+  string schedule_at = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  int32 manual_retry =11;
 }
 
 message ListJobsResponse {
   repeated Job jobs = 1;
+  int32 total = 2;
+  int32 limit = 3;
+  int32 offset = 4;
 }
 
 message GetJobLogsRequest {

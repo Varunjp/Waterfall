@@ -19,18 +19,18 @@ func NewDashboardUsecase(j repository.JobRepository,l repository.JobLogRepositor
 	return &DashboardUsecase{jobs: j, logs: l, queue: q}
 }
 
-func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,offset int)([]domain.Job,error) {
+func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,offset int)([]domain.Job,int,error) {
 	
 	appID,err := middleware.AppIDFromContext(ctx)
 	if err != nil {
 		log.Println(err.Error())
-		return nil,err 
+		return nil,0,err 
 	}
 
 	return uc.jobs.ListByApp(ctx,appID,status,limit,offset)
 }
 
-func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context,limit,offset int)([]domain.Job,error) {
+func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context,limit,offset int)([]domain.Job,int,error) {
 	return uc.jobs.ListFailed(ctx,limit,offset)
 }
 

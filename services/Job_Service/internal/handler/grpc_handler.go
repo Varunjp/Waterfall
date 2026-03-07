@@ -28,7 +28,17 @@ func (h *JobHandler) CreateJob(ctx context.Context, r *jobpb.CreateJobRequest)(*
 }
 
 func (h *JobHandler) UpdateJob(ctx context.Context, r *jobpb.UpdateJobRequest) (*jobpb.JobResponse,error) {
-	err := h.uc.Update(ctx,r.JobId,r.Payload)
+
+	var schedulTime time.Time
+	scheModified := false 
+	if r.ScheduleAt == nil {
+		schedulTime = time.Now()
+	}else {
+		schedulTime = r.ScheduleAt.AsTime()
+		scheModified = true 
+	}
+
+	err := h.uc.Update(ctx,r.JobId,r.Payload,schedulTime,scheModified)
 	if err != nil {
 		return nil,err 
 	}
@@ -45,7 +55,7 @@ func (h *JobHandler) CancelJob(ctx context.Context, r *jobpb.CancelJobRequest)(*
 
 func (h *JobHandler) ListJobs(ctx context.Context,req *jobpb.ListJobsRequest)(*jobpb.ListJobsResponse,error) {
 
-	jobs,err := h.dc.ListJobs(
+	jobs,total,err := h.dc.ListJobs(
 		ctx,
 		req.Status,
 		int(req.Limit),
@@ -56,11 +66,11 @@ func (h *JobHandler) ListJobs(ctx context.Context,req *jobpb.ListJobsRequest)(*j
 		return nil,err 
 	}
 
-	return mapJobs(jobs),nil 
+	return mapJobs(jobs,total,int(req.Limit),int(req.Offset)),nil 
 }
 
 func (h *JobHandler) ListFailedJobs(ctx context.Context,req *jobpb.ListFailedJobsRequest)(*jobpb.ListJobsResponse,error) {
-	jobs,err := h.dc.ListFailedJobs(
+	jobs,total,err := h.dc.ListFailedJobs(
 		ctx,
 		int(req.Limit),
 		int(req.Offset),
@@ -69,7 +79,7 @@ func (h *JobHandler) ListFailedJobs(ctx context.Context,req *jobpb.ListFailedJob
 		return nil,err 
 	}
 
-	return mapJobs(jobs),nil 
+	return mapJobs(jobs,total,int(req.Limit),int(req.Offset)),nil 
 }
 
 func (h *JobHandler) GetJobLogs(ctx context.Context, req *jobpb.GetJobLogsRequest)(*jobpb.GetJobLogsResponse,error) {
@@ -119,7 +129,7 @@ func (h *JobHandler) RetryJob(ctx context.Context, req *jobpb.RetryJobRequest)(*
 	return &jobpb.RetryJobResponse{NewJobId: id},nil 
 }
 
-func mapJobs(jobs []domain.Job) *jobpb.ListJobsResponse {
+func mapJobs(jobs []domain.Job,total,limit,offset int) *jobpb.ListJobsResponse {
 	resp := &jobpb.ListJobsResponse{}
 	for _, j := range jobs {
 		resp.Jobs = append(resp.Jobs, &jobpb.Job{
@@ -130,11 +140,16 @@ func mapJobs(jobs []domain.Job) *jobpb.ListJobsResponse {
 			Payload: string(j.Payload),
 			Retry: int32(j.Retry),
 			MaxRetry: int32(j.MaxRetry),
+			ScheduleAt: j.ScheduledAt.Format(time.RFC3339),
 			CreatedAt: j.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: j.UpdatedAt.Format(time.RFC3339),
 			ManualRetry: int32(j.ManualRetry),
 		})
 	}
+
+	resp.Total = int32(total)
+	resp.Limit = int32(limit)
+	resp.Offset = int32(offset)
 
 	return resp 
 }

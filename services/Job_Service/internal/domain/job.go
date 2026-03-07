@@ -18,4 +18,5 @@ type JobEvent struct {
 	Payload   string       `json:"payload"`
 	EventType JobEventType `json:"event_type"`
 	Timestamp time.Time	   `json:"timestamp"`
+	ScheduleModifed bool   `json:"schdule_modified"`
 }

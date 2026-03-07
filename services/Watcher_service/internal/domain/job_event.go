@@ -23,4 +23,5 @@ type JobEvent struct {
 	Timestamp 	time.Time    `json:"timestamp"`
 	Retry     	int          `json:"retry"`
 	ManualRetry int 		 `json:"manual_retry"`
+	ScheduleModifed bool 	 `json:"schdule_modified"`
 }

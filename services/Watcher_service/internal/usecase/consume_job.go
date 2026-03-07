@@ -41,7 +41,7 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 
 		return uc.repo.Insert(ctx, job)
 	case domain.JobUpdated:
-		updated,err := uc.repo.UpdatePayload(ctx, event.JobID, event.Payload)
+		updated,err := uc.repo.UpdatePayload(ctx, event.JobID, event.Payload,event.Timestamp,event.ScheduleModifed)
 		if err != nil {
 			return err 
 		}

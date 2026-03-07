@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"strings"
 	"time"
 	"watcher_service/internal/domain"
 )
@@ -153,18 +155,42 @@ func (r *jobRepo) Insert(ctx context.Context, job domain.Job) error {
 	return err
 }
 
-func (r *jobRepo) UpdatePayload(ctx context.Context, jobID, payload string) (bool,error) {
+func (r *jobRepo) UpdatePayload(ctx context.Context, jobID, payload string,schedule_at time.Time,scheduleModify bool) (bool,error) {
 
-	query := `
-		UPDATE jobs
-		SET payload=$1,updated_at=NOW()
-		WHERE job_id=$2
+	query := `UPDATE jobs SET `
+	args := []any{}
+	argPos := 1
+	setParts := []string{}
+
+	// update payload
+	if payload != "" {
+		setParts = append(setParts, fmt.Sprintf("payload=$%d", argPos))
+		args = append(args, payload)
+		argPos++
+	}
+
+	// update schedule_at
+	if scheduleModify {
+		setParts = append(setParts, fmt.Sprintf("schedule_at=$%d", argPos))
+		args = append(args, schedule_at)
+		argPos++
+	}
+
+	// always update updated_at
+	setParts = append(setParts, "updated_at=NOW()")
+
+	query += strings.Join(setParts, ", ")
+
+	query += fmt.Sprintf(`
+		WHERE job_id=$%d
 		AND status IN ('SCHEDULED','QUEUED','PENDING')
 		RETURNING job_id;
-	`
+	`, argPos)
+
+	args = append(args, jobID)
 
 	var id string 
-	err := r.db.QueryRowContext(ctx,query,payload,jobID).Scan(&id)
+	err := r.db.QueryRowContext(ctx, query, args...).Scan(&id)
 
 	if err == sql.ErrNoRows {
 		return false,nil 

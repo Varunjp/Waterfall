@@ -12,7 +12,7 @@ import (
 
 type JobUseCase interface {
 	Create(ctx context.Context, appID, jobType, payload string, scheduleAt *time.Time)(string, error)
-	Update(ctx context.Context, jobID, payload string) error 
+	Update(ctx context.Context, jobID, payload string, scheduled_at time.Time,schduleModified bool) error 
 	Cancel(ctx context.Context, jobID string) error 
 }
 
@@ -51,12 +51,14 @@ func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string,
 	return jobID,nil 
 }
 
-func (u *jobUsecase) Update(ctx context.Context, jobID, payload string) error {
+func (u *jobUsecase) Update(ctx context.Context, jobID, payload string,scheduled_at time.Time,schduleModified bool) error {
+
 	event := domain.JobEvent {
 		JobID: jobID,
 		Payload: payload,
 		EventType: domain.JobUpdated,
-		Timestamp: time.Now(),
+		Timestamp: scheduled_at,
+		ScheduleModifed: schduleModified,
 	}
 
 	return u.producer.Publish(ctx,jobID,event)
