@@ -26,7 +26,7 @@ func NewAppUserService(r repo.AppUserRepository,rd *redisclient.OTPRepo,m *utils
 	return &AppUserService{repo: r,otpRepo: rd,mailer: m,secret: secret}
 }
 
-func (s *AppUserService) Create(email, password, role string) error {
+func (s *AppUserService) Create(app_id,email, password, role string) error {
 	if role != enums.RoleSuperAdmin &&
 		role != enums.RoleAdmin &&
 		role != enums.RoleViewer {
@@ -39,6 +39,7 @@ func (s *AppUserService) Create(email, password, role string) error {
 	}
 
 	user := &entities.AppUser{
+		AppID: app_id,
 		Email:        email,
 		PasswordHash: hash,
 		Role:         role,

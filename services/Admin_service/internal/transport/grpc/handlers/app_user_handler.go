@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"admin_service/internal/domain/entities"
 	pb "admin_service/internal/proto/admin"
+	"admin_service/internal/usecase/interfaces"
 	"context"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -10,30 +10,16 @@ import (
 
 type AppUserHandler struct {
 	pb.UnimplementedAppUserServiceServer
-	usecase interface {
-		Create(string, string, string) error
-		List(string) ([]*entities.AppUser, error)
-		AppLogin(email,password string)(string,error)
-		RequestPasswordReset(ctx context.Context,email string) error
-		VerifyOtp(ctx context.Context,email,otp string)(string,error)
-		ResetPassword(ctx context.Context,token,password string) error
-	}
+	usecase interfaces.AppUserUsecase
 }
 
-func NewAppUserHandler(u interface {
-	Create(string, string, string) error
-	List(string) ([]*entities.AppUser, error)
-	AppLogin(email,password string)(string,error)
-	RequestPasswordReset(ctx context.Context,email string) error
-	VerifyOtp(ctx context.Context,email,otp string)(string,error)
-	ResetPassword(ctx context.Context,token,password string) error
-}) *AppUserHandler {
+func NewAppUserHandler(u interfaces.AppUserUsecase) *AppUserHandler {
 	return &AppUserHandler{usecase: u}
 }
 
 func (h *AppUserHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, h.usecase.Create(
-		req.Email, req.Password, req.Role,
+		req.AppId,req.Email, req.Password, req.Role,
 	)
 }
 
