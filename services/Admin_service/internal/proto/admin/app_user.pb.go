@@ -403,6 +403,7 @@ type CreateUserRequest struct {
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	Role          string                 `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
+	AppId         string                 `protobuf:"bytes,4,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -454,6 +455,13 @@ func (x *CreateUserRequest) GetPassword() string {
 func (x *CreateUserRequest) GetRole() string {
 	if x != nil {
 		return x.Role
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetAppId() string {
+	if x != nil {
+		return x.AppId
 	}
 	return ""
 }
@@ -639,11 +647,12 @@ const file_internal_proto_admin_app_user_proto_rawDesc = "" +
 	"resetToken\x12!\n" +
 	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\"1\n" +
 	"\x15ResetPasswordResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"Y\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"p\n" +
 	"\x11CreateUserRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
-	"\x04role\x18\x03 \x01(\tR\x04role\")\n" +
+	"\x04role\x18\x03 \x01(\tR\x04role\x12\x15\n" +
+	"\x06app_id\x18\x04 \x01(\tR\x05appId\")\n" +
 	"\x10ListUsersRequest\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\tR\x05appId\"[\n" +
 	"\aAppUser\x12\x0e\n" +

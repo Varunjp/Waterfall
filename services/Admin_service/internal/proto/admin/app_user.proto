@@ -57,6 +57,7 @@ message CreateUserRequest {
   string email = 1;
   string password = 2;
   string role = 3;
+  string app_id = 4;
 }
 
 message ListUsersRequest {
