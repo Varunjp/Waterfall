@@ -14,3 +14,8 @@ type Job struct {
 	MaxRetries  int `json:"max_retries"`
 	ManualRetry int `json:"manual_retry"`
 }
+
+type Usage struct {
+	AppID   	string 	`json:"app_id"`
+	JobExecuted int 	`json:"job_executed"`
+}

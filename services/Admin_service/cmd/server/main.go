@@ -49,10 +49,12 @@ func main() {
 	usecase := service.NewAdminService(repo,cfg.JWTKey)
 	appRepo := postgres.NewAppRepo(dbConn)
 	appUserRepo := postgres.NewAppUserRepo(dbConn)
+	planRepo := postgres.NewPlanRepo(dbConn)
 	appUsecase := service.NewAppService(appRepo)
 	appHandler := handlers.NewAppHandler(appUsecase)
 	appUserUC := service.NewAppUserService(appUserRepo,otpRepo,mailer,cfg.JWTKey)
 	appUserHandler := handlers.NewAppUserHandler(appUserUC)
+	planUC := service.NewPlanService(planRepo)
 
 	apiKeyRepo := postgres.NewApiKeyRepo(dbConn)
 	emailRepo := postgres.NewEmailRepo(dbConn)
@@ -62,7 +64,7 @@ func main() {
 	emailUC := service.NewEmailService(emailRepo)
 	//auditUC := service.NewAuditService(auditRepo)
 
-	handler := handlers.NewAdminHandler(usecase)
+	handler := handlers.NewAdminHandler(usecase,planUC)
 	
 	lis, _ := net.Listen("tcp",":"+cfg.GrpcPort)
 	grpcServer := grpc.NewServer(grpc.ChainUnaryInterceptor(

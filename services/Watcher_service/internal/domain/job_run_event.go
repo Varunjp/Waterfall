@@ -10,3 +10,8 @@ type JobRunEvent struct {
 	FinishedAt *time.Time `json:"finished_at,omitempty"`
 	NextRun    *time.Time `json:"next_run,omitempty"`
 }
+
+type Usage struct {
+	AppID   	string  `json:"app_id"`
+	JobExecuted int 	`json:"job_executed"`
+}

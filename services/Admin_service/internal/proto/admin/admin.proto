@@ -2,10 +2,13 @@ syntax = "proto3";
 
 package admin;
 
-option go_package = "admin_service/internal/proto/admin;adminpb";
+option go_package = "internal/proto/admin;adminpb";
 
 service AdminService {
     rpc Login(LoginRequest) returns (LoginResponse);
+    rpc CreatePlan(CreatePlanRequest) returns (CreatePlanResponse);
+    rpc ListPlans(ListPlanRequest) returns (ListPlanResponse);
+    rpc UpdatePlan(UpdatePlanRequest) returns (UpdatePlanResponse);
 }
 
 message LoginRequest {
@@ -15,4 +18,38 @@ message LoginRequest {
 
 message LoginResponse {
     string access_token = 1;
+}
+
+message CreatePlanRequest {
+    string name = 1;
+    int32  joblimit = 2;
+    double price = 3;
+}
+
+message CreatePlanResponse {
+    string message = 1;
+}
+
+message ListPlanRequest {}
+
+message Plan {
+    string planID = 1;
+    string name = 2;
+    int32  jobLimit = 3;
+    double price = 4;
+}
+
+message ListPlanResponse {
+    repeated Plan plans = 1;
+}
+
+message UpdatePlanRequest {
+    string planID = 1;
+    string name = 2;
+    int32  jobLimt = 3;
+    double price = 4;
+}
+
+message UpdatePlanResponse {
+    Plan updatedPlan = 1;
 }

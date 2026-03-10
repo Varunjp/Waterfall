@@ -7,12 +7,15 @@ import (
 
 type Config struct {
 	DBURL         string
+	DBADMINURL	  string
 	KafkaBroker   []string
 	KafkaTopic    string
 	JobTopic      string
 	JobGroupID    string
 	JobRunTopic   string
 	JobStatusTopic string 
+	JobUsageTopic  string
+	JobUsageGroupID string 
 	JobRunGroupID string
 	PollInterval  int
 }
@@ -27,10 +30,13 @@ func Load() *Config {
 
 	return &Config{
 		DBURL:       os.Getenv("DATABASE_URL"),
+		DBADMINURL: os.Getenv("DATABASE_ADMIN_URL"),
 		KafkaBroker: []string{os.Getenv("KAFKA_BROKER")},
 		KafkaTopic:  os.Getenv("KAFKA_TOPIC"),
 		JobTopic:    os.Getenv("KAFKA_JOB_TOPIC"),
 		JobGroupID:  os.Getenv("KAFKA_CONSUMER_GROUP"),
+		JobUsageTopic: os.Getenv("KAFKA_JOB_USAGE_TOPIC"),
+		JobUsageGroupID: os.Getenv("KAFKA_JOB_USAGE_TOPIC"),
 		JobRunTopic: firstNonEmpty(
 			os.Getenv("KAFKA_RUN_TOPIC"),
 			os.Getenv("KAFAK_RUN_TOPIC"),
