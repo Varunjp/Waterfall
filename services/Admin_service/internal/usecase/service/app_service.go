@@ -6,6 +6,7 @@ import (
 	"admin_service/internal/infrastructure/security"
 	"admin_service/internal/pkg/validation"
 	repo "admin_service/internal/repository/interfaces"
+	"context"
 	"errors"
 	"log"
 	"time"
@@ -18,10 +19,11 @@ var (
 
 type AppService struct {
 	repo repo.AppRepository
+	toplan repo.AddToPlanRepo
 }
 
-func NewAppService(r repo.AppRepository) *AppService {
-	return &AppService{repo: r}
+func NewAppService(r repo.AppRepository,tp repo.AddToPlanRepo) *AppService {
+	return &AppService{repo: r,toplan: tp}
 }
 
 func (s *AppService) Register(name,email string) (string,error) {
@@ -71,6 +73,12 @@ func (s *AppService) Register(name,email string) (string,error) {
 
 	if err != nil {
 		return "",err 
+	}
+	ctx := context.Background()
+	err = s.toplan.AddToDefault(ctx,appID)
+
+	if err != nil {
+		return "",err
 	}
 
 	return appID,nil 

@@ -4,12 +4,14 @@ import (
 	"job_service/internal/config"
 	"job_service/internal/handler"
 	postgresclient "job_service/internal/infra/postgres"
+	redisclient "job_service/internal/infra/redis"
 	"job_service/internal/logger"
 	"job_service/internal/middleware"
 	"job_service/internal/producer"
 	jobpb "job_service/internal/proto/jobpb"
 	"job_service/internal/queue"
 	"job_service/internal/repository"
+	redisRepo "job_service/internal/repository/redis"
 	"job_service/internal/usecase"
 	"log"
 	"net"
@@ -34,12 +36,19 @@ func main() {
 	}
 	
 	db := postgresclient.MustConntect(cfg.DBDSN)
+	adminDb := postgresclient.MustConntect(cfg.DBADMINDNS)
 	jobRepo := repository.NewJobRepo(db)
 	logRepo := repository.NewLogRepo(db)
+	adminRepo := repository.NewAdminRepo(adminDb)
+	rc,err := redisclient.NewRedisClient(cfg.RedisAddr,cfg.RedisPassword,cfg.RedisDB)
+	if err != nil {
+		panic(err)
+	}
+	rr := redisRepo.NewRedisRepo(rc.Client,adminRepo)
 	queueProducer := queue.NewKafkaProducer([]string{cfg.KafkaBrokers[0]},cfg.KafkaTopic)
 
 	producer := producer.NewKafkaProducer(cfg.KafkaBrokers,cfg.KafkaTopic)
-	uc := usecase.NewJobUsecase(producer,logg)
+	uc := usecase.NewJobUsecase(producer,logg,rr)
 	dc := usecase.NewDashboardUsecase(jobRepo,logRepo,queueProducer)
 	h := handler.NewJobHandler(uc,*dc)
 

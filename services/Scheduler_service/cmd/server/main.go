@@ -54,7 +54,7 @@ func main() {
 
 	assigner := usecase.NewAssigner(redisClient,adminRepo,metricsP,kafkaProducer)
 	stallMonitor := usecase.NewStallMonitor(redisClient,kafkaRunConsumer,kafkaProducer)
-	resultProcess := usecase.NewJobResultProcess(adminRepo,metricsP,kafkaProducer,log,3,usageProducer)
+	resultProcess := usecase.NewJobResultProcess(adminRepo,metricsP,kafkaProducer,log,3,usageProducer,redisClient)
 
 	runner := scheduler.NewRunner(
 		kafkaConsumer,assigner,kafkaProducer,redisClient.Client,log,
