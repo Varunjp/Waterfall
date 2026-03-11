@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v6.33.1
-// source: admin/admin.proto
+// source: internal/proto/admin/admin.proto
 
 package adminpb
 
@@ -19,7 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AdminService_Login_FullMethodName = "/admin.AdminService/Login"
+	AdminService_Login_FullMethodName      = "/admin.AdminService/Login"
+	AdminService_CreatePlan_FullMethodName = "/admin.AdminService/CreatePlan"
+	AdminService_ListPlans_FullMethodName  = "/admin.AdminService/ListPlans"
+	AdminService_UpdatePlan_FullMethodName = "/admin.AdminService/UpdatePlan"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -27,6 +30,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdminServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	CreatePlan(ctx context.Context, in *CreatePlanRequest, opts ...grpc.CallOption) (*CreatePlanResponse, error)
+	ListPlans(ctx context.Context, in *ListPlanRequest, opts ...grpc.CallOption) (*ListPlanResponse, error)
+	UpdatePlan(ctx context.Context, in *UpdatePlanRequest, opts ...grpc.CallOption) (*UpdatePlanResponse, error)
 }
 
 type adminServiceClient struct {
@@ -47,11 +53,44 @@ func (c *adminServiceClient) Login(ctx context.Context, in *LoginRequest, opts .
 	return out, nil
 }
 
+func (c *adminServiceClient) CreatePlan(ctx context.Context, in *CreatePlanRequest, opts ...grpc.CallOption) (*CreatePlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePlanResponse)
+	err := c.cc.Invoke(ctx, AdminService_CreatePlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) ListPlans(ctx context.Context, in *ListPlanRequest, opts ...grpc.CallOption) (*ListPlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPlanResponse)
+	err := c.cc.Invoke(ctx, AdminService_ListPlans_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) UpdatePlan(ctx context.Context, in *UpdatePlanRequest, opts ...grpc.CallOption) (*UpdatePlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdatePlanResponse)
+	err := c.cc.Invoke(ctx, AdminService_UpdatePlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServiceServer is the server API for AdminService service.
 // All implementations must embed UnimplementedAdminServiceServer
 // for forward compatibility.
 type AdminServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	CreatePlan(context.Context, *CreatePlanRequest) (*CreatePlanResponse, error)
+	ListPlans(context.Context, *ListPlanRequest) (*ListPlanResponse, error)
+	UpdatePlan(context.Context, *UpdatePlanRequest) (*UpdatePlanResponse, error)
 	mustEmbedUnimplementedAdminServiceServer()
 }
 
@@ -64,6 +103,15 @@ type UnimplementedAdminServiceServer struct{}
 
 func (UnimplementedAdminServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedAdminServiceServer) CreatePlan(context.Context, *CreatePlanRequest) (*CreatePlanResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePlan not implemented")
+}
+func (UnimplementedAdminServiceServer) ListPlans(context.Context, *ListPlanRequest) (*ListPlanResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPlans not implemented")
+}
+func (UnimplementedAdminServiceServer) UpdatePlan(context.Context, *UpdatePlanRequest) (*UpdatePlanResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdatePlan not implemented")
 }
 func (UnimplementedAdminServiceServer) mustEmbedUnimplementedAdminServiceServer() {}
 func (UnimplementedAdminServiceServer) testEmbeddedByValue()                      {}
@@ -104,6 +152,60 @@ func _AdminService_Login_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_CreatePlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).CreatePlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_CreatePlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).CreatePlan(ctx, req.(*CreatePlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_ListPlans_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).ListPlans(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_ListPlans_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).ListPlans(ctx, req.(*ListPlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_UpdatePlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).UpdatePlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_UpdatePlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).UpdatePlan(ctx, req.(*UpdatePlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -115,7 +217,19 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Login",
 			Handler:    _AdminService_Login_Handler,
 		},
+		{
+			MethodName: "CreatePlan",
+			Handler:    _AdminService_CreatePlan_Handler,
+		},
+		{
+			MethodName: "ListPlans",
+			Handler:    _AdminService_ListPlans_Handler,
+		},
+		{
+			MethodName: "UpdatePlan",
+			Handler:    _AdminService_UpdatePlan_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/admin.proto",
+	Metadata: "internal/proto/admin/admin.proto",
 }

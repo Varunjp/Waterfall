@@ -13,5 +13,6 @@ docker exec redpanda rpk topic create scheduler_queue --partitions 3 --replicas 
 docker exec redpanda rpk topic create retry_queue --partitions 3 --replicas 1 2>$null
 docker exec redpanda rpk topic create worker_jobs --partitions 1 --replicas 1 2>$null
 docker exec redpanda rpk topic create job_status --partitions 1 --replicas 1 2>$null
+docker exec redpanda rpk topic create job_usage --partitions 1 --replicas 1 2>$null
 
 Write-Host "Done"

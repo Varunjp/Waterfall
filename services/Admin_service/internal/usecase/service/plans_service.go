@@ -45,23 +45,24 @@ func (s *PlanService) ListPlan()([]*entities.Plan,error) {
 	return s.repo.GetPlans()
 }
 
-func (s *PlanService) UpdatePlans(name string,jobLimit int,price float64) error {
+func (s *PlanService) UpdatePlans(planId,name string,jobLimit int,price float64) (*entities.Plan,error) {
 	
 	if jobLimit != 0 {
 		if !validation.IsValidLimit(jobLimit) {
-			return errors.New("invalid job limit provided")
+			return nil,errors.New("invalid job limit provided")
 		}
 	}
 
 	if price != 0 {
 		if !validation.IsValidPrice(price) {
-			return errors.New("Price cannot be less than Rs.1")
+			return nil,errors.New("Price cannot be less than Rs.1")
 		}
 	}
 
 	name = strings.TrimSpace(name)
 
 	updatePlan := &entities.Plan{
+		PlanID: planId,
 		Name: name,
 		MonthlyJobLimit: jobLimit,
 		Price: price,

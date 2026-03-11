@@ -11,6 +11,7 @@ import (
 	"time"
 	"watcher_service/internal/config"
 	"watcher_service/internal/consumer"
+	dbClient "watcher_service/internal/infra/db"
 	"watcher_service/internal/logger"
 	"watcher_service/internal/producer"
 	"watcher_service/internal/repository"
@@ -50,6 +51,8 @@ func main() {
 	db.SetConnMaxLifetime(time.Hour)
 
 	repo := repository.NewJobRepository(db)
+	adDb := dbClient.NewPostgres(cfg.DBADMINURL)
+	adrepo := repository.NewAdminRepo(adDb)
 	queueProducer := producer.NewKafkaProducer(cfg.KafkaBroker, cfg.KafkaTopic)
 	jobStatusProducer := producer.NewKafkaProducer(cfg.KafkaBroker,cfg.JobStatusTopic)
 	watchUC := usecase.NewWatchJobsUsecase(repo, queueProducer,jobStatusProducer, logg)
@@ -63,12 +66,14 @@ func main() {
 		logg,
 	)
 
-	jobRunUC := usecase.NewUpdateJobStatusUsecase(repo)
+	jobRunUC := usecase.NewUpdateJobStatusUsecase(repo,adrepo)
+	usage := consumer.NewUsageKafkaReader(cfg.KafkaBroker,cfg.JobUsageTopic,cfg.JobUsageGroupID)
 	jobRunConsumer := consumer.NewJobRunConsumer(
 		cfg.KafkaBroker,
 		cfg.JobRunTopic,
 		cfg.JobRunGroupID,
 		jobRunUC,
+		usage,
 		logg,
 	)
 

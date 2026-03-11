@@ -53,7 +53,7 @@ func(r *PlanRepo) GetPlans()([]*entities.Plan,error){
 	return plans,nil 
 }
 
-func(r *PlanRepo)UpdatePlan(plan *entities.Plan)error{
+func(r *PlanRepo)UpdatePlan(plan *entities.Plan)(*entities.Plan,error){
 	query := "UPDATE plans SET "
 	args := []any{}
 	i := 1
@@ -82,8 +82,19 @@ func(r *PlanRepo)UpdatePlan(plan *entities.Plan)error{
 
 	_, err := r.db.Exec(query, args...)
 	if err != nil {
-		return err
+		return nil,err
 	}
 
-	return nil
+	nquery := `SELECT plan_id,name,monthly_job_limit,price FROM plans WHERE plan_id = $1`
+	
+	var p entities.Plan
+	err = r.db.QueryRow(nquery,plan.PlanID).Scan(
+		&p.PlanID,&p.Name,&p.MonthlyJobLimit,&p.Price,
+	)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return &p,nil
 } 

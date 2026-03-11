@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        v6.33.1
-// source: admin/admin.proto
+// source: internal/proto/admin/admin.proto
 
 package adminpb
 
@@ -31,7 +31,7 @@ type LoginRequest struct {
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_admin_admin_proto_msgTypes[0]
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_admin_proto_msgTypes[0]
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_admin_admin_proto_rawDescGZIP(), []int{0}
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *LoginRequest) GetEmail() string {
@@ -82,7 +82,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_admin_admin_proto_msgTypes[1]
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -94,7 +94,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_admin_proto_msgTypes[1]
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +107,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_admin_admin_proto_rawDescGZIP(), []int{1}
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *LoginResponse) GetAccessToken() string {
@@ -117,66 +117,471 @@ func (x *LoginResponse) GetAccessToken() string {
 	return ""
 }
 
-var File_admin_admin_proto protoreflect.FileDescriptor
+type CreatePlanRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Joblimit      int32                  `protobuf:"varint,2,opt,name=joblimit,proto3" json:"joblimit,omitempty"`
+	Price         float64                `protobuf:"fixed64,3,opt,name=price,proto3" json:"price,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const file_admin_admin_proto_rawDesc = "" +
+func (x *CreatePlanRequest) Reset() {
+	*x = CreatePlanRequest{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePlanRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePlanRequest) ProtoMessage() {}
+
+func (x *CreatePlanRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePlanRequest.ProtoReflect.Descriptor instead.
+func (*CreatePlanRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CreatePlanRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreatePlanRequest) GetJoblimit() int32 {
+	if x != nil {
+		return x.Joblimit
+	}
+	return 0
+}
+
+func (x *CreatePlanRequest) GetPrice() float64 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+type CreatePlanResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePlanResponse) Reset() {
+	*x = CreatePlanResponse{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePlanResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePlanResponse) ProtoMessage() {}
+
+func (x *CreatePlanResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePlanResponse.ProtoReflect.Descriptor instead.
+func (*CreatePlanResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreatePlanResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type ListPlanRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPlanRequest) Reset() {
+	*x = ListPlanRequest{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPlanRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPlanRequest) ProtoMessage() {}
+
+func (x *ListPlanRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPlanRequest.ProtoReflect.Descriptor instead.
+func (*ListPlanRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{4}
+}
+
+type Plan struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlanID        string                 `protobuf:"bytes,1,opt,name=planID,proto3" json:"planID,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	JobLimit      int32                  `protobuf:"varint,3,opt,name=jobLimit,proto3" json:"jobLimit,omitempty"`
+	Price         float64                `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Plan) Reset() {
+	*x = Plan{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Plan) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Plan) ProtoMessage() {}
+
+func (x *Plan) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Plan.ProtoReflect.Descriptor instead.
+func (*Plan) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *Plan) GetPlanID() string {
+	if x != nil {
+		return x.PlanID
+	}
+	return ""
+}
+
+func (x *Plan) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Plan) GetJobLimit() int32 {
+	if x != nil {
+		return x.JobLimit
+	}
+	return 0
+}
+
+func (x *Plan) GetPrice() float64 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+type ListPlanResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Plans         []*Plan                `protobuf:"bytes,1,rep,name=plans,proto3" json:"plans,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPlanResponse) Reset() {
+	*x = ListPlanResponse{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPlanResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPlanResponse) ProtoMessage() {}
+
+func (x *ListPlanResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPlanResponse.ProtoReflect.Descriptor instead.
+func (*ListPlanResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ListPlanResponse) GetPlans() []*Plan {
+	if x != nil {
+		return x.Plans
+	}
+	return nil
+}
+
+type UpdatePlanRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlanID        string                 `protobuf:"bytes,1,opt,name=planID,proto3" json:"planID,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	JobLimt       int32                  `protobuf:"varint,3,opt,name=jobLimt,proto3" json:"jobLimt,omitempty"`
+	Price         float64                `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePlanRequest) Reset() {
+	*x = UpdatePlanRequest{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePlanRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePlanRequest) ProtoMessage() {}
+
+func (x *UpdatePlanRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePlanRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePlanRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdatePlanRequest) GetPlanID() string {
+	if x != nil {
+		return x.PlanID
+	}
+	return ""
+}
+
+func (x *UpdatePlanRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdatePlanRequest) GetJobLimt() int32 {
+	if x != nil {
+		return x.JobLimt
+	}
+	return 0
+}
+
+func (x *UpdatePlanRequest) GetPrice() float64 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+type UpdatePlanResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UpdatedPlan   *Plan                  `protobuf:"bytes,1,opt,name=updatedPlan,proto3" json:"updatedPlan,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePlanResponse) Reset() {
+	*x = UpdatePlanResponse{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePlanResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePlanResponse) ProtoMessage() {}
+
+func (x *UpdatePlanResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePlanResponse.ProtoReflect.Descriptor instead.
+func (*UpdatePlanResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpdatePlanResponse) GetUpdatedPlan() *Plan {
+	if x != nil {
+		return x.UpdatedPlan
+	}
+	return nil
+}
+
+var File_internal_proto_admin_admin_proto protoreflect.FileDescriptor
+
+const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\n" +
-	"\x11admin/admin.proto\x12\x05admin\"@\n" +
+	" internal/proto/admin/admin.proto\x12\x05admin\"@\n" +
 	"\fLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"2\n" +
 	"\rLoginResponse\x12!\n" +
-	"\faccess_token\x18\x01 \x01(\tR\vaccessToken2B\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\"Y\n" +
+	"\x11CreatePlanRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
+	"\bjoblimit\x18\x02 \x01(\x05R\bjoblimit\x12\x14\n" +
+	"\x05price\x18\x03 \x01(\x01R\x05price\".\n" +
+	"\x12CreatePlanResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\x11\n" +
+	"\x0fListPlanRequest\"d\n" +
+	"\x04Plan\x12\x16\n" +
+	"\x06planID\x18\x01 \x01(\tR\x06planID\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
+	"\bjobLimit\x18\x03 \x01(\x05R\bjobLimit\x12\x14\n" +
+	"\x05price\x18\x04 \x01(\x01R\x05price\"5\n" +
+	"\x10ListPlanResponse\x12!\n" +
+	"\x05plans\x18\x01 \x03(\v2\v.admin.PlanR\x05plans\"o\n" +
+	"\x11UpdatePlanRequest\x12\x16\n" +
+	"\x06planID\x18\x01 \x01(\tR\x06planID\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
+	"\ajobLimt\x18\x03 \x01(\x05R\ajobLimt\x12\x14\n" +
+	"\x05price\x18\x04 \x01(\x01R\x05price\"C\n" +
+	"\x12UpdatePlanResponse\x12-\n" +
+	"\vupdatedPlan\x18\x01 \x01(\v2\v.admin.PlanR\vupdatedPlan2\x86\x02\n" +
 	"\fAdminService\x122\n" +
-	"\x05Login\x12\x13.admin.LoginRequest\x1a\x14.admin.LoginResponseB,Z*admin_service/internal/proto/admin;adminpbb\x06proto3"
+	"\x05Login\x12\x13.admin.LoginRequest\x1a\x14.admin.LoginResponse\x12A\n" +
+	"\n" +
+	"CreatePlan\x12\x18.admin.CreatePlanRequest\x1a\x19.admin.CreatePlanResponse\x12<\n" +
+	"\tListPlans\x12\x16.admin.ListPlanRequest\x1a\x17.admin.ListPlanResponse\x12A\n" +
+	"\n" +
+	"UpdatePlan\x12\x18.admin.UpdatePlanRequest\x1a\x19.admin.UpdatePlanResponseB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
 
 var (
-	file_admin_admin_proto_rawDescOnce sync.Once
-	file_admin_admin_proto_rawDescData []byte
+	file_internal_proto_admin_admin_proto_rawDescOnce sync.Once
+	file_internal_proto_admin_admin_proto_rawDescData []byte
 )
 
-func file_admin_admin_proto_rawDescGZIP() []byte {
-	file_admin_admin_proto_rawDescOnce.Do(func() {
-		file_admin_admin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_admin_proto_rawDesc), len(file_admin_admin_proto_rawDesc)))
+func file_internal_proto_admin_admin_proto_rawDescGZIP() []byte {
+	file_internal_proto_admin_admin_proto_rawDescOnce.Do(func() {
+		file_internal_proto_admin_admin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_internal_proto_admin_admin_proto_rawDesc), len(file_internal_proto_admin_admin_proto_rawDesc)))
 	})
-	return file_admin_admin_proto_rawDescData
+	return file_internal_proto_admin_admin_proto_rawDescData
 }
 
-var file_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_admin_admin_proto_goTypes = []any{
-	(*LoginRequest)(nil),  // 0: admin.LoginRequest
-	(*LoginResponse)(nil), // 1: admin.LoginResponse
+var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_internal_proto_admin_admin_proto_goTypes = []any{
+	(*LoginRequest)(nil),       // 0: admin.LoginRequest
+	(*LoginResponse)(nil),      // 1: admin.LoginResponse
+	(*CreatePlanRequest)(nil),  // 2: admin.CreatePlanRequest
+	(*CreatePlanResponse)(nil), // 3: admin.CreatePlanResponse
+	(*ListPlanRequest)(nil),    // 4: admin.ListPlanRequest
+	(*Plan)(nil),               // 5: admin.Plan
+	(*ListPlanResponse)(nil),   // 6: admin.ListPlanResponse
+	(*UpdatePlanRequest)(nil),  // 7: admin.UpdatePlanRequest
+	(*UpdatePlanResponse)(nil), // 8: admin.UpdatePlanResponse
 }
-var file_admin_admin_proto_depIdxs = []int32{
-	0, // 0: admin.AdminService.Login:input_type -> admin.LoginRequest
-	1, // 1: admin.AdminService.Login:output_type -> admin.LoginResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+var file_internal_proto_admin_admin_proto_depIdxs = []int32{
+	5, // 0: admin.ListPlanResponse.plans:type_name -> admin.Plan
+	5, // 1: admin.UpdatePlanResponse.updatedPlan:type_name -> admin.Plan
+	0, // 2: admin.AdminService.Login:input_type -> admin.LoginRequest
+	2, // 3: admin.AdminService.CreatePlan:input_type -> admin.CreatePlanRequest
+	4, // 4: admin.AdminService.ListPlans:input_type -> admin.ListPlanRequest
+	7, // 5: admin.AdminService.UpdatePlan:input_type -> admin.UpdatePlanRequest
+	1, // 6: admin.AdminService.Login:output_type -> admin.LoginResponse
+	3, // 7: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
+	6, // 8: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
+	8, // 9: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
+	6, // [6:10] is the sub-list for method output_type
+	2, // [2:6] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_admin_admin_proto_init() }
-func file_admin_admin_proto_init() {
-	if File_admin_admin_proto != nil {
+func init() { file_internal_proto_admin_admin_proto_init() }
+func file_internal_proto_admin_admin_proto_init() {
+	if File_internal_proto_admin_admin_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_admin_proto_rawDesc), len(file_admin_admin_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_admin_proto_rawDesc), len(file_internal_proto_admin_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_admin_admin_proto_goTypes,
-		DependencyIndexes: file_admin_admin_proto_depIdxs,
-		MessageInfos:      file_admin_admin_proto_msgTypes,
+		GoTypes:           file_internal_proto_admin_admin_proto_goTypes,
+		DependencyIndexes: file_internal_proto_admin_admin_proto_depIdxs,
+		MessageInfos:      file_internal_proto_admin_admin_proto_msgTypes,
 	}.Build()
-	File_admin_admin_proto = out.File
-	file_admin_admin_proto_goTypes = nil
-	file_admin_admin_proto_depIdxs = nil
+	File_internal_proto_admin_admin_proto = out.File
+	file_internal_proto_admin_admin_proto_goTypes = nil
+	file_internal_proto_admin_admin_proto_depIdxs = nil
 }

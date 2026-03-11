@@ -4,6 +4,7 @@ import (
 	"context"
 	"job_service/internal/domain"
 	"job_service/internal/producer"
+	redisRepo "job_service/internal/repository/redis"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,13 +20,20 @@ type JobUseCase interface {
 type jobUsecase struct {
 	producer producer.Producer
 	logger *zap.Logger
+	redis *redisRepo.RedisRepo
 }
 
-func NewJobUsecase(p producer.Producer,l *zap.Logger) JobUseCase {
-	return &jobUsecase{producer: p, logger: l}
+func NewJobUsecase(p producer.Producer,l *zap.Logger,r *redisRepo.RedisRepo) JobUseCase {
+	return &jobUsecase{producer: p, logger: l,redis: r}
 }
 
 func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string, scheduleAt *time.Time)(string, error) {
+
+	err := u.redis.CheckQuota(ctx,appID)
+	if err != nil {
+		return "",err 
+	}
+
 	jobID := uuid.NewString()
 
 	event := domain.JobEvent {
@@ -42,7 +50,7 @@ func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string,
 		event.Timestamp = time.Now()
 	}
 	
-	err := u.producer.Publish(ctx,jobID,event)
+	err = u.producer.Publish(ctx,jobID,event)
 	if err != nil {
 		return "",err 
 	}

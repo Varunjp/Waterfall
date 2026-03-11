@@ -2,10 +2,12 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"scheduler_service/internal/domain"
 	"scheduler_service/internal/metrics"
 	"scheduler_service/internal/producer"
+	redisClient "scheduler_service/internal/redis"
 	"scheduler_service/internal/repository"
 	"time"
 
@@ -16,17 +18,21 @@ type jobUsecase struct {
 	adminRepo *repository.AdminRepo
 	metrics *metrics.SchedulerMetrics
 	producer *producer.KafkaProducer
+	usage *producer.KafkaProducer
 	log *zap.Logger
 	maxRetry int 
+	redis *redisClient.Client
 }
 
-func NewJobResultProcess(a *repository.AdminRepo, m *metrics.SchedulerMetrics, p  *producer.KafkaProducer,l *zap.Logger,maxRetry int) *jobUsecase {
+func NewJobResultProcess(a *repository.AdminRepo, m *metrics.SchedulerMetrics, p  *producer.KafkaProducer,l *zap.Logger,maxRetry int, u *producer.KafkaProducer,r *redisClient.Client) *jobUsecase {
 	return &jobUsecase{
 		adminRepo: a,
 		metrics: m,
 		producer: p,
+		usage: u,
 		log: l,
 		maxRetry: maxRetry,
+		redis: r,
 	}
 }
 
@@ -58,20 +64,38 @@ func (u *jobUsecase) ProcessJobResult(ctx context.Context,input domain.JobResult
 	}
 
 	event := map[string]any{
-			"job_id": input.JobID,
-			"app_id": input.AppID,
-			"status": input.Status,
-			"retry": input.Retry,
-			"error": input.ErrorMessage,
-		}
+		"job_id": input.JobID,
+		"app_id": input.AppID,
+		"status": input.Status,
+		"retry": input.Retry,
+		"error": input.ErrorMessage,
+	}
 
 	if err := u.producer.Publish(ctx,event); err != nil {
 		return err 
 	}
+
+	usageEvent := map[string]any{
+		"app_id": input.AppID,
+		"job_executed": 1,
+	}
+
+	if err := u.usage.Publish(ctx,usageEvent); err != nil {
+		return err 
+	}
+	
 	u.log.Info("job result processed",
 		zap.String("job_id",input.JobID),
 		zap.String("status",input.Status),
 	)
+
+	key := fmt.Sprintf("usage:%s:%s",input.AppID,time.Now().Format("2006-01"))
+
+	err := u.redis.Incr(ctx,key).Err()
+
+	if err != nil {
+		return err 
+	}
 
 	return nil 
 }

@@ -25,6 +25,7 @@ type KafkaConfig struct {
 	JobCreateTopic   string
 	JobUpdateTopic   string
 	JobStatusTopic   string 
+	JobUsageTopic	 string 
 	ConsumerGroup    string
 }
 
@@ -60,6 +61,7 @@ func Load() Config {
 			JobCreateTopic: mustEnv("KAFKA_JOB_CREATE_TOPIC"),
 			JobUpdateTopic: mustEnv("KAFKA_JOB_UPDATE_TOPIC"),
 			JobStatusTopic: mustEnv("KAFKA_JOB_STATUS_TOPIC"),
+			JobUsageTopic: mustEnv("KAFKA_JOB_USAGE_TOPIC"),
 			ConsumerGroup:  mustEnv("KAFKA_CONSUMER_GROUP"),
 		},
 
