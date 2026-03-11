@@ -28,7 +28,7 @@ func (a *adminrepo) GetPlanID(ctx context.Context,appID string)(string,error) {
 
 	err := a.db.QueryRow(ctx,pidquery,appID).Scan(&planId)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err,sql.ErrNoRows) {
 		return "",errors.New("no active subsription")
 	}
 

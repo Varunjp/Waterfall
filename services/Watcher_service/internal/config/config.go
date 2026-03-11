@@ -37,10 +37,7 @@ func Load() *Config {
 		JobGroupID:  os.Getenv("KAFKA_CONSUMER_GROUP"),
 		JobUsageTopic: os.Getenv("KAFKA_JOB_USAGE_TOPIC"),
 		JobUsageGroupID: os.Getenv("KAFKA_JOB_USAGE_TOPIC"),
-		JobRunTopic: firstNonEmpty(
-			os.Getenv("KAFKA_RUN_TOPIC"),
-			os.Getenv("KAFAK_RUN_TOPIC"),
-		),
+		JobRunTopic: os.Getenv("KAFKA_RUN_TOPIC"),
 		JobStatusTopic: os.Getenv("KAFKA_JOB_STATUS_TOPIC"),
 		JobRunGroupID: firstNonEmpty(
 			os.Getenv("KAFKA_RUN_GROUP_ID"),

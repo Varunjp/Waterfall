@@ -20,6 +20,7 @@ func NewConsumeJobUsecase(r repository.JobRepository, l *zap.Logger) *ConsumeJob
 }
 
 func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) error {
+
 	switch event.EventType {
 	case domain.JobCreated:
 		job := domain.Job{

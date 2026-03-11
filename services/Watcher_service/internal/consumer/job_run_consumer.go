@@ -13,7 +13,6 @@ import (
 
 type JobRunConsumer struct {
 	reader  *kafka.Reader
-	usagereader *kafka.Reader
 	usecase *usecase.UpdateJobStatusUsecase
 	logger  *zap.Logger
 }
@@ -23,7 +22,6 @@ func NewJobRunConsumer(
 	topic string,
 	groupID string,
 	uc *usecase.UpdateJobStatusUsecase,
-	ur *kafka.Reader,
 	l *zap.Logger,
 ) *JobRunConsumer {
 	reader := kafka.NewReader(kafka.ReaderConfig{
@@ -35,7 +33,6 @@ func NewJobRunConsumer(
 	return &JobRunConsumer{
 		reader:  reader,
 		usecase: uc,
-		usagereader: ur,
 		logger:  l,
 	}
 }
@@ -63,24 +60,7 @@ func (c *JobRunConsumer) Start(ctx context.Context) error {
 				continue
 			}
 
-			// Usage calculation
-			
-			msg,err = c.usagereader.ReadMessage(ctx)
-			if err != nil {
-				if errors.Is(err, context.Canceled) {
-					return nil
-				}
-				c.logger.Error("kafka read failed", zap.Error(err))
-				continue
-			}
-
-			var use domain.Usage
-			if err := json.Unmarshal(msg.Value,&use); err != nil {
-				c.logger.Error("invalid job_run message", zap.Error(err))
-				continue
-			}
-
-			if err := c.usecase.Handle(ctx, event,&use); err != nil {
+			if err := c.usecase.Handle(ctx, event); err != nil {
 				c.logger.Error(
 					"failed to update job status",
 					zap.String("job_id", event.JobID),
