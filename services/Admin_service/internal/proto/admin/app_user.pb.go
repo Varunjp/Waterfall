@@ -622,6 +622,370 @@ func (x *ListUsersResponse) GetUsers() []*AppUser {
 	return nil
 }
 
+type ListPlansRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPlansRequest) Reset() {
+	*x = ListPlansRequest{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPlansRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPlansRequest) ProtoMessage() {}
+
+func (x *ListPlansRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPlansRequest.ProtoReflect.Descriptor instead.
+func (*ListPlansRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{12}
+}
+
+type UserPlan struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlanId        string                 `protobuf:"bytes,1,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`
+	PlanName      string                 `protobuf:"bytes,2,opt,name=planName,proto3" json:"planName,omitempty"`
+	MonthlyLimit  int32                  `protobuf:"varint,3,opt,name=monthlyLimit,proto3" json:"monthlyLimit,omitempty"`
+	Planprice     float64                `protobuf:"fixed64,4,opt,name=planprice,proto3" json:"planprice,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserPlan) Reset() {
+	*x = UserPlan{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserPlan) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserPlan) ProtoMessage() {}
+
+func (x *UserPlan) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserPlan.ProtoReflect.Descriptor instead.
+func (*UserPlan) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *UserPlan) GetPlanId() string {
+	if x != nil {
+		return x.PlanId
+	}
+	return ""
+}
+
+func (x *UserPlan) GetPlanName() string {
+	if x != nil {
+		return x.PlanName
+	}
+	return ""
+}
+
+func (x *UserPlan) GetMonthlyLimit() int32 {
+	if x != nil {
+		return x.MonthlyLimit
+	}
+	return 0
+}
+
+func (x *UserPlan) GetPlanprice() float64 {
+	if x != nil {
+		return x.Planprice
+	}
+	return 0
+}
+
+type ListPlansResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Plans         []*UserPlan            `protobuf:"bytes,1,rep,name=plans,proto3" json:"plans,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPlansResponse) Reset() {
+	*x = ListPlansResponse{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPlansResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPlansResponse) ProtoMessage() {}
+
+func (x *ListPlansResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPlansResponse.ProtoReflect.Descriptor instead.
+func (*ListPlansResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ListPlansResponse) GetPlans() []*UserPlan {
+	if x != nil {
+		return x.Plans
+	}
+	return nil
+}
+
+type CreateOrderRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppId         string                 `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	PlanId        string                 `protobuf:"bytes,2,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`
+	Amount        int64                  `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateOrderRequest) Reset() {
+	*x = CreateOrderRequest{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateOrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOrderRequest) ProtoMessage() {}
+
+func (x *CreateOrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateOrderRequest.ProtoReflect.Descriptor instead.
+func (*CreateOrderRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CreateOrderRequest) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
+func (x *CreateOrderRequest) GetPlanId() string {
+	if x != nil {
+		return x.PlanId
+	}
+	return ""
+}
+
+func (x *CreateOrderRequest) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+type CreateOrderResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	Amount        int64                  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateOrderResponse) Reset() {
+	*x = CreateOrderResponse{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOrderResponse) ProtoMessage() {}
+
+func (x *CreateOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateOrderResponse.ProtoReflect.Descriptor instead.
+func (*CreateOrderResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *CreateOrderResponse) GetOrderId() string {
+	if x != nil {
+		return x.OrderId
+	}
+	return ""
+}
+
+func (x *CreateOrderResponse) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+type VerifyPaymentRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	PaymentId     string                 `protobuf:"bytes,2,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`
+	Signature     string                 `protobuf:"bytes,3,opt,name=signature,proto3" json:"signature,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyPaymentRequest) Reset() {
+	*x = VerifyPaymentRequest{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyPaymentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyPaymentRequest) ProtoMessage() {}
+
+func (x *VerifyPaymentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyPaymentRequest.ProtoReflect.Descriptor instead.
+func (*VerifyPaymentRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *VerifyPaymentRequest) GetOrderId() string {
+	if x != nil {
+		return x.OrderId
+	}
+	return ""
+}
+
+func (x *VerifyPaymentRequest) GetPaymentId() string {
+	if x != nil {
+		return x.PaymentId
+	}
+	return ""
+}
+
+func (x *VerifyPaymentRequest) GetSignature() string {
+	if x != nil {
+		return x.Signature
+	}
+	return ""
+}
+
+type VerifyPaymentResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyPaymentResponse) Reset() {
+	*x = VerifyPaymentResponse{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyPaymentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyPaymentResponse) ProtoMessage() {}
+
+func (x *VerifyPaymentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyPaymentResponse.ProtoReflect.Descriptor instead.
+func (*VerifyPaymentResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *VerifyPaymentResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_internal_proto_admin_app_user_proto protoreflect.FileDescriptor
 
 const file_internal_proto_admin_app_user_proto_rawDesc = "" +
@@ -661,12 +1025,37 @@ const file_internal_proto_admin_app_user_proto_rawDesc = "" +
 	"\x04role\x18\x03 \x01(\tR\x04role\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\tR\x06status\"9\n" +
 	"\x11ListUsersResponse\x12$\n" +
-	"\x05users\x18\x01 \x03(\v2\x0e.admin.AppUserR\x05users2\xe1\x03\n" +
+	"\x05users\x18\x01 \x03(\v2\x0e.admin.AppUserR\x05users\"\x12\n" +
+	"\x10ListPlansRequest\"\x81\x01\n" +
+	"\bUserPlan\x12\x17\n" +
+	"\aplan_id\x18\x01 \x01(\tR\x06planId\x12\x1a\n" +
+	"\bplanName\x18\x02 \x01(\tR\bplanName\x12\"\n" +
+	"\fmonthlyLimit\x18\x03 \x01(\x05R\fmonthlyLimit\x12\x1c\n" +
+	"\tplanprice\x18\x04 \x01(\x01R\tplanprice\":\n" +
+	"\x11ListPlansResponse\x12%\n" +
+	"\x05plans\x18\x01 \x03(\v2\x0f.admin.UserPlanR\x05plans\"\\\n" +
+	"\x12CreateOrderRequest\x12\x15\n" +
+	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x17\n" +
+	"\aplan_id\x18\x02 \x01(\tR\x06planId\x12\x16\n" +
+	"\x06amount\x18\x03 \x01(\x03R\x06amount\"H\n" +
+	"\x13CreateOrderResponse\x12\x19\n" +
+	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x03R\x06amount\"n\n" +
+	"\x14VerifyPaymentRequest\x12\x19\n" +
+	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x1d\n" +
+	"\n" +
+	"payment_id\x18\x02 \x01(\tR\tpaymentId\x12\x1c\n" +
+	"\tsignature\x18\x03 \x01(\tR\tsignature\"1\n" +
+	"\x15VerifyPaymentResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xb3\x05\n" +
 	"\x0eAppUserService\x12>\n" +
 	"\n" +
 	"CreateUser\x12\x18.admin.CreateUserRequest\x1a\x16.google.protobuf.Empty\x12>\n" +
 	"\tListUsers\x12\x17.admin.ListUsersRequest\x1a\x18.admin.ListUsersResponse\x12;\n" +
-	"\bAppLogin\x12\x16.admin.AppLoginRequest\x1a\x17.admin.AppLoginResponse\x12_\n" +
+	"\bAppLogin\x12\x16.admin.AppLoginRequest\x1a\x17.admin.AppLoginResponse\x12>\n" +
+	"\tListPlans\x12\x17.admin.ListPlansRequest\x1a\x18.admin.ListPlansResponse\x12D\n" +
+	"\vCreateOrder\x12\x19.admin.CreateOrderRequest\x1a\x1a.admin.CreateOrderResponse\x12J\n" +
+	"\rVerifyPayment\x12\x1b.admin.VerifyPaymentRequest\x1a\x1c.admin.VerifyPaymentResponse\x12_\n" +
 	"\x14RequestResetPassword\x12\".admin.RequestResetPasswordRequest\x1a#.admin.RequestResetPasswordResponse\x12e\n" +
 	"\x16VerifyPasswordResetOtp\x12$.admin.VerifyPasswordResetOtpRequest\x1a%.admin.VerifyPasswordResetOtpResponse\x12J\n" +
 	"\rResetPassword\x12\x1b.admin.ResetPasswordRequest\x1a\x1c.admin.ResetPasswordResponseB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
@@ -683,7 +1072,7 @@ func file_internal_proto_admin_app_user_proto_rawDescGZIP() []byte {
 	return file_internal_proto_admin_app_user_proto_rawDescData
 }
 
-var file_internal_proto_admin_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_internal_proto_admin_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_internal_proto_admin_app_user_proto_goTypes = []any{
 	(*AppLoginRequest)(nil),                // 0: admin.AppLoginRequest
 	(*AppLoginResponse)(nil),               // 1: admin.AppLoginResponse
@@ -697,27 +1086,41 @@ var file_internal_proto_admin_app_user_proto_goTypes = []any{
 	(*ListUsersRequest)(nil),               // 9: admin.ListUsersRequest
 	(*AppUser)(nil),                        // 10: admin.AppUser
 	(*ListUsersResponse)(nil),              // 11: admin.ListUsersResponse
-	(*emptypb.Empty)(nil),                  // 12: google.protobuf.Empty
+	(*ListPlansRequest)(nil),               // 12: admin.ListPlansRequest
+	(*UserPlan)(nil),                       // 13: admin.UserPlan
+	(*ListPlansResponse)(nil),              // 14: admin.ListPlansResponse
+	(*CreateOrderRequest)(nil),             // 15: admin.CreateOrderRequest
+	(*CreateOrderResponse)(nil),            // 16: admin.CreateOrderResponse
+	(*VerifyPaymentRequest)(nil),           // 17: admin.VerifyPaymentRequest
+	(*VerifyPaymentResponse)(nil),          // 18: admin.VerifyPaymentResponse
+	(*emptypb.Empty)(nil),                  // 19: google.protobuf.Empty
 }
 var file_internal_proto_admin_app_user_proto_depIdxs = []int32{
 	10, // 0: admin.ListUsersResponse.users:type_name -> admin.AppUser
-	8,  // 1: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
-	9,  // 2: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
-	0,  // 3: admin.AppUserService.AppLogin:input_type -> admin.AppLoginRequest
-	2,  // 4: admin.AppUserService.RequestResetPassword:input_type -> admin.RequestResetPasswordRequest
-	4,  // 5: admin.AppUserService.VerifyPasswordResetOtp:input_type -> admin.VerifyPasswordResetOtpRequest
-	6,  // 6: admin.AppUserService.ResetPassword:input_type -> admin.ResetPasswordRequest
-	12, // 7: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
-	11, // 8: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
-	1,  // 9: admin.AppUserService.AppLogin:output_type -> admin.AppLoginResponse
-	3,  // 10: admin.AppUserService.RequestResetPassword:output_type -> admin.RequestResetPasswordResponse
-	5,  // 11: admin.AppUserService.VerifyPasswordResetOtp:output_type -> admin.VerifyPasswordResetOtpResponse
-	7,  // 12: admin.AppUserService.ResetPassword:output_type -> admin.ResetPasswordResponse
-	7,  // [7:13] is the sub-list for method output_type
-	1,  // [1:7] is the sub-list for method input_type
-	1,  // [1:1] is the sub-list for extension type_name
-	1,  // [1:1] is the sub-list for extension extendee
-	0,  // [0:1] is the sub-list for field type_name
+	13, // 1: admin.ListPlansResponse.plans:type_name -> admin.UserPlan
+	8,  // 2: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
+	9,  // 3: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
+	0,  // 4: admin.AppUserService.AppLogin:input_type -> admin.AppLoginRequest
+	12, // 5: admin.AppUserService.ListPlans:input_type -> admin.ListPlansRequest
+	15, // 6: admin.AppUserService.CreateOrder:input_type -> admin.CreateOrderRequest
+	17, // 7: admin.AppUserService.VerifyPayment:input_type -> admin.VerifyPaymentRequest
+	2,  // 8: admin.AppUserService.RequestResetPassword:input_type -> admin.RequestResetPasswordRequest
+	4,  // 9: admin.AppUserService.VerifyPasswordResetOtp:input_type -> admin.VerifyPasswordResetOtpRequest
+	6,  // 10: admin.AppUserService.ResetPassword:input_type -> admin.ResetPasswordRequest
+	19, // 11: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
+	11, // 12: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
+	1,  // 13: admin.AppUserService.AppLogin:output_type -> admin.AppLoginResponse
+	14, // 14: admin.AppUserService.ListPlans:output_type -> admin.ListPlansResponse
+	16, // 15: admin.AppUserService.CreateOrder:output_type -> admin.CreateOrderResponse
+	18, // 16: admin.AppUserService.VerifyPayment:output_type -> admin.VerifyPaymentResponse
+	3,  // 17: admin.AppUserService.RequestResetPassword:output_type -> admin.RequestResetPasswordResponse
+	5,  // 18: admin.AppUserService.VerifyPasswordResetOtp:output_type -> admin.VerifyPasswordResetOtpResponse
+	7,  // 19: admin.AppUserService.ResetPassword:output_type -> admin.ResetPasswordResponse
+	11, // [11:20] is the sub-list for method output_type
+	2,  // [2:11] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_internal_proto_admin_app_user_proto_init() }
@@ -731,7 +1134,7 @@ func file_internal_proto_admin_app_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_app_user_proto_rawDesc), len(file_internal_proto_admin_app_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

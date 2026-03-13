@@ -10,7 +10,9 @@ service AppUserService {
   rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty);
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
   rpc AppLogin(AppLoginRequest) returns (AppLoginResponse);
- 
+  
+  rpc ListPlans(ListPlansRequest) returns (ListPlansResponse);
+
   rpc RequestResetPassword(RequestResetPasswordRequest) returns (RequestResetPasswordResponse);
   rpc VerifyPasswordResetOtp(VerifyPasswordResetOtpRequest)
       returns (VerifyPasswordResetOtpResponse);
@@ -73,4 +75,17 @@ message AppUser {
 
 message ListUsersResponse {
   repeated AppUser users = 1;
+}
+
+message ListPlansRequest {}
+
+message UserPlan {
+  string plan_id = 1;
+  string planName = 2;
+  int32 monthlyLimit = 3;
+  double planprice = 4;
+}
+
+message ListPlansResponse {
+  repeated UserPlan plans = 1;
 }

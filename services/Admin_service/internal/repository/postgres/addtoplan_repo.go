@@ -22,9 +22,9 @@ func (a *AddToPlanRepo) AddToDefault(ctx context.Context,appID string) error {
 		return errors.New("FREE_PLAN_ID not configured")
 	}
 	now := time.Now().UTC()
-	till := now.AddDate(1,0,0)
+	till := now.AddDate(0,1,0)
 	_,err := a.db.ExecContext(ctx,`
-		INSERT INTO subscriptions(app_id,plan_id,status,start_date,end_date) VALUES($1,$2,'ACTIVE',$3,$4)
+		INSERT INTO subscriptions(app_id,plan_id,status,current_period_start,current_period_end) VALUES($1,$2,'ACTIVE',$3,$4)
 		ON CONFLICT (app_id) DO NOTHING
 	`,appID,planId,now,till)
 
@@ -36,7 +36,7 @@ func (a *AddToPlanRepo) ExtendSubscription(ctx context.Context, planID, appID st
 	var endDate time.Time
 
 	err := a.db.QueryRowContext(ctx,
-		`SELECT end_date FROM subscriptions WHERE app_id=$1`,
+		`SELECT current_period_end FROM subscriptions WHERE app_id=$1`,
 		appID,
 	).Scan(&endDate)
 	
@@ -47,7 +47,7 @@ func (a *AddToPlanRepo) ExtendSubscription(ctx context.Context, planID, appID st
 		newEnd = now.AddDate(0, durationMonths, 0)
 
 		_, err = a.db.ExecContext(ctx, `
-			INSERT INTO subscriptions(app_id,plan_id,status,start_date,end_date)
+			INSERT INTO subscriptions(app_id,plan_id,status,current_period_start,current_period_end)
 			VALUES ($1,$2,'ACTIVE',$3,$4)
 		`, appID, planID, now, newEnd)
 
@@ -68,8 +68,8 @@ func (a *AddToPlanRepo) ExtendSubscription(ctx context.Context, planID, appID st
 		UPDATE subscriptions
 		SET plan_id=$2,
 			status='ACTIVE',
-			start_date=$3,
-			end_date=$4
+			current_period_start=$3,
+			current_period_end=$4
 		WHERE app_id=$1
 	`, appID, planID, now, newEnd)
 

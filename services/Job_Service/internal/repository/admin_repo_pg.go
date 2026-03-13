@@ -22,7 +22,7 @@ func (a *adminrepo) GetPlanID(ctx context.Context,appID string)(string,error) {
 	FROM subscriptions 
 	WHERE app_id = $1 
 	AND status = 'ACTIVE'
-	AND end_date > NOW()`
+	AND current_period_end > NOW()`
 
 	var planId string 
 
