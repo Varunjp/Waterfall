@@ -57,12 +57,8 @@ func main() {
 	appUserHandler := handlers.NewAppUserHandler(appUserUC)
 	planUC := service.NewPlanService(planRepo)
 
-	apiKeyRepo := postgres.NewApiKeyRepo(dbConn)
-	emailRepo := postgres.NewEmailRepo(dbConn)
 	//auditRepo := postgres.NewAuditRepo(dbConn)
 
-	apiKeyUC := service.NewApiKeyService(apiKeyRepo)
-	emailUC := service.NewEmailService(emailRepo)
 	//auditUC := service.NewAuditService(auditRepo)
 
 	handler := handlers.NewAdminHandler(usecase,planUC)
@@ -76,9 +72,7 @@ func main() {
 	pb.RegisterAdminServiceServer(grpcServer,handler)
 	pb.RegisterAppServiceServer(grpcServer, appHandler)
 	pb.RegisterAppUserServiceServer(grpcServer, appUserHandler)
-	pb.RegisterApiKeyServiceServer(grpcServer, handlers.NewApiKeyHandler(apiKeyUC))
-	pb.RegisterEmailServiceServer(grpcServer, handlers.NewEmailHandler(emailUC))
-	
+
 	log.Println("admin service listening on",cfg.GrpcPort)
 	grpcServer.Serve(lis)
 }
