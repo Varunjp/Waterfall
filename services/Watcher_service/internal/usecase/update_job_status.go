@@ -17,7 +17,7 @@ func NewUpdateJobStatusUsecase(repo repository.JobRepository,adrepo repository.A
 	return &UpdateJobStatusUsecase{jobRepo: repo,adminRepo: adrepo}
 }
 
-func (uc *UpdateJobStatusUsecase) Handle(ctx context.Context, event domain.JobRunEvent, usage *domain.Usage) error {
+func (uc *UpdateJobStatusUsecase) Handle(ctx context.Context, event domain.JobRunEvent) error {
 	if event.JobID == "" {
 		return errors.New("job_id missing")
 	}
@@ -39,8 +39,8 @@ func (uc *UpdateJobStatusUsecase) Handle(ctx context.Context, event domain.JobRu
 		return uc.jobRepo.RetryJob(ctx, event.JobID, domain.StatusScheduled, event.Retry,nr)
 	}
 
-	if event.Status == string(domain.JobComplete) || event.Status == string(domain.JobFailed) {
-		err := uc.adminRepo.UpdateUsage(ctx,usage.AppID)
+	if event.Status == "COMPLETED" || event.Status == "FAILED" {
+		err := uc.adminRepo.UpdateUsage(ctx,event.AppID)
 		if err != nil {
 			return err 
 		}

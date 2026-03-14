@@ -67,13 +67,11 @@ func main() {
 	)
 
 	jobRunUC := usecase.NewUpdateJobStatusUsecase(repo,adrepo)
-	usage := consumer.NewUsageKafkaReader(cfg.KafkaBroker,cfg.JobUsageTopic,cfg.JobUsageGroupID)
 	jobRunConsumer := consumer.NewJobRunConsumer(
 		cfg.KafkaBroker,
 		cfg.JobRunTopic,
 		cfg.JobRunGroupID,
 		jobRunUC,
-		usage,
 		logg,
 	)
 

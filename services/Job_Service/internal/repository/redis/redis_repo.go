@@ -2,6 +2,7 @@ package redisRepo
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"job_service/internal/repository"
@@ -44,8 +45,10 @@ func (r *RedisRepo) CheckQuota(ctx context.Context,appID string) error {
 	usage,err := r.redis.Get(usageKey).Int()
 	if err == redis.Nil {
 		usage,err = r.adminRepo.GetMonthlyUsage(ctx,appID)
-		if err != nil {
-			return err 
+		if errors.Is(err,sql.ErrNoRows) {
+			usage = 0
+		}else if err != nil {
+			return err
 		}
 		err = r.redis.Set(usageKey,any(usage),35*24*time.Hour).Err()
 		if err != nil {

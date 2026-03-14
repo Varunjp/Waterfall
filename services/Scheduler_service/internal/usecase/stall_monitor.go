@@ -58,7 +58,7 @@ func (s *StallMonitor) scan(ctx context.Context,raw []byte) {
 	ts,err := s.redis.Get(ctx,hbKey).Int64()
 
 	if err == redis.Nil {
-		s.handlestall(ctx,job.JobID)
+		s.handlestall(ctx,job.JobID,job)
 		return 
 	}
 
@@ -69,14 +69,34 @@ func (s *StallMonitor) scan(ctx context.Context,raw []byte) {
 	now := time.Now().Unix()
 
 	if now-ts > 30 {
-		s.handlestall(ctx,job.JobID)
+		s.handlestall(ctx,job.JobID,job)
 	}
 }
 
-func (s *StallMonitor) handlestall(ctx context.Context,jobID string) {
+func (s *StallMonitor) handlestall(ctx context.Context,jobID string,stjob domain.Job) {
 	metaKey := "running:"+jobID 
 
 	raw,err := s.redis.Get(ctx,metaKey).Result()
+
+	if err == redis.Nil {
+		stjob.Retry++
+		if stjob.Retry > stjob.MaxRetries {
+			s.producer.Publish(ctx,map[string]any{
+				"job_id":stjob.JobID,
+				"app_id":stjob.AppID,
+				"Status": "DLQ",
+				"retries": stjob.Retry,
+			})
+			return 
+		}
+		
+		s.producer.Publish(ctx,map[string]any{
+			"job_id": stjob.JobID,
+			"app_id":stjob.AppID,
+			"status": "JOB_RETRY",
+			"retry": stjob.Retry,
+		})
+	}
 
 	if err != nil {
 		return 
@@ -100,6 +120,7 @@ func (s *StallMonitor) handlestall(ctx context.Context,jobID string) {
 	}
 	s.producer.Publish(ctx,map[string]any{
 		"job_id": job.JobID,
+		"app_id":job.AppID,
 		"status": "JOB_RETRY",
 		"retry": job.Retry,
 	})

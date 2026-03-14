@@ -84,12 +84,14 @@ func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
 		WHERE
 			(
 				status = 'RUNNING'
+				AND updated_at < NOW() - INTERVAL '20 minutes'
 				AND schedule_at >= $1 
 				AND schedule_at < $2
 			)
 			OR 
 			(
 				status = 'QUEUED'
+				AND updated_at < NOW() - INTERVAL '20 minutes'
 				AND schedule_at >= $1 
 				AND schedule_at < $2
 			)

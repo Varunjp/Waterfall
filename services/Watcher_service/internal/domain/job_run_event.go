@@ -4,14 +4,10 @@ import "time"
 
 type JobRunEvent struct {
 	JobID      string     `json:"job_id"`
+	AppID   	string  `json:"app_id"`
 	Status     string     `json:"status"`
 	Retry      int        `json:"retry"`
 	Error      *string    `json:"error,omitempty"`
 	FinishedAt *time.Time `json:"finished_at,omitempty"`
 	NextRun    *time.Time `json:"next_run,omitempty"`
-}
-
-type Usage struct {
-	AppID   	string  `json:"app_id"`
-	JobExecuted int 	`json:"job_executed"`
 }

@@ -22,13 +22,13 @@ func (a *adminrepo) GetPlanID(ctx context.Context,appID string)(string,error) {
 	FROM subscriptions 
 	WHERE app_id = $1 
 	AND status = 'ACTIVE'
-	AND end_date > NOW()`
+	AND current_period_end > NOW()`
 
 	var planId string 
 
 	err := a.db.QueryRow(ctx,pidquery,appID).Scan(&planId)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err,sql.ErrNoRows) {
 		return "",errors.New("no active subsription")
 	}
 
