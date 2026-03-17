@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	GrpcPort string
+	HTTPPort string 
 	DBUrl    string
 	JWTKey   string
 	RedisAddr string 
@@ -19,12 +20,21 @@ type Config struct {
 	SmtpPort string 
 	SmtpUser string 
 	Smtppass string 
+	Stripe stripeConfig 
+}
+
+type stripeConfig struct {
+	WebhookSecret string 
+	SecretKey 	  string 
+	SuccessURL    string 
+	CancelURL 	  string
 }
 
 func Load() *Config {
 	redisDB, _ := strconv.Atoi(GetEnv("REDIS_DB", "0"))
 	return &Config{
 		GrpcPort: GetEnv("GRPC_PORT", "50051"),
+		HTTPPort: GetEnv("HTTP_PORT",""),
 		DBUrl: "postgres://" +
 			GetEnv("DB_USER", "") + ":" +
 			GetEnv("DB_PASSWORD", "") + "@" +
@@ -39,6 +49,12 @@ func Load() *Config {
 		SmtpPort: GetEnv("SMTP_PORT",""),
 		SmtpUser: GetEnv("SMTP_USER",""),
 		Smtppass: GetEnv("SMTP_PASS",""),
+		Stripe: stripeConfig{
+			WebhookSecret: GetEnv("STRIPE_WEBHOOK_SECRET",""),
+			SecretKey: GetEnv("STRIPE_SECRET_KEY",""),
+			SuccessURL: GetEnv("STRIPE_SUCCESS_URL",""),
+			CancelURL: GetEnv("STRIPE_CANCEL_URL",""),
+		},
 	}
 }
 

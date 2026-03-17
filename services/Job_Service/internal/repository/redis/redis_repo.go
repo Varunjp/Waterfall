@@ -50,7 +50,7 @@ func (r *RedisRepo) CheckQuota(ctx context.Context,appID string) error {
 		}else if err != nil {
 			return err
 		}
-		err = r.redis.Set(usageKey,any(usage),35*24*time.Hour).Err()
+		err = r.redis.Set(usageKey,any(usage),1*24*time.Hour).Err()
 		if err != nil {
 			return err 
 		}
@@ -61,4 +61,13 @@ func (r *RedisRepo) CheckQuota(ctx context.Context,appID string) error {
 	}
 
 	return nil 
+}
+
+func (r *RedisRepo) Incr(ctx context.Context,appID string)error {
+
+	key := fmt.Sprintf("usage:%s:%s",appID,time.Now().Format("2006-01"))
+
+	err := r.redis.Incr(key).Err()
+
+	return err 
 }

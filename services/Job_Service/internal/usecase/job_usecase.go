@@ -55,6 +55,12 @@ func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string,
 		return "",err 
 	}
 
+	err = u.redis.Incr(ctx,appID)
+
+	if err != nil {
+		return "",err 
+	}
+
 	u.logger.Info("job created",zap.String("job_id",jobID))
 	return jobID,nil 
 }
