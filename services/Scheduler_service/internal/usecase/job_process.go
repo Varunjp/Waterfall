@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"scheduler_service/internal/domain"
 	"scheduler_service/internal/metrics"
@@ -77,14 +76,6 @@ func (u *jobUsecase) ProcessJobResult(ctx context.Context,input domain.JobResult
 		zap.String("job_id",input.JobID),
 		zap.String("status",input.Status),
 	)
-
-	key := fmt.Sprintf("usage:%s:%s",input.AppID,time.Now().Format("2006-01"))
-
-	err := u.redis.Incr(ctx,key).Err()
-
-	if err != nil {
-		return err 
-	}
 
 	return nil 
 }
