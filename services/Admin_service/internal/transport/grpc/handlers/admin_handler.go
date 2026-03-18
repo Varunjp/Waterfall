@@ -47,7 +47,7 @@ func (h *AdminHandler) ListPlans(ctx context.Context,req *pb.ListPlanRequest)(*p
 }
 
 func (h *AdminHandler) UpdatePlan(ctx context.Context,req *pb.UpdatePlanRequest)(*pb.UpdatePlanResponse,error) {
-	plan,err := h.plan.UpdatePlans(req.PlanID,req.Name,int(req.JobLimt),req.Price)
+	plan,err := h.plan.UpdatePlans(req.PlanID,req.Name,int(req.JobLimt),req.Price,req.StripePriceID)
 	if err != nil {
 		return nil,err 
 	}

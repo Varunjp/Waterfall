@@ -127,3 +127,14 @@ func (s *AppUserService) ResetPassword(ctx context.Context,token,password string
 
 	return s.repo.UpdatePassword(ctx,email,string(hash))
 }
+
+func (s *AppUserService) ListPlans(ctx context.Context) ([]*entities.Plan,error) {
+
+	plans,err := s.repo.ListPlans()
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return plans,nil 
+}

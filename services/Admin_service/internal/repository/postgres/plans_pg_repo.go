@@ -79,6 +79,12 @@ func(r *PlanRepo)UpdatePlan(plan *entities.Plan)(*entities.Plan,error){
 		i++
 	}
 
+	if plan.StripeID != "" {
+		query += fmt.Sprintf("stripe_price_id=$%d",i)
+		args = append(args, plan.StripeID)
+		i++
+	}
+
 	query = strings.TrimSuffix(query, ",")
 	query += fmt.Sprintf(" WHERE plan_id=$%d", i)
 	args = append(args, plan.PlanID)
@@ -88,11 +94,11 @@ func(r *PlanRepo)UpdatePlan(plan *entities.Plan)(*entities.Plan,error){
 		return nil,err
 	}
 
-	nquery := `SELECT plan_id,name,monthly_job_limit,price FROM plans WHERE plan_id = $1`
+	nquery := `SELECT plan_id,name,monthly_job_limit,price,stripe_price_id FROM plans WHERE plan_id = $1`
 	
 	var p entities.Plan
 	err = r.db.QueryRow(nquery,plan.PlanID).Scan(
-		&p.PlanID,&p.Name,&p.MonthlyJobLimit,&p.Price,
+		&p.PlanID,&p.Name,&p.MonthlyJobLimit,&p.Price,&p.StripeID,
 	)
 
 	if err != nil {

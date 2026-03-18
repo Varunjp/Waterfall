@@ -10,4 +10,5 @@ type AppUserRepository interface {
 	FindByApp(appID string) ([]*entities.AppUser, error)
 	FindByEmail(email string) (*entities.AppUser,error)
 	UpdatePassword(ctx context.Context,email,passhash string) error 
+	ListPlans() ([]*entities.Plan,error)
 }

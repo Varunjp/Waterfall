@@ -24,8 +24,6 @@ const (
 	AppUserService_ListUsers_FullMethodName              = "/admin.AppUserService/ListUsers"
 	AppUserService_AppLogin_FullMethodName               = "/admin.AppUserService/AppLogin"
 	AppUserService_ListPlans_FullMethodName              = "/admin.AppUserService/ListPlans"
-	AppUserService_CreateOrder_FullMethodName            = "/admin.AppUserService/CreateOrder"
-	AppUserService_VerifyPayment_FullMethodName          = "/admin.AppUserService/VerifyPayment"
 	AppUserService_RequestResetPassword_FullMethodName   = "/admin.AppUserService/RequestResetPassword"
 	AppUserService_VerifyPasswordResetOtp_FullMethodName = "/admin.AppUserService/VerifyPasswordResetOtp"
 	AppUserService_ResetPassword_FullMethodName          = "/admin.AppUserService/ResetPassword"
@@ -39,8 +37,6 @@ type AppUserServiceClient interface {
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
 	AppLogin(ctx context.Context, in *AppLoginRequest, opts ...grpc.CallOption) (*AppLoginResponse, error)
 	ListPlans(ctx context.Context, in *ListPlansRequest, opts ...grpc.CallOption) (*ListPlansResponse, error)
-	CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error)
-	VerifyPayment(ctx context.Context, in *VerifyPaymentRequest, opts ...grpc.CallOption) (*VerifyPaymentResponse, error)
 	RequestResetPassword(ctx context.Context, in *RequestResetPasswordRequest, opts ...grpc.CallOption) (*RequestResetPasswordResponse, error)
 	VerifyPasswordResetOtp(ctx context.Context, in *VerifyPasswordResetOtpRequest, opts ...grpc.CallOption) (*VerifyPasswordResetOtpResponse, error)
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
@@ -94,26 +90,6 @@ func (c *appUserServiceClient) ListPlans(ctx context.Context, in *ListPlansReque
 	return out, nil
 }
 
-func (c *appUserServiceClient) CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateOrderResponse)
-	err := c.cc.Invoke(ctx, AppUserService_CreateOrder_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *appUserServiceClient) VerifyPayment(ctx context.Context, in *VerifyPaymentRequest, opts ...grpc.CallOption) (*VerifyPaymentResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(VerifyPaymentResponse)
-	err := c.cc.Invoke(ctx, AppUserService_VerifyPayment_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *appUserServiceClient) RequestResetPassword(ctx context.Context, in *RequestResetPasswordRequest, opts ...grpc.CallOption) (*RequestResetPasswordResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RequestResetPasswordResponse)
@@ -152,8 +128,6 @@ type AppUserServiceServer interface {
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
 	AppLogin(context.Context, *AppLoginRequest) (*AppLoginResponse, error)
 	ListPlans(context.Context, *ListPlansRequest) (*ListPlansResponse, error)
-	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error)
-	VerifyPayment(context.Context, *VerifyPaymentRequest) (*VerifyPaymentResponse, error)
 	RequestResetPassword(context.Context, *RequestResetPasswordRequest) (*RequestResetPasswordResponse, error)
 	VerifyPasswordResetOtp(context.Context, *VerifyPasswordResetOtpRequest) (*VerifyPasswordResetOtpResponse, error)
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
@@ -178,12 +152,6 @@ func (UnimplementedAppUserServiceServer) AppLogin(context.Context, *AppLoginRequ
 }
 func (UnimplementedAppUserServiceServer) ListPlans(context.Context, *ListPlansRequest) (*ListPlansResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListPlans not implemented")
-}
-func (UnimplementedAppUserServiceServer) CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateOrder not implemented")
-}
-func (UnimplementedAppUserServiceServer) VerifyPayment(context.Context, *VerifyPaymentRequest) (*VerifyPaymentResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method VerifyPayment not implemented")
 }
 func (UnimplementedAppUserServiceServer) RequestResetPassword(context.Context, *RequestResetPasswordRequest) (*RequestResetPasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RequestResetPassword not implemented")
@@ -287,42 +255,6 @@ func _AppUserService_ListPlans_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppUserService_CreateOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateOrderRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AppUserServiceServer).CreateOrder(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AppUserService_CreateOrder_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppUserServiceServer).CreateOrder(ctx, req.(*CreateOrderRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AppUserService_VerifyPayment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VerifyPaymentRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AppUserServiceServer).VerifyPayment(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AppUserService_VerifyPayment_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppUserServiceServer).VerifyPayment(ctx, req.(*VerifyPaymentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _AppUserService_RequestResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RequestResetPasswordRequest)
 	if err := dec(in); err != nil {
@@ -399,14 +331,6 @@ var AppUserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListPlans",
 			Handler:    _AppUserService_ListPlans_Handler,
-		},
-		{
-			MethodName: "CreateOrder",
-			Handler:    _AppUserService_CreateOrder_Handler,
-		},
-		{
-			MethodName: "VerifyPayment",
-			Handler:    _AppUserService_VerifyPayment_Handler,
 		},
 		{
 			MethodName: "RequestResetPassword",

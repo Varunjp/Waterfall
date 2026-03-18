@@ -263,6 +263,7 @@ type Plan struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	JobLimit      int32                  `protobuf:"varint,3,opt,name=jobLimit,proto3" json:"jobLimit,omitempty"`
 	Price         float64                `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
+	StripePriceID string                 `protobuf:"bytes,5,opt,name=stripePriceID,proto3" json:"stripePriceID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -325,6 +326,13 @@ func (x *Plan) GetPrice() float64 {
 	return 0
 }
 
+func (x *Plan) GetStripePriceID() string {
+	if x != nil {
+		return x.StripePriceID
+	}
+	return ""
+}
+
 type ListPlanResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Plans         []*Plan                `protobuf:"bytes,1,rep,name=plans,proto3" json:"plans,omitempty"`
@@ -375,6 +383,7 @@ type UpdatePlanRequest struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	JobLimt       int32                  `protobuf:"varint,3,opt,name=jobLimt,proto3" json:"jobLimt,omitempty"`
 	Price         float64                `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
+	StripePriceID string                 `protobuf:"bytes,5,opt,name=stripePriceID,proto3" json:"stripePriceID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -437,6 +446,13 @@ func (x *UpdatePlanRequest) GetPrice() float64 {
 	return 0
 }
 
+func (x *UpdatePlanRequest) GetStripePriceID() string {
+	if x != nil {
+		return x.StripePriceID
+	}
+	return ""
+}
+
 type UpdatePlanResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UpdatedPlan   *Plan                  `protobuf:"bytes,1,opt,name=updatedPlan,proto3" json:"updatedPlan,omitempty"`
@@ -497,19 +513,21 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\x05price\x18\x03 \x01(\x01R\x05price\".\n" +
 	"\x12CreatePlanResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"\x11\n" +
-	"\x0fListPlanRequest\"d\n" +
+	"\x0fListPlanRequest\"\x8a\x01\n" +
 	"\x04Plan\x12\x16\n" +
 	"\x06planID\x18\x01 \x01(\tR\x06planID\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\bjobLimit\x18\x03 \x01(\x05R\bjobLimit\x12\x14\n" +
-	"\x05price\x18\x04 \x01(\x01R\x05price\"5\n" +
+	"\x05price\x18\x04 \x01(\x01R\x05price\x12$\n" +
+	"\rstripePriceID\x18\x05 \x01(\tR\rstripePriceID\"5\n" +
 	"\x10ListPlanResponse\x12!\n" +
-	"\x05plans\x18\x01 \x03(\v2\v.admin.PlanR\x05plans\"o\n" +
+	"\x05plans\x18\x01 \x03(\v2\v.admin.PlanR\x05plans\"\x95\x01\n" +
 	"\x11UpdatePlanRequest\x12\x16\n" +
 	"\x06planID\x18\x01 \x01(\tR\x06planID\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
 	"\ajobLimt\x18\x03 \x01(\x05R\ajobLimt\x12\x14\n" +
-	"\x05price\x18\x04 \x01(\x01R\x05price\"C\n" +
+	"\x05price\x18\x04 \x01(\x01R\x05price\x12$\n" +
+	"\rstripePriceID\x18\x05 \x01(\tR\rstripePriceID\"C\n" +
 	"\x12UpdatePlanResponse\x12-\n" +
 	"\vupdatedPlan\x18\x01 \x01(\v2\v.admin.PlanR\vupdatedPlan2\x86\x02\n" +
 	"\fAdminService\x122\n" +

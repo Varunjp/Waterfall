@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"admin_service/internal/domain/entities"
 	pb "admin_service/internal/proto/admin"
 	"admin_service/internal/usecase/interfaces"
 	"context"
@@ -83,4 +84,28 @@ func (h *AppUserHandler) ResetPassword(ctx context.Context,req *pb.ResetPassword
 	return &pb.ResetPasswordResponse{
 		Message: "password updated",
 	},nil 
+}
+
+func (h *AppUserHandler) ListPlans(ctx context.Context, req *pb.ListPlansRequest)(*pb.ListPlansResponse,error) {
+
+	plan,err := h.usecase.ListPlans(ctx)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return mapUPlans(plan),nil
+}
+
+func mapUPlans(plans []*entities.Plan) *pb.ListPlansResponse {
+	resp := &pb.ListPlansResponse{}
+	for _,p := range plans {
+		resp.Plans = append(resp.Plans, &pb.UserPlan{
+			PlanId: p.PlanID,
+			PlanName: p.Name,
+			MonthlyLimit: int32(p.MonthlyJobLimit),
+			Planprice: p.Price,
+		})
+	}
+	return resp 
 }
