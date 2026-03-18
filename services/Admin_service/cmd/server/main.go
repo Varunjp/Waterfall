@@ -13,9 +13,14 @@ import (
 	"admin_service/internal/transport/grpc/interceptors"
 	controller "admin_service/internal/transport/rest"
 	"admin_service/internal/usecase/service"
+	"context"
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -30,7 +35,12 @@ func main() {
 	cfg := config.Load()
 	stripe.Key = cfg.Stripe.SecretKey
 
+	_,cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	dbConn := db.NewPostgres(cfg.DBUrl)
+	defer dbConn.Close()
+
 	repo := postgres.NewAdminRepo(dbConn)
 
 	if err := config.BootstrapAdmin(repo); err != nil {
@@ -44,6 +54,7 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to connect redis",err)
 	}
+	defer redisClient.Client.Close()
 
 	otpRepo := redisRepo.NewOTPRepo(redisClient.Client)
 	mailer := utils.NewMailer(
@@ -81,24 +92,25 @@ func main() {
 	billingService := service.NewBillingService(billingRepo,st,redisClient.Client)
 
 	handler := handlers.NewAdminHandler(usecase,planUC)
+
+	lis, err := net.Listen("tcp",":"+cfg.GrpcPort)
+	if err != nil {
+		log.Fatal("failed to listen :",err)
+	}
+	grpcServer := grpc.NewServer(grpc.ChainUnaryInterceptor(
+		interceptors.AuthInterceptor(cfg.JWTKey),
+		interceptors.RBACInterceptor(),
+	))
+
+	pb.RegisterAdminServiceServer(grpcServer,handler)
+	pb.RegisterAppServiceServer(grpcServer, appHandler)
+	pb.RegisterAppUserServiceServer(grpcServer, appUserHandler)
 	
 	go func(){
-		lis, err := net.Listen("tcp",":"+cfg.GrpcPort)
-		if err != nil {
-			log.Fatal("failed to listen :",err)
-		}
-		grpcServer := grpc.NewServer(grpc.ChainUnaryInterceptor(
-			interceptors.AuthInterceptor(cfg.JWTKey),
-			interceptors.RBACInterceptor(),
-		))
-
-		pb.RegisterAdminServiceServer(grpcServer,handler)
-		pb.RegisterAppServiceServer(grpcServer, appHandler)
-		pb.RegisterAppUserServiceServer(grpcServer, appUserHandler)
-
 		log.Println("admin service listening on",cfg.GrpcPort)
-		grpcServer.Serve(lis)
-
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Println("grpc stopped:",err)
+		}
 	}()
 	
 	billingController := controller.NewBillingController(*billingService,cfg)
@@ -110,9 +122,33 @@ func main() {
 		billingController,
 	)
 
-	log.Println("HTTP billing server running on", cfg.HTTPPort)
-
-	if err := http.ListenAndServe(":"+cfg.HTTPPort, r); err != nil {
-		log.Fatal(err)
+	httpServer := &http.Server{
+		Addr: ":"+cfg.HTTPPort,
+		Handler: r,
 	}
+
+	go func(){
+		log.Println("HTTP billing server running on", cfg.HTTPPort)
+		if err := httpServer.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	
+	stop := make(chan os.Signal,1)
+	signal.Notify(stop,syscall.SIGINT,syscall.SIGTERM)
+
+	<- stop 
+	log.Println("Shutting down...")
+
+	cancel()
+
+	grpcServer.GracefulStop()
+	ctxShutdown,cancelShutdown := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelShutdown()
+
+	if err := httpServer.Shutdown(ctxShutdown); err != nil {
+		log.Println("HTTP shutdown error:",err)
+	}
+
+	log.Println("Server exited properly")
 }
