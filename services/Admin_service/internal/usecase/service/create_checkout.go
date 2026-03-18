@@ -201,6 +201,14 @@ func (s *BillingService) HandlePaymentSuccess(
 		return err 
 	}
 
+	planKey := fmt.Sprintf("plan:%s",appID)
+
+	err = s.redis.Del(planKey).Err()
+
+	if err != nil && err != redis.Nil{
+		return err 
+	}
+
 	return nil
 }
 

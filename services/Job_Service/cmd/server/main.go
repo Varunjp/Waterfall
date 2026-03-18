@@ -7,6 +7,7 @@ import (
 	redisclient "job_service/internal/infra/redis"
 	"job_service/internal/logger"
 	"job_service/internal/middleware"
+	"job_service/internal/pkg/grpc/interceptor"
 	"job_service/internal/producer"
 	jobpb "job_service/internal/proto/jobpb"
 	"job_service/internal/queue"
@@ -53,7 +54,11 @@ func main() {
 	h := handler.NewJobHandler(uc,*dc)
 
 	server := grpc.NewServer(
-		grpc.UnaryInterceptor(middleware.APIKeyInterceptor(cfg.JWTKey)),
+		// grpc.UnaryInterceptor(middleware.APIKeyInterceptor(cfg.JWTKey)),
+		grpc.ChainUnaryInterceptor(
+			middleware.APIKeyInterceptor(cfg.JWTKey),
+			interceptor.UnaryErrorInterceptor(),
+		),
 	)
 	
 	jobpb.RegisterJobServiceServer(server,h)

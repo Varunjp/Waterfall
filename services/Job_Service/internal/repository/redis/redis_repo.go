@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"job_service/internal/pkg/grpc/interceptor"
 	"job_service/internal/repository"
 	"time"
 
@@ -57,7 +58,7 @@ func (r *RedisRepo) CheckQuota(ctx context.Context,appID string) error {
 	}
 
 	if usage >= limit {
-		return errors.New("quota exceeded")
+		return interceptor.ErrQuotaExceeded
 	}
 
 	return nil 
