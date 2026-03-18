@@ -48,7 +48,7 @@ func (a *AddToPlanRepo) ExtendSubscription(ctx context.Context, planID, appID st
 
 		_, err = a.db.ExecContext(ctx, `
 			INSERT INTO subscriptions(app_id,plan_id,status,current_period_start,current_period_end)
-			VALUES ($1,$2,'ACTIVE',$3,$4)
+			VALUES ($1,$2,'active',$3,$4)
 		`, appID, planID, now, newEnd)
 
 		return err

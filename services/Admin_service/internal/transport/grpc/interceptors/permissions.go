@@ -17,7 +17,8 @@ var MethodPermissions = map[string][]string{
 }
 
 var publicMethods = map[string]bool{
-	"/admin.AppService/RegisterApp":  true,
-	"/admin.AdminService/Login":      true,
-	"/admin.AppUserService/AppLogin": true,
+	"/admin.AppService/RegisterApp":   true,
+	"/admin.AdminService/Login":       true,
+	"/admin.AppUserService/AppLogin":  true,
+	"/admin.AppUserService/ListPlans": true,
 }
