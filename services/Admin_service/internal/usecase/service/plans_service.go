@@ -45,7 +45,7 @@ func (s *PlanService) ListPlan()([]*entities.Plan,error) {
 	return s.repo.GetPlans()
 }
 
-func (s *PlanService) UpdatePlans(planId,name string,jobLimit int,price float64) (*entities.Plan,error) {
+func (s *PlanService) UpdatePlans(planId,name string,jobLimit int,price float64,stripePriceID string) (*entities.Plan,error) {
 	
 	if jobLimit != 0 {
 		if !validation.IsValidLimit(jobLimit) {
@@ -59,6 +59,8 @@ func (s *PlanService) UpdatePlans(planId,name string,jobLimit int,price float64)
 		}
 	}
 
+	stripePriceID = strings.TrimSpace(stripePriceID)
+
 	name = strings.TrimSpace(name)
 
 	updatePlan := &entities.Plan{
@@ -66,6 +68,7 @@ func (s *PlanService) UpdatePlans(planId,name string,jobLimit int,price float64)
 		Name: name,
 		MonthlyJobLimit: jobLimit,
 		Price: price,
+		StripeID: stripePriceID,
 	}
 
 	return s.repo.UpdatePlan(updatePlan)

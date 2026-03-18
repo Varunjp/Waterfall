@@ -37,6 +37,7 @@ message Plan {
     string name = 2;
     int32  jobLimit = 3;
     double price = 4;
+    string stripePriceID = 5;
 }
 
 message ListPlanResponse {
@@ -48,6 +49,7 @@ message UpdatePlanRequest {
     string name = 2;
     int32  jobLimt = 3;
     double price = 4;
+    string stripePriceID = 5;
 }
 
 message UpdatePlanResponse {
