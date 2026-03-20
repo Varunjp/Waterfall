@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v6.33.1
-// source: internal/proto/admin/app_user.proto
+// source: proto/app_user.proto
 
 package adminpb
 
@@ -33,7 +33,7 @@ type AppLoginRequest struct {
 
 func (x *AppLoginRequest) Reset() {
 	*x = AppLoginRequest{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[0]
+	mi := &file_proto_app_user_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +45,7 @@ func (x *AppLoginRequest) String() string {
 func (*AppLoginRequest) ProtoMessage() {}
 
 func (x *AppLoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[0]
+	mi := &file_proto_app_user_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *AppLoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppLoginRequest.ProtoReflect.Descriptor instead.
 func (*AppLoginRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{0}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *AppLoginRequest) GetEmail() string {
@@ -84,7 +84,7 @@ type AppLoginResponse struct {
 
 func (x *AppLoginResponse) Reset() {
 	*x = AppLoginResponse{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[1]
+	mi := &file_proto_app_user_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +96,7 @@ func (x *AppLoginResponse) String() string {
 func (*AppLoginResponse) ProtoMessage() {}
 
 func (x *AppLoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[1]
+	mi := &file_proto_app_user_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +109,7 @@ func (x *AppLoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppLoginResponse.ProtoReflect.Descriptor instead.
 func (*AppLoginResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{1}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AppLoginResponse) GetAccessToken() string {
@@ -128,7 +128,7 @@ type RequestResetPasswordRequest struct {
 
 func (x *RequestResetPasswordRequest) Reset() {
 	*x = RequestResetPasswordRequest{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[2]
+	mi := &file_proto_app_user_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -140,7 +140,7 @@ func (x *RequestResetPasswordRequest) String() string {
 func (*RequestResetPasswordRequest) ProtoMessage() {}
 
 func (x *RequestResetPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[2]
+	mi := &file_proto_app_user_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -153,7 +153,7 @@ func (x *RequestResetPasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestResetPasswordRequest.ProtoReflect.Descriptor instead.
 func (*RequestResetPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{2}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *RequestResetPasswordRequest) GetEmail() string {
@@ -172,7 +172,7 @@ type RequestResetPasswordResponse struct {
 
 func (x *RequestResetPasswordResponse) Reset() {
 	*x = RequestResetPasswordResponse{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[3]
+	mi := &file_proto_app_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -184,7 +184,7 @@ func (x *RequestResetPasswordResponse) String() string {
 func (*RequestResetPasswordResponse) ProtoMessage() {}
 
 func (x *RequestResetPasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[3]
+	mi := &file_proto_app_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -197,7 +197,7 @@ func (x *RequestResetPasswordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestResetPasswordResponse.ProtoReflect.Descriptor instead.
 func (*RequestResetPasswordResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{3}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *RequestResetPasswordResponse) GetMessage() string {
@@ -217,7 +217,7 @@ type VerifyPasswordResetOtpRequest struct {
 
 func (x *VerifyPasswordResetOtpRequest) Reset() {
 	*x = VerifyPasswordResetOtpRequest{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[4]
+	mi := &file_proto_app_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -229,7 +229,7 @@ func (x *VerifyPasswordResetOtpRequest) String() string {
 func (*VerifyPasswordResetOtpRequest) ProtoMessage() {}
 
 func (x *VerifyPasswordResetOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[4]
+	mi := &file_proto_app_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -242,7 +242,7 @@ func (x *VerifyPasswordResetOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyPasswordResetOtpRequest.ProtoReflect.Descriptor instead.
 func (*VerifyPasswordResetOtpRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{4}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *VerifyPasswordResetOtpRequest) GetEmail() string {
@@ -268,7 +268,7 @@ type VerifyPasswordResetOtpResponse struct {
 
 func (x *VerifyPasswordResetOtpResponse) Reset() {
 	*x = VerifyPasswordResetOtpResponse{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[5]
+	mi := &file_proto_app_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -280,7 +280,7 @@ func (x *VerifyPasswordResetOtpResponse) String() string {
 func (*VerifyPasswordResetOtpResponse) ProtoMessage() {}
 
 func (x *VerifyPasswordResetOtpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[5]
+	mi := &file_proto_app_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -293,7 +293,7 @@ func (x *VerifyPasswordResetOtpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyPasswordResetOtpResponse.ProtoReflect.Descriptor instead.
 func (*VerifyPasswordResetOtpResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{5}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *VerifyPasswordResetOtpResponse) GetResetToken() string {
@@ -313,7 +313,7 @@ type ResetPasswordRequest struct {
 
 func (x *ResetPasswordRequest) Reset() {
 	*x = ResetPasswordRequest{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[6]
+	mi := &file_proto_app_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -325,7 +325,7 @@ func (x *ResetPasswordRequest) String() string {
 func (*ResetPasswordRequest) ProtoMessage() {}
 
 func (x *ResetPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[6]
+	mi := &file_proto_app_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -338,7 +338,7 @@ func (x *ResetPasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetPasswordRequest.ProtoReflect.Descriptor instead.
 func (*ResetPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{6}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ResetPasswordRequest) GetResetToken() string {
@@ -364,7 +364,7 @@ type ResetPasswordResponse struct {
 
 func (x *ResetPasswordResponse) Reset() {
 	*x = ResetPasswordResponse{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[7]
+	mi := &file_proto_app_user_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -376,7 +376,7 @@ func (x *ResetPasswordResponse) String() string {
 func (*ResetPasswordResponse) ProtoMessage() {}
 
 func (x *ResetPasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[7]
+	mi := &file_proto_app_user_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -389,7 +389,7 @@ func (x *ResetPasswordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetPasswordResponse.ProtoReflect.Descriptor instead.
 func (*ResetPasswordResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{7}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ResetPasswordResponse) GetMessage() string {
@@ -411,7 +411,7 @@ type CreateUserRequest struct {
 
 func (x *CreateUserRequest) Reset() {
 	*x = CreateUserRequest{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[8]
+	mi := &file_proto_app_user_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -423,7 +423,7 @@ func (x *CreateUserRequest) String() string {
 func (*CreateUserRequest) ProtoMessage() {}
 
 func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[8]
+	mi := &file_proto_app_user_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -436,7 +436,7 @@ func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{8}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CreateUserRequest) GetEmail() string {
@@ -476,7 +476,7 @@ type ListUsersRequest struct {
 
 func (x *ListUsersRequest) Reset() {
 	*x = ListUsersRequest{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[9]
+	mi := &file_proto_app_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -488,7 +488,7 @@ func (x *ListUsersRequest) String() string {
 func (*ListUsersRequest) ProtoMessage() {}
 
 func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[9]
+	mi := &file_proto_app_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -501,7 +501,7 @@ func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
 func (*ListUsersRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{9}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListUsersRequest) GetAppId() string {
@@ -523,7 +523,7 @@ type AppUser struct {
 
 func (x *AppUser) Reset() {
 	*x = AppUser{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[10]
+	mi := &file_proto_app_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -535,7 +535,7 @@ func (x *AppUser) String() string {
 func (*AppUser) ProtoMessage() {}
 
 func (x *AppUser) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[10]
+	mi := &file_proto_app_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -548,7 +548,7 @@ func (x *AppUser) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppUser.ProtoReflect.Descriptor instead.
 func (*AppUser) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{10}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *AppUser) GetId() string {
@@ -588,7 +588,7 @@ type ListUsersResponse struct {
 
 func (x *ListUsersResponse) Reset() {
 	*x = ListUsersResponse{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[11]
+	mi := &file_proto_app_user_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -600,7 +600,7 @@ func (x *ListUsersResponse) String() string {
 func (*ListUsersResponse) ProtoMessage() {}
 
 func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[11]
+	mi := &file_proto_app_user_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -613,7 +613,7 @@ func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
 func (*ListUsersResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{11}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListUsersResponse) GetUsers() []*AppUser {
@@ -631,7 +631,7 @@ type ListPlansRequest struct {
 
 func (x *ListPlansRequest) Reset() {
 	*x = ListPlansRequest{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[12]
+	mi := &file_proto_app_user_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -643,7 +643,7 @@ func (x *ListPlansRequest) String() string {
 func (*ListPlansRequest) ProtoMessage() {}
 
 func (x *ListPlansRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[12]
+	mi := &file_proto_app_user_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -656,7 +656,7 @@ func (x *ListPlansRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPlansRequest.ProtoReflect.Descriptor instead.
 func (*ListPlansRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{12}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{12}
 }
 
 type UserPlan struct {
@@ -671,7 +671,7 @@ type UserPlan struct {
 
 func (x *UserPlan) Reset() {
 	*x = UserPlan{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[13]
+	mi := &file_proto_app_user_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -683,7 +683,7 @@ func (x *UserPlan) String() string {
 func (*UserPlan) ProtoMessage() {}
 
 func (x *UserPlan) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[13]
+	mi := &file_proto_app_user_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -696,7 +696,7 @@ func (x *UserPlan) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserPlan.ProtoReflect.Descriptor instead.
 func (*UserPlan) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{13}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UserPlan) GetPlanId() string {
@@ -736,7 +736,7 @@ type ListPlansResponse struct {
 
 func (x *ListPlansResponse) Reset() {
 	*x = ListPlansResponse{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[14]
+	mi := &file_proto_app_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -748,7 +748,7 @@ func (x *ListPlansResponse) String() string {
 func (*ListPlansResponse) ProtoMessage() {}
 
 func (x *ListPlansResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[14]
+	mi := &file_proto_app_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -761,7 +761,7 @@ func (x *ListPlansResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPlansResponse.ProtoReflect.Descriptor instead.
 func (*ListPlansResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{14}
+	return file_proto_app_user_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ListPlansResponse) GetPlans() []*UserPlan {
@@ -771,11 +771,11 @@ func (x *ListPlansResponse) GetPlans() []*UserPlan {
 	return nil
 }
 
-var File_internal_proto_admin_app_user_proto protoreflect.FileDescriptor
+var File_proto_app_user_proto protoreflect.FileDescriptor
 
-const file_internal_proto_admin_app_user_proto_rawDesc = "" +
+const file_proto_app_user_proto_rawDesc = "" +
 	"\n" +
-	"#internal/proto/admin/app_user.proto\x12\x05admin\x1a'googleapis/google/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"C\n" +
+	"\x14proto/app_user.proto\x12\x05admin\x1a'googleapis/google/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"C\n" +
 	"\x0fAppLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"5\n" +
@@ -827,22 +827,22 @@ const file_internal_proto_admin_app_user_proto_rawDesc = "" +
 	"\tListPlans\x12\x17.admin.ListPlansRequest\x1a\x18.admin.ListPlansResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/plans\x12\x90\x01\n" +
 	"\x14RequestResetPassword\x12\".admin.RequestResetPasswordRequest\x1a#.admin.RequestResetPasswordResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/users/password/reset/request\x12\x95\x01\n" +
 	"\x16VerifyPasswordResetOtp\x12$.admin.VerifyPasswordResetOtpRequest\x1a%.admin.VerifyPasswordResetOtpResponse\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/users/password/reset/verify\x12s\n" +
-	"\rResetPassword\x12\x1b.admin.ResetPasswordRequest\x1a\x1c.admin.ResetPasswordResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/v1/users/password/resetB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
+	"\rResetPassword\x12\x1b.admin.ResetPasswordRequest\x1a\x1c.admin.ResetPasswordResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/v1/users/password/resetB\x18Z\x16internal/proto/adminpbb\x06proto3"
 
 var (
-	file_internal_proto_admin_app_user_proto_rawDescOnce sync.Once
-	file_internal_proto_admin_app_user_proto_rawDescData []byte
+	file_proto_app_user_proto_rawDescOnce sync.Once
+	file_proto_app_user_proto_rawDescData []byte
 )
 
-func file_internal_proto_admin_app_user_proto_rawDescGZIP() []byte {
-	file_internal_proto_admin_app_user_proto_rawDescOnce.Do(func() {
-		file_internal_proto_admin_app_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_internal_proto_admin_app_user_proto_rawDesc), len(file_internal_proto_admin_app_user_proto_rawDesc)))
+func file_proto_app_user_proto_rawDescGZIP() []byte {
+	file_proto_app_user_proto_rawDescOnce.Do(func() {
+		file_proto_app_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_app_user_proto_rawDesc), len(file_proto_app_user_proto_rawDesc)))
 	})
-	return file_internal_proto_admin_app_user_proto_rawDescData
+	return file_proto_app_user_proto_rawDescData
 }
 
-var file_internal_proto_admin_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
-var file_internal_proto_admin_app_user_proto_goTypes = []any{
+var file_proto_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_proto_app_user_proto_goTypes = []any{
 	(*AppLoginRequest)(nil),                // 0: admin.AppLoginRequest
 	(*AppLoginResponse)(nil),               // 1: admin.AppLoginResponse
 	(*RequestResetPasswordRequest)(nil),    // 2: admin.RequestResetPasswordRequest
@@ -860,7 +860,7 @@ var file_internal_proto_admin_app_user_proto_goTypes = []any{
 	(*ListPlansResponse)(nil),              // 14: admin.ListPlansResponse
 	(*emptypb.Empty)(nil),                  // 15: google.protobuf.Empty
 }
-var file_internal_proto_admin_app_user_proto_depIdxs = []int32{
+var file_proto_app_user_proto_depIdxs = []int32{
 	10, // 0: admin.ListUsersResponse.users:type_name -> admin.AppUser
 	13, // 1: admin.ListPlansResponse.plans:type_name -> admin.UserPlan
 	8,  // 2: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
@@ -884,26 +884,26 @@ var file_internal_proto_admin_app_user_proto_depIdxs = []int32{
 	0,  // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_internal_proto_admin_app_user_proto_init() }
-func file_internal_proto_admin_app_user_proto_init() {
-	if File_internal_proto_admin_app_user_proto != nil {
+func init() { file_proto_app_user_proto_init() }
+func file_proto_app_user_proto_init() {
+	if File_proto_app_user_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_app_user_proto_rawDesc), len(file_internal_proto_admin_app_user_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_app_user_proto_rawDesc), len(file_proto_app_user_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_internal_proto_admin_app_user_proto_goTypes,
-		DependencyIndexes: file_internal_proto_admin_app_user_proto_depIdxs,
-		MessageInfos:      file_internal_proto_admin_app_user_proto_msgTypes,
+		GoTypes:           file_proto_app_user_proto_goTypes,
+		DependencyIndexes: file_proto_app_user_proto_depIdxs,
+		MessageInfos:      file_proto_app_user_proto_msgTypes,
 	}.Build()
-	File_internal_proto_admin_app_user_proto = out.File
-	file_internal_proto_admin_app_user_proto_goTypes = nil
-	file_internal_proto_admin_app_user_proto_depIdxs = nil
+	File_proto_app_user_proto = out.File
+	file_proto_app_user_proto_goTypes = nil
+	file_proto_app_user_proto_depIdxs = nil
 }

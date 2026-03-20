@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v6.33.1
-// source: internal/proto/admin/admin.proto
+// source: proto/admin.proto
 
 package adminpb
 
@@ -32,7 +32,7 @@ type LoginRequest struct {
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[0]
+	mi := &file_proto_admin_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -44,7 +44,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[0]
+	mi := &file_proto_admin_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +57,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{0}
+	return file_proto_admin_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *LoginRequest) GetEmail() string {
@@ -83,7 +83,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[1]
+	mi := &file_proto_admin_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -95,7 +95,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[1]
+	mi := &file_proto_admin_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -108,7 +108,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{1}
+	return file_proto_admin_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *LoginResponse) GetAccessToken() string {
@@ -129,7 +129,7 @@ type CreatePlanRequest struct {
 
 func (x *CreatePlanRequest) Reset() {
 	*x = CreatePlanRequest{}
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[2]
+	mi := &file_proto_admin_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -141,7 +141,7 @@ func (x *CreatePlanRequest) String() string {
 func (*CreatePlanRequest) ProtoMessage() {}
 
 func (x *CreatePlanRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[2]
+	mi := &file_proto_admin_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -154,7 +154,7 @@ func (x *CreatePlanRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePlanRequest.ProtoReflect.Descriptor instead.
 func (*CreatePlanRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{2}
+	return file_proto_admin_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreatePlanRequest) GetName() string {
@@ -187,7 +187,7 @@ type CreatePlanResponse struct {
 
 func (x *CreatePlanResponse) Reset() {
 	*x = CreatePlanResponse{}
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[3]
+	mi := &file_proto_admin_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -199,7 +199,7 @@ func (x *CreatePlanResponse) String() string {
 func (*CreatePlanResponse) ProtoMessage() {}
 
 func (x *CreatePlanResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[3]
+	mi := &file_proto_admin_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -212,7 +212,7 @@ func (x *CreatePlanResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePlanResponse.ProtoReflect.Descriptor instead.
 func (*CreatePlanResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{3}
+	return file_proto_admin_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CreatePlanResponse) GetMessage() string {
@@ -230,7 +230,7 @@ type ListPlanRequest struct {
 
 func (x *ListPlanRequest) Reset() {
 	*x = ListPlanRequest{}
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[4]
+	mi := &file_proto_admin_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -242,7 +242,7 @@ func (x *ListPlanRequest) String() string {
 func (*ListPlanRequest) ProtoMessage() {}
 
 func (x *ListPlanRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[4]
+	mi := &file_proto_admin_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -255,7 +255,7 @@ func (x *ListPlanRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPlanRequest.ProtoReflect.Descriptor instead.
 func (*ListPlanRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{4}
+	return file_proto_admin_proto_rawDescGZIP(), []int{4}
 }
 
 type Plan struct {
@@ -271,7 +271,7 @@ type Plan struct {
 
 func (x *Plan) Reset() {
 	*x = Plan{}
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[5]
+	mi := &file_proto_admin_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -283,7 +283,7 @@ func (x *Plan) String() string {
 func (*Plan) ProtoMessage() {}
 
 func (x *Plan) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[5]
+	mi := &file_proto_admin_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -296,7 +296,7 @@ func (x *Plan) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Plan.ProtoReflect.Descriptor instead.
 func (*Plan) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{5}
+	return file_proto_admin_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Plan) GetPlanID() string {
@@ -343,7 +343,7 @@ type ListPlanResponse struct {
 
 func (x *ListPlanResponse) Reset() {
 	*x = ListPlanResponse{}
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[6]
+	mi := &file_proto_admin_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -355,7 +355,7 @@ func (x *ListPlanResponse) String() string {
 func (*ListPlanResponse) ProtoMessage() {}
 
 func (x *ListPlanResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[6]
+	mi := &file_proto_admin_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -368,7 +368,7 @@ func (x *ListPlanResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPlanResponse.ProtoReflect.Descriptor instead.
 func (*ListPlanResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{6}
+	return file_proto_admin_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListPlanResponse) GetPlans() []*Plan {
@@ -391,7 +391,7 @@ type UpdatePlanRequest struct {
 
 func (x *UpdatePlanRequest) Reset() {
 	*x = UpdatePlanRequest{}
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[7]
+	mi := &file_proto_admin_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -403,7 +403,7 @@ func (x *UpdatePlanRequest) String() string {
 func (*UpdatePlanRequest) ProtoMessage() {}
 
 func (x *UpdatePlanRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[7]
+	mi := &file_proto_admin_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -416,7 +416,7 @@ func (x *UpdatePlanRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePlanRequest.ProtoReflect.Descriptor instead.
 func (*UpdatePlanRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{7}
+	return file_proto_admin_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdatePlanRequest) GetPlanID() string {
@@ -463,7 +463,7 @@ type UpdatePlanResponse struct {
 
 func (x *UpdatePlanResponse) Reset() {
 	*x = UpdatePlanResponse{}
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[8]
+	mi := &file_proto_admin_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -475,7 +475,7 @@ func (x *UpdatePlanResponse) String() string {
 func (*UpdatePlanResponse) ProtoMessage() {}
 
 func (x *UpdatePlanResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_admin_proto_msgTypes[8]
+	mi := &file_proto_admin_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -488,7 +488,7 @@ func (x *UpdatePlanResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePlanResponse.ProtoReflect.Descriptor instead.
 func (*UpdatePlanResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{8}
+	return file_proto_admin_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UpdatePlanResponse) GetUpdatedPlan() *Plan {
@@ -498,11 +498,11 @@ func (x *UpdatePlanResponse) GetUpdatedPlan() *Plan {
 	return nil
 }
 
-var File_internal_proto_admin_admin_proto protoreflect.FileDescriptor
+var File_proto_admin_proto protoreflect.FileDescriptor
 
-const file_internal_proto_admin_admin_proto_rawDesc = "" +
+const file_proto_admin_proto_rawDesc = "" +
 	"\n" +
-	" internal/proto/admin/admin.proto\x12\x05admin\x1a'googleapis/google/api/annotations.proto\"@\n" +
+	"\x11proto/admin.proto\x12\x05admin\x1a'googleapis/google/api/annotations.proto\"@\n" +
 	"\fLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"2\n" +
@@ -537,22 +537,22 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"CreatePlan\x12\x18.admin.CreatePlanRequest\x1a\x19.admin.CreatePlanResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/plans\x12Y\n" +
 	"\tListPlans\x12\x16.admin.ListPlanRequest\x1a\x17.admin.ListPlanResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/admin/plans\x12j\n" +
 	"\n" +
-	"UpdatePlan\x12\x18.admin.UpdatePlanRequest\x1a\x19.admin.UpdatePlanResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\x1a\x1c/api/v1/admin/plans/{planID}B\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
+	"UpdatePlan\x12\x18.admin.UpdatePlanRequest\x1a\x19.admin.UpdatePlanResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\x1a\x1c/api/v1/admin/plans/{planID}B\x18Z\x16internal/proto/adminpbb\x06proto3"
 
 var (
-	file_internal_proto_admin_admin_proto_rawDescOnce sync.Once
-	file_internal_proto_admin_admin_proto_rawDescData []byte
+	file_proto_admin_proto_rawDescOnce sync.Once
+	file_proto_admin_proto_rawDescData []byte
 )
 
-func file_internal_proto_admin_admin_proto_rawDescGZIP() []byte {
-	file_internal_proto_admin_admin_proto_rawDescOnce.Do(func() {
-		file_internal_proto_admin_admin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_internal_proto_admin_admin_proto_rawDesc), len(file_internal_proto_admin_admin_proto_rawDesc)))
+func file_proto_admin_proto_rawDescGZIP() []byte {
+	file_proto_admin_proto_rawDescOnce.Do(func() {
+		file_proto_admin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_admin_proto_rawDesc), len(file_proto_admin_proto_rawDesc)))
 	})
-	return file_internal_proto_admin_admin_proto_rawDescData
+	return file_proto_admin_proto_rawDescData
 }
 
-var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_internal_proto_admin_admin_proto_goTypes = []any{
+var file_proto_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_proto_admin_proto_goTypes = []any{
 	(*LoginRequest)(nil),       // 0: admin.LoginRequest
 	(*LoginResponse)(nil),      // 1: admin.LoginResponse
 	(*CreatePlanRequest)(nil),  // 2: admin.CreatePlanRequest
@@ -563,7 +563,7 @@ var file_internal_proto_admin_admin_proto_goTypes = []any{
 	(*UpdatePlanRequest)(nil),  // 7: admin.UpdatePlanRequest
 	(*UpdatePlanResponse)(nil), // 8: admin.UpdatePlanResponse
 }
-var file_internal_proto_admin_admin_proto_depIdxs = []int32{
+var file_proto_admin_proto_depIdxs = []int32{
 	5, // 0: admin.ListPlanResponse.plans:type_name -> admin.Plan
 	5, // 1: admin.UpdatePlanResponse.updatedPlan:type_name -> admin.Plan
 	0, // 2: admin.AdminService.Login:input_type -> admin.LoginRequest
@@ -581,26 +581,26 @@ var file_internal_proto_admin_admin_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_internal_proto_admin_admin_proto_init() }
-func file_internal_proto_admin_admin_proto_init() {
-	if File_internal_proto_admin_admin_proto != nil {
+func init() { file_proto_admin_proto_init() }
+func file_proto_admin_proto_init() {
+	if File_proto_admin_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_admin_proto_rawDesc), len(file_internal_proto_admin_admin_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_admin_proto_rawDesc), len(file_proto_admin_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_internal_proto_admin_admin_proto_goTypes,
-		DependencyIndexes: file_internal_proto_admin_admin_proto_depIdxs,
-		MessageInfos:      file_internal_proto_admin_admin_proto_msgTypes,
+		GoTypes:           file_proto_admin_proto_goTypes,
+		DependencyIndexes: file_proto_admin_proto_depIdxs,
+		MessageInfos:      file_proto_admin_proto_msgTypes,
 	}.Build()
-	File_internal_proto_admin_admin_proto = out.File
-	file_internal_proto_admin_admin_proto_goTypes = nil
-	file_internal_proto_admin_admin_proto_depIdxs = nil
+	File_proto_admin_proto = out.File
+	file_proto_admin_proto_goTypes = nil
+	file_proto_admin_proto_depIdxs = nil
 }

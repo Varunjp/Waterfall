@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v6.33.1
-// source: internal/proto/admin/app.proto
+// source: proto/app.proto
 
 package adminpb
 
@@ -33,7 +33,7 @@ type RegisterAppRequest struct {
 
 func (x *RegisterAppRequest) Reset() {
 	*x = RegisterAppRequest{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[0]
+	mi := &file_proto_app_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +45,7 @@ func (x *RegisterAppRequest) String() string {
 func (*RegisterAppRequest) ProtoMessage() {}
 
 func (x *RegisterAppRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[0]
+	mi := &file_proto_app_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *RegisterAppRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterAppRequest.ProtoReflect.Descriptor instead.
 func (*RegisterAppRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{0}
+	return file_proto_app_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *RegisterAppRequest) GetAppName() string {
@@ -84,7 +84,7 @@ type RegisterAppResponse struct {
 
 func (x *RegisterAppResponse) Reset() {
 	*x = RegisterAppResponse{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[1]
+	mi := &file_proto_app_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +96,7 @@ func (x *RegisterAppResponse) String() string {
 func (*RegisterAppResponse) ProtoMessage() {}
 
 func (x *RegisterAppResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[1]
+	mi := &file_proto_app_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +109,7 @@ func (x *RegisterAppResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterAppResponse.ProtoReflect.Descriptor instead.
 func (*RegisterAppResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{1}
+	return file_proto_app_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *RegisterAppResponse) GetAppId() string {
@@ -127,7 +127,7 @@ type ListAppsRequest struct {
 
 func (x *ListAppsRequest) Reset() {
 	*x = ListAppsRequest{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[2]
+	mi := &file_proto_app_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -139,7 +139,7 @@ func (x *ListAppsRequest) String() string {
 func (*ListAppsRequest) ProtoMessage() {}
 
 func (x *ListAppsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[2]
+	mi := &file_proto_app_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -152,7 +152,7 @@ func (x *ListAppsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAppsRequest.ProtoReflect.Descriptor instead.
 func (*ListAppsRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{2}
+	return file_proto_app_proto_rawDescGZIP(), []int{2}
 }
 
 type ListAppsResponse struct {
@@ -164,7 +164,7 @@ type ListAppsResponse struct {
 
 func (x *ListAppsResponse) Reset() {
 	*x = ListAppsResponse{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[3]
+	mi := &file_proto_app_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -176,7 +176,7 @@ func (x *ListAppsResponse) String() string {
 func (*ListAppsResponse) ProtoMessage() {}
 
 func (x *ListAppsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[3]
+	mi := &file_proto_app_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -189,7 +189,7 @@ func (x *ListAppsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAppsResponse.ProtoReflect.Descriptor instead.
 func (*ListAppsResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{3}
+	return file_proto_app_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListAppsResponse) GetApps() []*App {
@@ -212,7 +212,7 @@ type App struct {
 
 func (x *App) Reset() {
 	*x = App{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[4]
+	mi := &file_proto_app_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -224,7 +224,7 @@ func (x *App) String() string {
 func (*App) ProtoMessage() {}
 
 func (x *App) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[4]
+	mi := &file_proto_app_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -237,7 +237,7 @@ func (x *App) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use App.ProtoReflect.Descriptor instead.
 func (*App) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{4}
+	return file_proto_app_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *App) GetAppId() string {
@@ -284,7 +284,7 @@ type BlockAppRequest struct {
 
 func (x *BlockAppRequest) Reset() {
 	*x = BlockAppRequest{}
-	mi := &file_internal_proto_admin_app_proto_msgTypes[5]
+	mi := &file_proto_app_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -296,7 +296,7 @@ func (x *BlockAppRequest) String() string {
 func (*BlockAppRequest) ProtoMessage() {}
 
 func (x *BlockAppRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_proto_msgTypes[5]
+	mi := &file_proto_app_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -309,7 +309,7 @@ func (x *BlockAppRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlockAppRequest.ProtoReflect.Descriptor instead.
 func (*BlockAppRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_proto_rawDescGZIP(), []int{5}
+	return file_proto_app_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *BlockAppRequest) GetAppId() string {
@@ -319,11 +319,11 @@ func (x *BlockAppRequest) GetAppId() string {
 	return ""
 }
 
-var File_internal_proto_admin_app_proto protoreflect.FileDescriptor
+var File_proto_app_proto protoreflect.FileDescriptor
 
-const file_internal_proto_admin_app_proto_rawDesc = "" +
+const file_proto_app_proto_rawDesc = "" +
 	"\n" +
-	"\x1einternal/proto/admin/app.proto\x12\x05admin\x1a'googleapis/google/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"L\n" +
+	"\x0fproto/app.proto\x12\x05admin\x1a'googleapis/google/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"L\n" +
 	"\x12RegisterAppRequest\x12\x19\n" +
 	"\bapp_name\x18\x01 \x01(\tR\aappName\x12\x1b\n" +
 	"\tapp_email\x18\x02 \x01(\tR\bappEmail\",\n" +
@@ -347,22 +347,22 @@ const file_internal_proto_admin_app_proto_rawDesc = "" +
 	"\bListApps\x12\x16.admin.ListAppsRequest\x1a\x17.admin.ListAppsResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\f/api/v1/apps\x12b\n" +
 	"\bBlockApp\x12\x16.admin.BlockAppRequest\x1a\x16.google.protobuf.Empty\"&\x82\xd3\xe4\x93\x02 :\x01*2\x1b/api/v1/apps/{app_id}/block\x12f\n" +
 	"\n" +
-	"UnblockApp\x12\x16.admin.BlockAppRequest\x1a\x16.google.protobuf.Empty\"(\x82\xd3\xe4\x93\x02\":\x01*2\x1d/api/v1/apps/{app_id}/unblockB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
+	"UnblockApp\x12\x16.admin.BlockAppRequest\x1a\x16.google.protobuf.Empty\"(\x82\xd3\xe4\x93\x02\":\x01*2\x1d/api/v1/apps/{app_id}/unblockB\x18Z\x16internal/proto/adminpbb\x06proto3"
 
 var (
-	file_internal_proto_admin_app_proto_rawDescOnce sync.Once
-	file_internal_proto_admin_app_proto_rawDescData []byte
+	file_proto_app_proto_rawDescOnce sync.Once
+	file_proto_app_proto_rawDescData []byte
 )
 
-func file_internal_proto_admin_app_proto_rawDescGZIP() []byte {
-	file_internal_proto_admin_app_proto_rawDescOnce.Do(func() {
-		file_internal_proto_admin_app_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_internal_proto_admin_app_proto_rawDesc), len(file_internal_proto_admin_app_proto_rawDesc)))
+func file_proto_app_proto_rawDescGZIP() []byte {
+	file_proto_app_proto_rawDescOnce.Do(func() {
+		file_proto_app_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_app_proto_rawDesc), len(file_proto_app_proto_rawDesc)))
 	})
-	return file_internal_proto_admin_app_proto_rawDescData
+	return file_proto_app_proto_rawDescData
 }
 
-var file_internal_proto_admin_app_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_internal_proto_admin_app_proto_goTypes = []any{
+var file_proto_app_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_proto_app_proto_goTypes = []any{
 	(*RegisterAppRequest)(nil),  // 0: admin.RegisterAppRequest
 	(*RegisterAppResponse)(nil), // 1: admin.RegisterAppResponse
 	(*ListAppsRequest)(nil),     // 2: admin.ListAppsRequest
@@ -371,7 +371,7 @@ var file_internal_proto_admin_app_proto_goTypes = []any{
 	(*BlockAppRequest)(nil),     // 5: admin.BlockAppRequest
 	(*emptypb.Empty)(nil),       // 6: google.protobuf.Empty
 }
-var file_internal_proto_admin_app_proto_depIdxs = []int32{
+var file_proto_app_proto_depIdxs = []int32{
 	4, // 0: admin.ListAppsResponse.apps:type_name -> admin.App
 	0, // 1: admin.AppService.RegisterApp:input_type -> admin.RegisterAppRequest
 	2, // 2: admin.AppService.ListApps:input_type -> admin.ListAppsRequest
@@ -388,26 +388,26 @@ var file_internal_proto_admin_app_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_internal_proto_admin_app_proto_init() }
-func file_internal_proto_admin_app_proto_init() {
-	if File_internal_proto_admin_app_proto != nil {
+func init() { file_proto_app_proto_init() }
+func file_proto_app_proto_init() {
+	if File_proto_app_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_app_proto_rawDesc), len(file_internal_proto_admin_app_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_app_proto_rawDesc), len(file_proto_app_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_internal_proto_admin_app_proto_goTypes,
-		DependencyIndexes: file_internal_proto_admin_app_proto_depIdxs,
-		MessageInfos:      file_internal_proto_admin_app_proto_msgTypes,
+		GoTypes:           file_proto_app_proto_goTypes,
+		DependencyIndexes: file_proto_app_proto_depIdxs,
+		MessageInfos:      file_proto_app_proto_msgTypes,
 	}.Build()
-	File_internal_proto_admin_app_proto = out.File
-	file_internal_proto_admin_app_proto_goTypes = nil
-	file_internal_proto_admin_app_proto_depIdxs = nil
+	File_proto_app_proto = out.File
+	file_proto_app_proto_goTypes = nil
+	file_proto_app_proto_depIdxs = nil
 }
