@@ -3,6 +3,7 @@ package gateway
 import (
 	"api_gateway/internal/config"
 	"api_gateway/internal/middleware"
+	"api_gateway/internal/proto/adminpb"
 	"api_gateway/internal/proto/jobpb"
 	"context"
 	"encoding/json"
@@ -19,12 +20,7 @@ import (
 func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *http.Server {
 
 	gwMux := runtime.NewServeMux(
-		runtime.WithIncomingHeaderMatcher(func(key string)(string,bool){
-			if key == "Authorization" {
-				return key,true
-			}
-			return key,false
-		}),
+		runtime.WithIncomingHeaderMatcher(headerMatcher),
 		runtime.WithErrorHandler(customErrorHandler),
 	)
 
@@ -43,6 +39,35 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 		panic(err)
 	}
 
+	err = adminpb.RegisterAdminServiceHandlerFromEndpoint(
+		ctx,
+		gwMux,
+		cfg.AdminServiceURL,
+		opts,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = adminpb.RegisterAppServiceHandlerFromEndpoint(
+		ctx,gwMux,cfg.AdminServiceURL,opts,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = adminpb.RegisterAppUserServiceHandlerFromEndpoint(
+		ctx,gwMux,cfg.AdminServiceURL,opts,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	billingProxy := NewReverseProxy(cfg.BillingServiceURL)
+
 	r := gin.New()
 
 	r.Use(
@@ -57,6 +82,8 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 	})
 
 	r.Any("/api/*any",gin.WrapH(gwMux))
+
+	r.Any("/billing/*path",gin.WrapH(billingProxy))
 
 	return &http.Server{
 		Addr: ":"+cfg.Port,
@@ -80,4 +107,13 @@ func customErrorHandler(
 	json.NewEncoder(w).Encode(map[string]string{
 		"error": s.Message(),
 	})
+}
+
+func headerMatcher(key string) (string,bool) {
+	switch key {
+	case "Authorization","x-api-key":
+		return key,true 
+	default:
+		return key,false 
+	}
 }

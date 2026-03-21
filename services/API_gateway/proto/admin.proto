@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package admin;
 
-option go_package = "internal/proto/admin;adminpb";
+option go_package = "internal/proto/adminpb";
 
 import "googleapis/google/api/annotations.proto";
 

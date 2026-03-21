@@ -12,6 +12,7 @@ import (
 	"watcher_service/internal/config"
 	"watcher_service/internal/consumer"
 	dbClient "watcher_service/internal/infra/db"
+	redisClient "watcher_service/internal/infra/redis"
 	"watcher_service/internal/logger"
 	"watcher_service/internal/producer"
 	"watcher_service/internal/repository"
@@ -56,8 +57,13 @@ func main() {
 	queueProducer := producer.NewKafkaProducer(cfg.KafkaBroker, cfg.KafkaTopic)
 	jobStatusProducer := producer.NewKafkaProducer(cfg.KafkaBroker,cfg.JobStatusTopic)
 	watchUC := usecase.NewWatchJobsUsecase(repo, queueProducer,jobStatusProducer, logg)
+	rd,err:= redisClient.NewRedisClient(cfg.RedisAddr,cfg.RedisPassword,cfg.RedisDB)
 
-	jobEventUC := usecase.NewConsumeJobUsecase(repo, logg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	jobEventUC := usecase.NewConsumeJobUsecase(repo, logg,rd)
 	jobEventConsumer := consumer.NewKafkaConsumer(
 		cfg.KafkaBroker,
 		cfg.JobTopic,
