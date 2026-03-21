@@ -18,6 +18,9 @@ type Config struct {
 	JobUsageGroupID string 
 	JobRunGroupID string
 	PollInterval  int
+	RedisAddr 		string 
+	RedisPassword 	string 
+	RedisDB  		int
 }
 
 func Load() *Config {
@@ -27,7 +30,7 @@ func Load() *Config {
 			pollInterval = parsed
 		}
 	}
-
+	redisDB, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
 	return &Config{
 		DBURL:       os.Getenv("DATABASE_URL"),
 		DBADMINURL: os.Getenv("DATABASE_ADMIN_URL"),
@@ -44,6 +47,9 @@ func Load() *Config {
 			os.Getenv("KAFAK_RUN_GROUPID"),
 		),
 		PollInterval: pollInterval,
+		RedisAddr: os.Getenv("REDIS_ADDR"),
+		RedisPassword: os.Getenv("REDIS_PASSWORD"),
+		RedisDB: redisDB,
 	}
 }
 

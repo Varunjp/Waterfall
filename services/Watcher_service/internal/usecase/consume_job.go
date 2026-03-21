@@ -3,20 +3,23 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 	"watcher_service/internal/domain"
 	"watcher_service/internal/repository"
 
+	"github.com/go-redis/redis"
 	"go.uber.org/zap"
 )
 
 type ConsumeJobUsecase struct {
 	repo   repository.JobRepository
+	redis  *redis.Client
 	logger *zap.Logger
 }
 
-func NewConsumeJobUsecase(r repository.JobRepository, l *zap.Logger) *ConsumeJobUsecase {
-	return &ConsumeJobUsecase{repo: r, logger: l}
+func NewConsumeJobUsecase(r repository.JobRepository, l *zap.Logger,rd *redis.Client) *ConsumeJobUsecase {
+	return &ConsumeJobUsecase{repo: r, logger: l,redis: rd}
 }
 
 func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) error {
@@ -58,6 +61,13 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 		if !updated {
 			return errors.New("job cannot be cancelled (already running or finished)")
 		}
+
+		key := fmt.Sprintf("usage:%s:%s",event.AppID,time.Now().Format("2006-01"))
+		err = uc.redis.Decr(key).Err()
+		if err != nil {
+			return err 
+		}
+		
 		return nil 
 	case domain.JobFailed:
 		return uc.repo.UpdateStatus(ctx, event.JobID, domain.StatusFailed)

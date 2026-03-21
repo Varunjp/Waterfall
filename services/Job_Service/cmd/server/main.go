@@ -50,7 +50,7 @@ func main() {
 
 	producer := producer.NewKafkaProducer(cfg.KafkaBrokers,cfg.KafkaTopic)
 	uc := usecase.NewJobUsecase(producer,logg,rr)
-	dc := usecase.NewDashboardUsecase(jobRepo,logRepo,queueProducer)
+	dc := usecase.NewDashboardUsecase(jobRepo,logRepo,queueProducer,rr)
 	h := handler.NewJobHandler(uc,*dc)
 
 	server := grpc.NewServer(

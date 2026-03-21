@@ -6,6 +6,7 @@ import (
 	"job_service/internal/middleware"
 	"job_service/internal/queue"
 	"job_service/internal/repository"
+	redisRepo "job_service/internal/repository/redis"
 	"log"
 )
 
@@ -13,10 +14,11 @@ type DashboardUsecase struct {
 	jobs repository.JobRepository
 	logs repository.JobLogRepository
 	queue queue.Producer
+	redis *redisRepo.RedisRepo
 }
 
-func NewDashboardUsecase(j repository.JobRepository,l repository.JobLogRepository, q queue.Producer) *DashboardUsecase {
-	return &DashboardUsecase{jobs: j, logs: l, queue: q}
+func NewDashboardUsecase(j repository.JobRepository,l repository.JobLogRepository, q queue.Producer,r *redisRepo.RedisRepo) *DashboardUsecase {
+	return &DashboardUsecase{jobs: j, logs: l, queue: q,redis: r}
 }
 
 func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,offset int)([]domain.Job,int,error) {
@@ -56,13 +58,15 @@ func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,er
 	if err != nil {
 		return "",err
 	}
-
 	if role == "viewer" {
 		return "",domain.ErrForbidden
 	}
 
 	job, err := uc.jobs.GetByID(ctx,jobID)
-
+	if err != nil {
+		return "",err 
+	}
+	err = uc.redis.CheckQuota(ctx,job.AppID)
 	if err != nil {
 		return "",err 
 	}
@@ -80,6 +84,9 @@ func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,er
 	if err != nil {
 		return "",err 
 	}
-
+	err = uc.redis.Incr(ctx,job.AppID)
+	if err != nil {
+		return "",err
+	}
 	return job.JobID,nil 
 }

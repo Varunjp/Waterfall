@@ -12,6 +12,14 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 	publicPaths := map[string]bool{
 		"/health": true,
 		"/api/v1/jobs": true,
+		"/api/v1/admin/login": true,
+		"/api/v1/users/login":true,
+		"/api/v1/users/password/reset/request": true,
+		"/api/v1/users/password/reset/verify": true,
+		"/api/v1/users/password/reset": true,
+		"/api/v1/apps": true,
+		"/billing/webhook":true,
+		"/billing/checkout":true,
 	}
 
 	return func(c *gin.Context) {
