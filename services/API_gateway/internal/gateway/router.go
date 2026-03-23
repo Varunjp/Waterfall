@@ -27,45 +27,36 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
-
 	err := jobpb.RegisterJobServiceHandlerFromEndpoint(
 		ctx,
 		gwMux,
 		cfg.JobServiceURL,
 		opts,
 	)
-
 	if err != nil {
 		panic(err)
 	}
-
 	err = adminpb.RegisterAdminServiceHandlerFromEndpoint(
 		ctx,
 		gwMux,
 		cfg.AdminServiceURL,
 		opts,
 	)
-
 	if err != nil {
 		panic(err)
 	}
-
 	err = adminpb.RegisterAppServiceHandlerFromEndpoint(
 		ctx,gwMux,cfg.AdminServiceURL,opts,
 	)
-
 	if err != nil {
 		panic(err)
 	}
-
 	err = adminpb.RegisterAppUserServiceHandlerFromEndpoint(
 		ctx,gwMux,cfg.AdminServiceURL,opts,
 	)
-
 	if err != nil {
 		panic(err)
 	}
-
 	billingProxy := NewReverseProxy(cfg.BillingServiceURL)
 
 	r := gin.New()
@@ -74,6 +65,7 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 		middleware.RecoveryMiddleware(),
 		middleware.LoggingMiddleware(),
 		middleware.AuthMiddleware(cfg.JWTSecret),
+		middleware.NoCacheMiddleware(),
 		middleware.RateLimitMiddleware(rdb,cfg.RateLimit),
 	)
 
@@ -84,6 +76,8 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 	r.Any("/api/*any",gin.WrapH(gwMux))
 
 	r.Any("/billing/*path",gin.WrapH(billingProxy))
+
+	RegisterUIRoutes(r)
 
 	return &http.Server{
 		Addr: ":"+cfg.Port,

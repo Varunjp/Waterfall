@@ -20,6 +20,8 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 		"/api/v1/apps": true,
 		"/billing/webhook":true,
 		"/billing/checkout":true,
+		"/":true,
+		"/login":true,
 	}
 
 	return func(c *gin.Context) {
@@ -28,8 +30,17 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 			c.Next()
 			return
 		}
-
 		authHeader := c.GetHeader("Authorization")
+
+		if strings.HasPrefix(c.Request.URL.Path, "/static") {
+			c.Next()
+			return
+		}
+
+		if authHeader == "" {
+			cookie, _ := c.Cookie("token")
+			authHeader = "Bearer "+cookie
+		}
 
 		if authHeader == "" {
 			c.AbortWithStatusJSON(401, gin.H{"error": "missing auth header"})
