@@ -11,6 +11,10 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+type contextKey string
+
+const ClaimsKey contextKey = "claims"
+
 func AuthInterceptor(secret string) grpc.UnaryServerInterceptor {
 	return func( 
 		ctx context.Context,
@@ -44,7 +48,7 @@ func AuthInterceptor(secret string) grpc.UnaryServerInterceptor {
 		if !ok  {
 			return nil,domainErr.ErrUnauthenticated
 		}
-		ctx = context.WithValue(ctx,"claims",claims)
+		ctx = context.WithValue(ctx,ClaimsKey,claims)
 		return handler(ctx,req)
 	}
 }

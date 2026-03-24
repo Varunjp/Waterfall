@@ -48,7 +48,7 @@ func (s *AppUserService) Create(app_id,email, password, role string) error {
 	return s.repo.Create(user)
 }
 
-func (s *AppUserService) List(appID string) ([]*entities.AppUser, error) {
+func (s *AppUserService) List(appID string) ([]*entities.AppUser, error) {	
 	return s.repo.FindByApp(appID)
 }
 

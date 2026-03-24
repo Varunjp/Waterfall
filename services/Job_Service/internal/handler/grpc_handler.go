@@ -55,11 +55,15 @@ func (h *JobHandler) CancelJob(ctx context.Context, r *jobpb.CancelJobRequest)(*
 
 func (h *JobHandler) ListJobs(ctx context.Context,req *jobpb.ListJobsRequest)(*jobpb.ListJobsResponse,error) {
 
+	startDate := req.StartDate.AsTime()
+	endDate := req.EndDate.AsTime()
 	jobs,total,err := h.dc.ListJobs(
 		ctx,
 		req.Status,
 		int(req.Limit),
 		int(req.Offset),
+		&startDate,
+		&endDate,
 	)
 
 	if err != nil {

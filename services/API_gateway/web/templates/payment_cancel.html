@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Cancelled</title>
+    <link rel="stylesheet" href="/static/css/payment.css" />
+  </head>
+  <body>
+    <div class="spotlight spotlight--red"></div>
+
+    <div class="payment-card">
+      <div class="status-icon status-icon--cancel">
+        <svg
+          viewBox="0 0 40 40"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <line x1="12" y1="12" x2="28" y2="28" />
+          <line x1="28" y1="12" x2="12" y2="28" />
+        </svg>
+      </div>
+
+      <div class="payment-header">
+        <p class="payment-label">Transaction Cancelled</p>
+        <h1>PAYMENT<br /><span>CANCELLED.</span></h1>
+      </div>
+
+      <p class="payment-desc">
+        No charge was made. You can go back and choose a plan whenever you're
+        ready.
+      </p>
+
+      <div class="payment-divider"></div>
+
+      <a href="/?section=plans" class="btn-action btn-action--outline">
+        <svg
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          width="14"
+          height="14"
+        >
+          <path d="M15 8H1M7 2L1 8l6 6" />
+        </svg>
+        Back to Plans
+      </a>
+    </div>
+  </body>
+</html>

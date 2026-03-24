@@ -8,6 +8,7 @@ import (
 	"job_service/internal/repository"
 	redisRepo "job_service/internal/repository/redis"
 	"log"
+	"time"
 )
 
 type DashboardUsecase struct {
@@ -21,7 +22,7 @@ func NewDashboardUsecase(j repository.JobRepository,l repository.JobLogRepositor
 	return &DashboardUsecase{jobs: j, logs: l, queue: q,redis: r}
 }
 
-func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,offset int)([]domain.Job,int,error) {
+func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,offset int,startDate,endDate *time.Time)([]domain.Job,int,error) {
 	
 	appID,err := middleware.AppIDFromContext(ctx)
 	if err != nil {
@@ -29,7 +30,15 @@ func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,o
 		return nil,0,err 
 	}
 
-	return uc.jobs.ListByApp(ctx,appID,status,limit,offset)
+	if !isValidTime(startDate) {
+		startDate = nil 
+	}
+
+	if !isValidTime(endDate) {
+		endDate = nil 
+	}
+
+	return uc.jobs.ListByApp(ctx,appID,status,limit,offset,startDate,endDate)
 }
 
 func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context,limit,offset int)([]domain.Job,int,error) {
@@ -89,4 +98,11 @@ func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,er
 		return "",err
 	}
 	return job.JobID,nil 
+}
+
+func isValidTime(t *time.Time) bool {
+	if t == nil {
+		return false
+	}
+	return !t.IsZero() && t.Unix() != 0
 }

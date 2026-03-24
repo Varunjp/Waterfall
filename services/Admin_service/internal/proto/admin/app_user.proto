@@ -100,9 +100,7 @@ message CreateUserRequest {
   string app_id = 4;
 }
 
-message ListUsersRequest {
-  string app_id = 1;
-}
+message ListUsersRequest {}
 
 message AppUser {
   string id = 1;

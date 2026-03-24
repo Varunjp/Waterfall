@@ -469,7 +469,6 @@ func (x *CreateUserRequest) GetAppId() string {
 
 type ListUsersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AppId         string                 `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -502,13 +501,6 @@ func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
 func (*ListUsersRequest) Descriptor() ([]byte, []int) {
 	return file_proto_app_user_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *ListUsersRequest) GetAppId() string {
-	if x != nil {
-		return x.AppId
-	}
-	return ""
 }
 
 type AppUser struct {
@@ -801,9 +793,8 @@ const file_proto_app_user_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
 	"\x04role\x18\x03 \x01(\tR\x04role\x12\x15\n" +
-	"\x06app_id\x18\x04 \x01(\tR\x05appId\")\n" +
-	"\x10ListUsersRequest\x12\x15\n" +
-	"\x06app_id\x18\x01 \x01(\tR\x05appId\"[\n" +
+	"\x06app_id\x18\x04 \x01(\tR\x05appId\"\x12\n" +
+	"\x10ListUsersRequest\"[\n" +
 	"\aAppUser\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x12\n" +

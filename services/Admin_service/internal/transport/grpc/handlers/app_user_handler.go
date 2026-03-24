@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"admin_service/internal/domain/entities"
+	"admin_service/internal/domain/errors"
+	"admin_service/internal/pkg/utils"
 	pb "admin_service/internal/proto/admin"
 	"admin_service/internal/usecase/interfaces"
 	"context"
@@ -25,7 +27,14 @@ func (h *AppUserHandler) CreateUser(ctx context.Context, req *pb.CreateUserReque
 }
 
 func (h *AppUserHandler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.ListUsersResponse, error) {
-	users, err := h.usecase.List(req.AppId)
+
+	appID,err := utils.GetAppIDFromContext(ctx)
+	
+	if err != nil {
+		return nil, errors.ErrUnauthenticated
+	}
+
+	users, err := h.usecase.List(appID)
 	if err != nil {
 		return nil, err
 	}

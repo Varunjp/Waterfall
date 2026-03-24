@@ -21,7 +21,7 @@ func RBACInterceptor() grpc.UnaryServerInterceptor {
 			return handler(ctx,req)
 		}
 
-		claims,ok := ctx.Value("claims").(jwt.MapClaims)
+		claims,ok := ctx.Value(ClaimsKey).(jwt.MapClaims)
 		if !ok {
 			return nil, status.Error(codes.Unauthenticated,"claims missing")
 		}
@@ -35,7 +35,6 @@ func RBACInterceptor() grpc.UnaryServerInterceptor {
 		if !exists {
 			return nil, status.Error(codes.PermissionDenied,"method not allowed")
 		}
-
 		for _,r := range allowedRoles {
 			if r == role {
 				return handler(ctx,req)

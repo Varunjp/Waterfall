@@ -10,11 +10,14 @@
   const authHeader = { Authorization: 'Bearer ' + token };
 
   /* ── State ─────────────────────────────────────── */
-  let currentPage    = 0;
-  let currentSection = 'jobs';
-  let currentFilter  = 'ALL';
-  let totalJobs      = 0;
-  const LIMIT        = 10;
+  let currentPage      = 0;
+  let currentSection   = 'jobs';
+  let currentFilter    = 'ALL';
+  let currentStartDate = null;
+  let currentEndDate   = null;
+  let totalJobs        = 0;
+  const LIMIT          = 10;
+  let currentUserRole  = null; // decoded from token
 
   /* ── Helpers ───────────────────────────────────── */
   function fmt(dateStr) {
@@ -24,7 +27,7 @@
     return d.toLocaleString('en-GB', {
       day: '2-digit', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit',
-      hour12: false, timeZone: 'Asia/Kolkata',
+      hour12: false, timeZone: 'UTC',
     });
   }
 
@@ -59,9 +62,11 @@
     area.style.animation = 'none';
     requestAnimationFrame(() => {
       area.style.animation = '';
-      if (section === 'jobs')       loadJobs(0);
-      else if (section === 'plans') loadPlans();
-      else                          renderPlaceholder(section);
+      if (section === 'jobs')        loadJobs(0);
+      else if (section === 'plans')  loadPlans();
+      else if (section === 'users')        loadUsers();
+      else if (section === 'subscription') loadSubscription();
+      else                               renderPlaceholder(section);
     });
   }
 
@@ -191,16 +196,35 @@
     btn.textContent = 'Processing…';
 
     try {
-      const res  = await fetch('/billing/checkout', {
+      const res = await fetch('/billing/checkout', {
         method:  'POST',
         headers: { ...authHeader, 'Content-Type': 'application/json' },
         body:    JSON.stringify({ plan_id: planId }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
 
-      if (data.url || data.checkoutUrl || data.redirect) {
-        window.location.href = data.url || data.checkoutUrl || data.redirect;
+      // If server redirects us directly (3xx), follow it
+      if (res.redirected) {
+        window.location.href = res.url;
+        return;
+      }
+
+      // Try to parse JSON — fall back gracefully if response isn't JSON
+      const contentType = res.headers.get('content-type') || '';
+      let data = {};
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        // Non-JSON body — read as text for error reporting only
+        const text = await res.text();
+        if (!res.ok) throw new Error(text || `Server error (${res.status})`);
+      }
+
+      if (!res.ok) throw new Error(data.message || `Server error (${res.status})`);
+
+      // Follow redirect URL returned in body
+      const redirectTo = data.checkout_url || data.url || data.checkoutUrl || data.redirect;
+      if (redirectTo) {
+        window.location.href = redirectTo;
         return;
       }
 
@@ -216,9 +240,11 @@
   /* ══════════════════════════════════════════════════
      JOBS
   ══════════════════════════════════════════════════ */
-  async function loadJobs(page = 0, filter = currentFilter) {
-    currentPage   = page;
-    currentFilter = filter;
+  async function loadJobs(page = 0, filter = currentFilter, startDate = currentStartDate, endDate = currentEndDate) {
+    currentPage      = page;
+    currentFilter    = filter;
+    currentStartDate = startDate;
+    currentEndDate   = endDate;
 
     const area = document.getElementById('content-area');
     area.innerHTML = `
@@ -232,14 +258,23 @@
       <div class="table-wrap">
         <div class="table-toolbar">
           <div class="table-toolbar-left">
-            <span class="toolbar-label">Filter</span>
+            <span class="toolbar-label">Status</span>
             <select class="filter-select" id="filterSelect">
-              <option value="ALL">All Statuses</option>
+              <option value="ALL">All</option>
               <option value="COMPLETED">Completed</option>
               <option value="FAILED">Failed</option>
               <option value="PENDING">Pending</option>
+              <option value="SCHEDULED">Scheduled</option>
+              <option value="QUEUED">Queued</option>
               <option value="RUNNING">Running</option>
             </select>
+            <span class="toolbar-divider"></span>
+            <span class="toolbar-label">From</span>
+            <input type="date" class="filter-date" id="startDate" />
+            <span class="toolbar-label">To</span>
+            <input type="date" class="filter-date" id="endDate" />
+            <button class="btn-filter-apply" id="btnApply">Apply</button>
+            <button class="btn-filter-clear" id="btnClear">Clear</button>
           </div>
           <span class="toolbar-label" id="record-count">—</span>
         </div>
@@ -247,17 +282,64 @@
         <div class="pagination" id="pagination"></div>
       </div>`;
 
+    // Today in YYYY-MM-DD (local) — hard max for both pickers
+    const todayStr = new Date().toLocaleDateString('en-CA');
+
+    const startEl = document.getElementById('startDate');
+    const endEl   = document.getElementById('endDate');
+
+    // Block future dates on both inputs
+    startEl.max = todayStr;
+    endEl.max   = todayStr;
+
+    // Restore saved filter values
     document.getElementById('filterSelect').value = filter;
+    if (startDate) startEl.value = startDate.substring(0, 10);
+    if (endDate)   endEl.value   = endDate.substring(0, 10);
+
+    // When start changes: end must be >= start
+    startEl.addEventListener('change', () => {
+      endEl.min = startEl.value || '';
+      if (endEl.value && startEl.value && endEl.value < startEl.value) {
+        endEl.value = startEl.value;
+      }
+    });
+
+    // When end changes: prevent end < start
+    endEl.addEventListener('change', () => {
+      if (startEl.value && endEl.value && endEl.value < startEl.value) {
+        endEl.value = startEl.value;
+      }
+    });
+
+    // Status dropdown — reset page on change
     document.getElementById('filterSelect').addEventListener('change', e => {
-      loadJobs(0, e.target.value);
+      loadJobs(0, e.target.value, currentStartDate, currentEndDate);
+    });
+
+    // Apply button — convert YYYY-MM-DD picker value to ISO UTC format for API
+    document.getElementById('btnApply').addEventListener('click', () => {
+      const toISO = (val, endOfDay = false) => {
+        if (!val) return null;
+        return endOfDay ? `${val}T23:59:59Z` : `${val}T00:00:00Z`;
+      };
+      loadJobs(0, currentFilter, toISO(startEl.value), toISO(endEl.value, true));
+    });
+
+    // Clear button — wipe dates and reload
+    document.getElementById('btnClear').addEventListener('click', () => {
+      startEl.value = '';
+      endEl.value   = '';
+      loadJobs(0, currentFilter, null, null);
     });
 
     try {
-      const url = filter === 'ALL'
-        ? `/api/v1/jobs?limit=${LIMIT}&offset=${page}`
-        : `/api/v1/jobs?limit=${LIMIT}&offset=${page}&status=${filter}`;
+      const params = new URLSearchParams({ limit: LIMIT, offset: page });
+      if (filter !== 'ALL')  params.set('status',    filter);
+      if (startDate)         params.set('startDate', startDate);
+      if (endDate)           params.set('endDate',   endDate);
 
-      const res  = await fetch(url, { headers: authHeader });
+      const res  = await fetch(`/api/v1/jobs?${params}`, { headers: authHeader });
       const data = await res.json();
       const jobs = data.jobs || [];
       totalJobs  = data.total || jobs.length;
@@ -272,7 +354,7 @@
   }
 
   function renderStats(jobs) {
-    const c = { COMPLETED: 0, FAILED: 0, PENDING: 0, RUNNING: 0 };
+    const c = { COMPLETED: 0, FAILED: 0, PENDING: 0, RUNNING: 0, SCHEDULED: 0, QUEUED: 0 };
     jobs.forEach(j => { if (c[j.status] !== undefined) c[j.status]++; });
 
     document.getElementById('stats-row').innerHTML = `
@@ -290,7 +372,7 @@
       </div>
       <div class="stat-card">
         <p class="stat-label">Pending / Running</p>
-        <p class="stat-value">${c.PENDING + c.RUNNING}</p>
+        <p class="stat-value">${c.PENDING + c.RUNNING + c.SCHEDULED + c.QUEUED}</p>
       </div>`;
   }
 
@@ -348,13 +430,13 @@
       </div>`;
   }
 
-  window._prevPage = () => loadJobs(currentPage - LIMIT, currentFilter);
-  window._nextPage = () => loadJobs(currentPage + LIMIT, currentFilter);
+  window._prevPage = () => loadJobs(currentPage - LIMIT, currentFilter, currentStartDate, currentEndDate);
+  window._nextPage = () => loadJobs(currentPage + LIMIT, currentFilter, currentStartDate, currentEndDate);
 
   window.retryJob = async (jobId) => {
     try {
       await fetch(`/api/v1/jobs/${jobId}/retry`, { method: 'POST', headers: authHeader });
-      loadJobs(currentPage, currentFilter);
+      loadJobs(currentPage, currentFilter, currentStartDate, currentEndDate);
     } catch {
       showToast('Retry failed', 'error');
     }
@@ -382,21 +464,22 @@
     logsBody.innerHTML      = '<div class="logs-empty">Click refresh to load logs</div>';
     logsBtn.classList.remove('active');
 
+    // Retry only for FAILED; logs available for all jobs
     if (job.status === 'FAILED') {
       retryBtn.style.display = 'block';
       retryBtn.onclick       = () => { closeModal(); window.retryJob(job.jobId); };
-      logsBtn.style.display  = 'flex';
-      logsBtn.onclick = () => {
-        const isOpen = logsPanel.style.display !== 'none';
-        logsPanel.style.display = isOpen ? 'none' : 'block';
-        logsBtn.classList.toggle('active', !isOpen);
-        if (!isOpen) fetchLogs(job.jobId);
-      };
-      refreshBtn.onclick = () => fetchLogs(job.jobId);
     } else {
       retryBtn.style.display = 'none';
-      logsBtn.style.display  = 'none';
     }
+
+    logsBtn.style.display = 'flex';
+    logsBtn.onclick = () => {
+      const isOpen = logsPanel.style.display !== 'none';
+      logsPanel.style.display = isOpen ? 'none' : 'block';
+      logsBtn.classList.toggle('active', !isOpen);
+      if (!isOpen) fetchLogs(job.jobId);
+    };
+    refreshBtn.onclick = () => fetchLogs(job.jobId);
 
     document.getElementById('modal-overlay').classList.add('open');
   }
@@ -460,6 +543,309 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeModal();
   });
+
+
+  /* ══════════════════════════════════════════════════
+     USERS
+  ══════════════════════════════════════════════════ */
+
+  /* Decode JWT payload to get the logged-in user's role */
+  function getMyRole() {
+    if (currentUserRole) return currentUserRole;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      currentUserRole = payload.role || payload.Role || '';
+    } catch { currentUserRole = ''; }
+    return currentUserRole;
+  }
+
+  async function loadUsers() {
+    const area = document.getElementById('content-area');
+    const isSuperAdmin = getMyRole() === 'super_admin';
+
+    area.innerHTML = `
+      <div class="section-header">
+        <div>
+          <p class="section-sub">Account Management</p>
+          <h2>USERS</h2>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <div class="table-toolbar-left">
+            <span class="toolbar-label">User Directory</span>
+          </div>
+          <span class="toolbar-label" id="user-count">—</span>
+        </div>
+        <div id="user-table-body"><div class="state-loading">Loading</div></div>
+      </div>`;
+
+    try {
+      const res   = await fetch('/api/v1/users', { headers: authHeader });
+      const data  = await res.json();
+      const users = data.users || [];
+
+      document.getElementById('user-count').textContent =
+        `${users.length} user${users.length !== 1 ? 's' : ''}`;
+
+      if (!users.length) {
+        document.getElementById('user-table-body').innerHTML =
+          '<div class="state-empty">No users found</div>';
+        return;
+      }
+
+      const rows = users.map(u => `
+        <tr>
+          <td><span class="cell-id" title="${escHtml(u.id)}">${escHtml(u.id)}</span></td>
+          <td>${escHtml(u.email)}</td>
+          <td><span class="role-tag role-${escHtml(u.role)}">${escHtml(u.role)}</span></td>
+          <td>${userStatusBadge(u.status)}</td>
+          <td class="user-actions">
+            ${isSuperAdmin ? `
+              <button class="btn-user-toggle ${u.status === 'active' ? 'btn-user-disable' : 'btn-user-enable'}"
+                onclick="toggleUser('${escHtml(u.id)}', '${escHtml(u.status)}', this)">
+                ${u.status === 'active' ? 'Disable' : 'Enable'}
+              </button>
+              <button class="btn-user-edit"
+                onclick="openUserModal('${escHtml(u.id)}', '${escHtml(u.email)}', '${escHtml(u.role)}')">
+                Edit
+              </button>
+            ` : '<span class="user-actions-readonly">—</span>'}
+          </td>
+        </tr>`).join('');
+
+      document.getElementById('user-table-body').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+
+    } catch {
+      document.getElementById('user-table-body').innerHTML =
+        '<div class="state-empty">Failed to load users</div>';
+    }
+  }
+
+  function userStatusBadge(status) {
+    const cls = status === 'active' ? 'badge-COMPLETED' : 'badge-FAILED';
+    return `<span class="badge ${cls}">${escHtml(status)}</span>`;
+  }
+
+  /* ── Toggle disable / enable ───────────────────── */
+  window.toggleUser = async (userId, currentStatus, btn) => {
+    const action     = currentStatus === 'active' ? 'disable' : 'enable';
+    const origText   = btn.textContent;
+    btn.disabled     = true;
+    btn.textContent  = '…';
+
+    try {
+      const res = await fetch(`/api/v1/users/${userId}/${action}`, {
+        method: 'POST', headers: authHeader,
+      });
+      if (!res.ok) throw new Error((await res.json()).message || 'Request failed');
+      showToast(`User ${action}d successfully`, 'success');
+      loadUsers();
+    } catch (err) {
+      btn.disabled    = false;
+      btn.textContent = origText;
+      showToast(err.message || `Failed to ${action} user`, 'error');
+    }
+  };
+
+  /* ── User edit modal ───────────────────────────── */
+  window.openUserModal = (userId, email, role) => {
+    document.getElementById('user-modal-email').textContent  = email;
+    document.getElementById('user-modal-role').value         = role;
+    document.getElementById('user-modal-password').value     = '';
+    document.getElementById('user-modal-pw-confirm').value   = '';
+    document.getElementById('user-modal-error').textContent  = '';
+    document.getElementById('user-modal-overlay').dataset.userId = userId;
+    document.getElementById('user-modal-overlay').classList.add('open');
+  };
+
+  window.closeUserModal = () => {
+    document.getElementById('user-modal-overlay').classList.remove('open');
+  };
+
+  document.getElementById('user-modal-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('user-modal-overlay')) closeUserModal();
+  });
+
+  document.getElementById('user-modal-save').addEventListener('click', async () => {
+    const overlay  = document.getElementById('user-modal-overlay');
+    const userId   = overlay.dataset.userId;
+    const role     = document.getElementById('user-modal-role').value;
+    const password = document.getElementById('user-modal-password').value.trim();
+    const confirm  = document.getElementById('user-modal-pw-confirm').value.trim();
+    const errEl    = document.getElementById('user-modal-error');
+    const saveBtn  = document.getElementById('user-modal-save');
+
+    errEl.textContent = '';
+
+    if (password && password !== confirm) {
+      errEl.textContent = 'Passwords do not match.';
+      return;
+    }
+
+    if (password && password.length < 8) {
+      errEl.textContent = 'Password must be at least 8 characters.';
+      return;
+    }
+
+    const body = { role };
+    if (password) body.password = password;
+
+    saveBtn.disabled    = true;
+    saveBtn.textContent = 'Saving…';
+
+    try {
+      const res = await fetch(`/api/v1/users/${userId}`, {
+        method:  'PATCH',
+        headers: { ...authHeader, 'Content-Type': 'application/json' },
+        body:    JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error((await res.json()).message || 'Update failed');
+      closeUserModal();
+      showToast('User updated successfully', 'success');
+      loadUsers();
+    } catch (err) {
+      errEl.textContent = err.message || 'Something went wrong.';
+    } finally {
+      saveBtn.disabled    = false;
+      saveBtn.textContent = 'Save Changes';
+    }
+  });
+
+
+  /* ══════════════════════════════════════════════════
+     SUBSCRIPTION
+  ══════════════════════════════════════════════════ */
+  async function loadSubscription() {
+    const area = document.getElementById('content-area');
+    area.innerHTML = `
+      <div class="section-header">
+        <div>
+          <p class="section-sub">Billing &amp; Usage</p>
+          <h2>SUBSCRIPTION</h2>
+        </div>
+      </div>
+      <div id="sub-body"><div class="state-loading">Loading</div></div>`;
+
+    try {
+      const res  = await fetch('/billing/subscription', { headers: authHeader });
+      const data = await res.json();
+      renderSubscription(data);
+    } catch {
+      document.getElementById('sub-body').innerHTML =
+        '<div class="state-empty">Failed to load subscription</div>';
+    }
+  }
+
+  function renderSubscription(d) {
+    const used    = d.CurrentLimit  ?? 0;
+    const limit   = d.PlanLimit     ?? 1;
+    const pct     = Math.min(100, Math.round((used / limit) * 100));
+
+    // Colour ramp: green → amber → red
+    let usageColor, usageBg;
+    if (pct < 60) {
+      usageColor = 'var(--status-completed)';
+      usageBg    = 'rgba(168,240,184,0.12)';
+    } else if (pct < 85) {
+      usageColor = 'var(--status-pending)';
+      usageBg    = 'rgba(240,230,168,0.12)';
+    } else {
+      usageColor = 'var(--status-failed)';
+      usageBg    = 'rgba(240,168,168,0.12)';
+    }
+
+    const statusCls = d.Status === 'active' ? 'badge-COMPLETED' : 'badge-FAILED';
+
+    document.getElementById('sub-body').innerHTML = `
+      <div class="sub-layout">
+
+        <!-- ── Plan hero ── -->
+        <div class="sub-hero">
+          <div class="sub-hero-left">
+            <p class="sub-hero-label">Current Plan</p>
+            <h3 class="sub-hero-name">${escHtml(d.PlanName)}</h3>
+            <span class="badge ${statusCls}" style="margin-top:10px">${escHtml(d.Status)}</span>
+          </div>
+          <div class="sub-hero-right">
+            <p class="sub-hero-label">Subscription ID</p>
+            <p class="sub-hero-id">${escHtml(d.StripeSubscriptionID || '—')}</p>
+          </div>
+        </div>
+
+        <!-- ── Usage bar card ── -->
+        <div class="sub-card sub-usage-card">
+          <div class="sub-usage-header">
+            <div>
+              <p class="sub-card-label">Monthly Usage</p>
+              <p class="sub-usage-numbers">
+                <span class="sub-usage-used" style="color:${usageColor}">${used.toLocaleString()}</span>
+                <span class="sub-usage-sep">/</span>
+                <span class="sub-usage-limit">${limit.toLocaleString()} jobs</span>
+              </p>
+            </div>
+            <div class="sub-pct-badge" style="color:${usageColor};background:${usageBg}">
+              ${pct}%
+            </div>
+          </div>
+          <div class="sub-bar-track">
+            <div class="sub-bar-fill" style="width:${pct}%;background:${usageColor}"></div>
+          </div>
+          <p class="sub-bar-caption" style="color:${usageColor}">
+            ${limit - used > 0
+              ? `${(limit - used).toLocaleString()} jobs remaining this period`
+              : 'Monthly limit reached'}
+          </p>
+        </div>
+
+        <!-- ── Meta grid ── -->
+        <div class="sub-meta-grid">
+          <div class="sub-meta-cell">
+            <p class="sub-card-label">Plan Limit</p>
+            <p class="sub-meta-val">${limit.toLocaleString()} <span>jobs / mo</span></p>
+          </div>
+          <div class="sub-meta-cell">
+            <p class="sub-card-label">Jobs Used</p>
+            <p class="sub-meta-val" style="color:${usageColor}">${used.toLocaleString()}</p>
+          </div>
+          <div class="sub-meta-cell">
+            <p class="sub-card-label">Period Start</p>
+            <p class="sub-meta-val">${fmt(d.CurrentPeriodStart)}</p>
+          </div>
+          <div class="sub-meta-cell">
+            <p class="sub-card-label">Period End</p>
+            <p class="sub-meta-val">${fmt(d.CurrentPeriodEnd)}</p>
+          </div>
+          <div class="sub-meta-cell">
+            <p class="sub-card-label">App ID</p>
+            <p class="sub-meta-val sub-meta-mono">${escHtml(d.AppID || '—')}</p>
+          </div>
+          <div class="sub-meta-cell">
+            <p class="sub-card-label">Subscribed On</p>
+            <p class="sub-meta-val">${fmt(d.CreatedAt)}</p>
+          </div>
+        </div>
+
+      </div>`;
+
+    // Animate bar in after render
+    requestAnimationFrame(() => {
+      const fill = document.querySelector('.sub-bar-fill');
+      if (fill) { fill.style.transition = 'width 0.9s cubic-bezier(0.16,1,0.3,1)'; }
+    });
+  }
 
   /* ── Toast ─────────────────────────────────────── */
   function showToast(msg, type = 'success') {

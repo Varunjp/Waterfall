@@ -63,6 +63,8 @@ func (r *BillingPGRepo) CreateSubscription(
 	ON CONFLICT (app_id)
 	DO UPDATE SET
 		plan_id = EXCLUDED.plan_id,
+		current_period_start = EXCLUDED.current_period_start,
+		current_period_end = EXCLUDED.current_period_end,
 		updated_at = NOW();
 	`
 
@@ -202,7 +204,7 @@ func (r *BillingPGRepo)GetSubscription(ctx context.Context,appID string)(*entiti
 	query := `
 		SELECT app_id,plan_id,status,current_period_start,current_period_end,created_at
 		FROM subscriptions
-		WHERE app_id = $1 AND status = 'ACTIVE' AND current_period_end > NOW();
+		WHERE app_id = $1;
 	`
 	var s entities.Subscription
 	err := r.db.QueryRowContext(
@@ -210,6 +212,21 @@ func (r *BillingPGRepo)GetSubscription(ctx context.Context,appID string)(*entiti
 		query,
 		appID,
 	).Scan(&s.AppID,&s.PlanID,&s.Status,&s.CurrentPeriodStart,&s.CurrentPeriodEnd,&s.CreatedAt)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	pquery := `SELECT name,monthly_job_limit FROM plans WHERE plan_id=$1;`
+
+	err = r.db.QueryRowContext(ctx,pquery,s.PlanID).Scan(&s.PlanName,&s.PlanLimit)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	mquery := `SELECT jobs_executed FROM usage_monthly WHERE app_id = $1 AND month = date_trunc('month', CURRENT_DATE);`
+	err = r.db.QueryRowContext(ctx,mquery,s.AppID).Scan(&s.CurrentLimit)
 
 	if err != nil {
 		return nil,err 

@@ -10,7 +10,7 @@
     <!-- ── Sidebar ───────────────────────────── -->
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <p class="logo-label">Waterfall</p>
+        <p class="logo-label">WaterFall</p>
         <h1>DASHBOARD</h1>
       </div>
 
@@ -63,6 +63,21 @@
             <path d="M11 7a2.5 2.5 0 0 0 0-5M15 13a4 4 0 0 0-4-4" />
           </svg>
           Users
+        </button>
+
+        <button class="nav-btn" data-section="subscription">
+          <svg
+            class="nav-icon"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <rect x="1" y="3" width="14" height="10" rx="1" />
+            <line x1="1" y1="7" x2="15" y2="7" />
+            <line x1="4" y1="11" x2="7" y2="11" />
+          </svg>
+          Subscription
         </button>
       </nav>
 
@@ -218,6 +233,91 @@
             ↻ Retry Job
           </button>
           <button class="btn-modal-close" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── User Edit Modal ───────────────────────── -->
+    <div class="modal-overlay" id="user-modal-overlay">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <p class="modal-tag">Super Admin</p>
+            <h3>EDIT USER</h3>
+          </div>
+          <button
+            class="btn-close"
+            onclick="closeUserModal()"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="detail-grid" style="margin-bottom: 20px">
+            <div class="detail-cell full">
+              <p class="detail-key">Email</p>
+              <p class="detail-val" id="user-modal-email">—</p>
+            </div>
+          </div>
+
+          <!-- Role -->
+          <div class="user-field-group">
+            <label class="user-field-label" for="user-modal-role">Role</label>
+            <select class="filter-select user-field-input" id="user-modal-role">
+              <option value="super_admin">super_admin</option>
+              <option value="admin">admin</option>
+              <option value="user">user</option>
+            </select>
+          </div>
+
+          <!-- Divider -->
+          <div class="user-field-divider">
+            <span
+              >Reset Password
+              <span class="user-field-optional">(optional)</span></span
+            >
+          </div>
+
+          <!-- New password -->
+          <div class="user-field-group">
+            <label class="user-field-label" for="user-modal-password"
+              >New Password</label
+            >
+            <input
+              type="password"
+              class="user-field-input"
+              id="user-modal-password"
+              placeholder="Min. 8 characters"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <!-- Confirm password -->
+          <div class="user-field-group">
+            <label class="user-field-label" for="user-modal-pw-confirm"
+              >Confirm Password</label
+            >
+            <input
+              type="password"
+              class="user-field-input"
+              id="user-modal-pw-confirm"
+              placeholder="Repeat new password"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <p class="user-modal-error" id="user-modal-error"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-modal-retry" id="user-modal-save">
+            Save Changes
+          </button>
+          <button class="btn-modal-close" onclick="closeUserModal()">
+            Cancel
+          </button>
         </div>
       </div>
     </div>

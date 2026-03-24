@@ -82,6 +82,8 @@ message ListJobsRequest {
   string status = 1;
   int32 limit = 2;
   int32 offset = 3;
+  google.protobuf.Timestamp startDate = 4;
+  google.protobuf.Timestamp endDate = 5;
 }
 
 message ListFailedJobsRequest {

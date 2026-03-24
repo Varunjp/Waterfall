@@ -234,7 +234,7 @@ func (c *BillingController) GetSubscription(
 
 	ctx := r.Context()
 
-	appID := r.Header.Get("X-App-ID")
+	appID := middleware.GetAppID(ctx)
 
 	subscription, err := c.service.GetSubscription(ctx, appID)
 	if err != nil {
