@@ -252,6 +252,8 @@ type ListJobsRequest struct {
 	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 	Offset        int32                  `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
+	StartDate     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=startDate,proto3" json:"startDate,omitempty"`
+	EndDate       *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=endDate,proto3" json:"endDate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -305,6 +307,20 @@ func (x *ListJobsRequest) GetOffset() int32 {
 		return x.Offset
 	}
 	return 0
+}
+
+func (x *ListJobsRequest) GetStartDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartDate
+	}
+	return nil
+}
+
+func (x *ListJobsRequest) GetEndDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndDate
+	}
+	return nil
 }
 
 type ListFailedJobsRequest struct {
@@ -851,11 +867,13 @@ const file_proto_job_proto_rawDesc = "" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"<\n" +
 	"\vJobResponse\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status\"W\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\"\xc7\x01\n" +
 	"\x0fListJobsRequest\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x03 \x01(\x05R\x06offset\"E\n" +
+	"\x06offset\x18\x03 \x01(\x05R\x06offset\x128\n" +
+	"\tstartDate\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x124\n" +
+	"\aendDate\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\"E\n" +
 	"\x15ListFailedJobsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\xae\x02\n" +
@@ -940,29 +958,31 @@ var file_proto_job_proto_goTypes = []any{
 var file_proto_job_proto_depIdxs = []int32{
 	14, // 0: job.CreateJobRequest.schedule_at:type_name -> google.protobuf.Timestamp
 	14, // 1: job.UpdateJobRequest.schedule_at:type_name -> google.protobuf.Timestamp
-	6,  // 2: job.ListJobsResponse.jobs:type_name -> job.Job
-	10, // 3: job.GetJobLogsResponse.logs:type_name -> job.JobLog
-	0,  // 4: job.JobService.CreateJob:input_type -> job.CreateJobRequest
-	1,  // 5: job.JobService.UpdateJob:input_type -> job.UpdateJobRequest
-	2,  // 6: job.JobService.CancelJob:input_type -> job.CancelJobRequest
-	4,  // 7: job.JobService.ListJobs:input_type -> job.ListJobsRequest
-	5,  // 8: job.JobService.ListFailedJobs:input_type -> job.ListFailedJobsRequest
-	8,  // 9: job.JobService.GetJobLogs:input_type -> job.GetJobLogsRequest
-	9,  // 10: job.JobService.GetJobAdminLogs:input_type -> job.GetJobLogsAdminRequest
-	12, // 11: job.JobService.RetryJob:input_type -> job.RetryJobRequest
-	3,  // 12: job.JobService.CreateJob:output_type -> job.JobResponse
-	3,  // 13: job.JobService.UpdateJob:output_type -> job.JobResponse
-	3,  // 14: job.JobService.CancelJob:output_type -> job.JobResponse
-	7,  // 15: job.JobService.ListJobs:output_type -> job.ListJobsResponse
-	7,  // 16: job.JobService.ListFailedJobs:output_type -> job.ListJobsResponse
-	11, // 17: job.JobService.GetJobLogs:output_type -> job.GetJobLogsResponse
-	11, // 18: job.JobService.GetJobAdminLogs:output_type -> job.GetJobLogsResponse
-	13, // 19: job.JobService.RetryJob:output_type -> job.RetryJobResponse
-	12, // [12:20] is the sub-list for method output_type
-	4,  // [4:12] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	14, // 2: job.ListJobsRequest.startDate:type_name -> google.protobuf.Timestamp
+	14, // 3: job.ListJobsRequest.endDate:type_name -> google.protobuf.Timestamp
+	6,  // 4: job.ListJobsResponse.jobs:type_name -> job.Job
+	10, // 5: job.GetJobLogsResponse.logs:type_name -> job.JobLog
+	0,  // 6: job.JobService.CreateJob:input_type -> job.CreateJobRequest
+	1,  // 7: job.JobService.UpdateJob:input_type -> job.UpdateJobRequest
+	2,  // 8: job.JobService.CancelJob:input_type -> job.CancelJobRequest
+	4,  // 9: job.JobService.ListJobs:input_type -> job.ListJobsRequest
+	5,  // 10: job.JobService.ListFailedJobs:input_type -> job.ListFailedJobsRequest
+	8,  // 11: job.JobService.GetJobLogs:input_type -> job.GetJobLogsRequest
+	9,  // 12: job.JobService.GetJobAdminLogs:input_type -> job.GetJobLogsAdminRequest
+	12, // 13: job.JobService.RetryJob:input_type -> job.RetryJobRequest
+	3,  // 14: job.JobService.CreateJob:output_type -> job.JobResponse
+	3,  // 15: job.JobService.UpdateJob:output_type -> job.JobResponse
+	3,  // 16: job.JobService.CancelJob:output_type -> job.JobResponse
+	7,  // 17: job.JobService.ListJobs:output_type -> job.ListJobsResponse
+	7,  // 18: job.JobService.ListFailedJobs:output_type -> job.ListJobsResponse
+	11, // 19: job.JobService.GetJobLogs:output_type -> job.GetJobLogsResponse
+	11, // 20: job.JobService.GetJobAdminLogs:output_type -> job.GetJobLogsResponse
+	13, // 21: job.JobService.RetryJob:output_type -> job.RetryJobResponse
+	14, // [14:22] is the sub-list for method output_type
+	6,  // [6:14] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_proto_job_proto_init() }

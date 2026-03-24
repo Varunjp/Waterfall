@@ -185,7 +185,7 @@ func (r *jobRepo) UpdatePayload(ctx context.Context, jobID, payload string,sched
 
 	query += fmt.Sprintf(`
 		WHERE job_id=$%d
-		AND status IN ('SCHEDULED','QUEUED','PENDING')
+		AND status = 'PENDING'
 		RETURNING job_id;
 	`, argPos)
 
@@ -259,7 +259,7 @@ func (r *jobRepo) CancelJob(ctx context.Context,jobID string) (bool,error) {
 		SET status = 'CANCELLED',
 			updated_at = NOW()
 		WHERE job_id = $1
-		AND status IN ('SCHEDULED','QUEUED','PENDING')
+		AND status IN ('SCHEDULED','PENDING')
 		RETURNING job_id;
 		`
 	var id string 

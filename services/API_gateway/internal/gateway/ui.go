@@ -33,4 +33,12 @@ func RegisterUIRoutes(r *gin.Engine) {
 	r.GET("/admin",func(c *gin.Context) {
 		c.HTML(http.StatusOK,"admin_login.html",nil)
 	})
+
+	r.GET("/payment-success",func(c *gin.Context) {
+		c.HTML(http.StatusOK,"payment_success.html",nil)
+	})
+
+	r.GET("/payment-cancel",func(c *gin.Context) {
+		c.HTML(http.StatusOK,"payment_cancel.html",nil)
+	})
 }
