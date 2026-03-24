@@ -2,6 +2,7 @@ package controller
 
 import (
 	"admin_service/internal/config"
+	"admin_service/internal/middleware"
 	"admin_service/internal/usecase/service"
 	"context"
 	"encoding/json"
@@ -36,15 +37,19 @@ type CheckoutResponse struct {
 func (c *BillingController) CreateCheckout(w http.ResponseWriter,r *http.Request) {
 
 	ctx := r.Context()
-
 	var req CheckoutRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
+
 	if err != nil {
 		http.Error(w,"invalid request body",http.StatusBadRequest)
 		return 
 	}
+	appID := middleware.GetAppID(ctx)
 
-	appID := r.Header.Get("X-App-ID")
+	if appID == "" {
+		http.Error(w,"unauthorized",http.StatusUnauthorized)
+		return 
+	}
 
 	url,err := c.service.CreateChecoutSession(
 		ctx,

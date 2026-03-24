@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body>
+    <!-- ── Sidebar ───────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <p class="logo-label">Waterfall</p>
+        <h1>DASHBOARD</h1>
+      </div>
+
+      <nav class="sidebar-nav">
+        <p class="nav-section-label">Manage</p>
+
+        <button class="nav-btn active" data-section="jobs">
+          <!-- icon: queue -->
+          <svg
+            class="nav-icon"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <rect x="1" y="2" width="14" height="3" rx="0.5" />
+            <rect x="1" y="7" width="14" height="3" rx="0.5" />
+            <rect x="1" y="12" width="9" height="2" rx="0.5" />
+          </svg>
+          Jobs
+        </button>
+
+        <button class="nav-btn" data-section="plans">
+          <!-- icon: layers -->
+          <svg
+            class="nav-icon"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M1 5l7-3 7 3-7 3-7-3z" />
+            <path d="M1 9l7 3 7-3" />
+            <path d="M1 13l7 3 7-3" />
+          </svg>
+          Plans
+        </button>
+
+        <button class="nav-btn" data-section="users">
+          <!-- icon: users -->
+          <svg
+            class="nav-icon"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <circle cx="6" cy="5" r="2.5" />
+            <path d="M1 13c0-2.76 2.24-5 5-5s5 2.24 5 5" />
+            <path d="M11 7a2.5 2.5 0 0 0 0-5M15 13a4 4 0 0 0-4-4" />
+          </svg>
+          Users
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-btn logout-btn" id="btn-logout">
+          <svg
+            class="nav-icon"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M6 2H2v12h4" />
+            <path d="M10 5l4 3-4 3" />
+            <path d="M14 8H6" />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── Main ──────────────────────────────── -->
+    <div class="main">
+      <header class="topbar">
+        <span class="topbar-title" id="topbar-title">JOBS</span>
+        <div class="topbar-meta">
+          <span class="dot-live">Live</span>
+        </div>
+      </header>
+
+      <div class="content-area" id="content-area">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ── Job Detail Modal ───────────────────── -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-heading"
+      >
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <p class="modal-tag">Job Detail</p>
+            <h3 id="modal-heading">JOB INFO</h3>
+          </div>
+          <button class="btn-close" onclick="closeModal()" aria-label="Close">
+            ✕
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="detail-grid">
+            <div class="detail-cell full">
+              <p class="detail-key">Job ID</p>
+              <p class="detail-val" id="modal-job-id">—</p>
+            </div>
+
+            <div class="detail-cell">
+              <p class="detail-key">Type</p>
+              <p class="detail-val" id="modal-type">—</p>
+            </div>
+
+            <div class="detail-cell">
+              <p class="detail-key">Status</p>
+              <p class="detail-val" id="modal-status">—</p>
+            </div>
+
+            <div class="detail-cell">
+              <p class="detail-key">Retry / Max Retry</p>
+              <p class="detail-val" id="modal-retry">—</p>
+            </div>
+
+            <div class="detail-cell">
+              <p class="detail-key">Manual Retries</p>
+              <p class="detail-val" id="modal-manual-retry">—</p>
+            </div>
+
+            <div class="detail-cell">
+              <p class="detail-key">Scheduled At</p>
+              <p class="detail-val" id="modal-schedule">—</p>
+            </div>
+
+            <div class="detail-cell">
+              <p class="detail-key">Created At</p>
+              <p class="detail-val" id="modal-created">—</p>
+            </div>
+
+            <div class="detail-cell full">
+              <p class="detail-key">Updated At</p>
+              <p class="detail-val" id="modal-updated">—</p>
+            </div>
+
+            <div class="detail-cell full">
+              <p class="detail-key">Payload</p>
+              <pre class="detail-val mono" id="modal-payload">—</pre>
+            </div>
+          </div>
+
+          <!-- Logs panel — only visible for FAILED jobs -->
+          <div id="logs-panel" style="display: none">
+            <div class="logs-header">
+              <span class="detail-key">Execution Logs</span>
+              <button
+                class="btn-logs-refresh"
+                id="btn-logs-refresh"
+                title="Refresh logs"
+              >
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  width="12"
+                  height="12"
+                >
+                  <path d="M13.5 8A5.5 5.5 0 1 1 10 3.07" />
+                  <path d="M10 1v3h3" />
+                </svg>
+              </button>
+            </div>
+            <div id="logs-body" class="logs-body">
+              <div class="logs-empty">Click refresh to load logs</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            class="btn-modal-logs"
+            id="modal-logs-btn"
+            style="display: none"
+          >
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              width="13"
+              height="13"
+            >
+              <path d="M2 4h12M2 8h8M2 12h5" />
+            </svg>
+            View Logs
+          </button>
+          <button
+            class="btn-modal-retry"
+            id="modal-retry-btn"
+            style="display: none"
+          >
+            ↻ Retry Job
+          </button>
+          <button class="btn-modal-close" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+  </body>
+</html>
