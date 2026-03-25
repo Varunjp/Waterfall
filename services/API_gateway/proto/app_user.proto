@@ -56,6 +56,13 @@ service AppUserService {
           body: "*"
         };
       }
+  
+  rpc UpdateUserStatus(UpdateUserStatusRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/users/{user_id}/status"
+      body: "*"
+    };
+  }
 }
 
 message AppLoginRequest {
@@ -124,4 +131,9 @@ message UserPlan {
 
 message ListPlansResponse {
   repeated UserPlan plans = 1;
+}
+
+message UpdateUserStatusRequest {
+  string user_id = 1;
+  string status = 2;
 }

@@ -24,6 +24,8 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 		"/login":true,
 		"/payment-success":true,
 		"/payment-cancel":true,
+		"/forgot-password":true,
+		"/admin":true,
 	}
 
 	return func(c *gin.Context) {

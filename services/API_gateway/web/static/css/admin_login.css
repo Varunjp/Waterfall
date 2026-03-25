@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:      #080808;
+  --surface:    #0d0d0d;
+  --white:      #f5f5f0;
+  --gray-mid:   #666660;
+  --gray-dim:   #2a2a28;
+  --border:     rgba(245,245,240,0.08);
+  --border-hi:  rgba(245,245,240,0.18);
+  --red:        #f0a8a8;
+}
+
+html, body {
+  height: 100%;
+  background: var(--black);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Grid */
+.bg-grid {
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+/* Spotlight — top-right this time for visual variety */
+.spotlight {
+  position: fixed;
+  top: -20%; right: -10%;
+  width: 600px; height: 600px;
+  background: radial-gradient(ellipse, rgba(245,245,240,0.04) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+/* Wrap */
+.login-wrap {
+  position: relative; z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 400px;
+  padding: 16px;
+  animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gray-mid);
+}
+
+.brand-line {
+  flex: 1;
+  height: 1px;
+  background: var(--gray-dim);
+  max-width: 48px;
+}
+
+/* Card */
+.login-card {
+  width: 100%;
+  background: rgba(13,13,13,0.9);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  padding: 44px 40px 40px;
+  position: relative;
+}
+
+.card-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245,245,240,0.3), transparent);
+}
+
+/* Header */
+.login-header { margin-bottom: 32px; }
+
+.login-header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  letter-spacing: 0.04em;
+  line-height: 0.92;
+  color: var(--white);
+}
+
+.login-header h1 em {
+  font-style: normal;
+  color: var(--gray-mid);
+}
+
+.login-sub {
+  margin-top: 10px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--gray-mid);
+}
+
+/* Fields */
+.field-group { margin-bottom: 14px; }
+
+label {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gray-mid);
+  margin-bottom: 7px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(245,245,240,0.03);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  outline: none;
+  border-radius: 0;
+  appearance: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+input::placeholder { color: rgba(245,245,240,0.18); }
+input:focus { background: rgba(245,245,240,0.06); border-color: var(--border-hi); }
+
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 40px; }
+
+.pw-eye {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  color: var(--gray-mid); cursor: pointer;
+  display: flex; align-items: center;
+  transition: color 0.2s;
+}
+.pw-eye:hover { color: var(--white); }
+
+/* Submit */
+.btn-signin {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  margin-top: 24px;
+  background: var(--white);
+  color: var(--black);
+  border: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  position: relative; overflow: hidden;
+  transition: color 0.25s;
+}
+
+.btn-signin::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--black);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.btn-signin:hover { color: var(--white); }
+.btn-signin:hover::after { transform: translateY(0); }
+.btn-signin > * { position: relative; z-index: 1; }
+.btn-signin:disabled { opacity: 0.5; pointer-events: none; }
+
+/* Error */
+.error-msg {
+  min-height: 18px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--red);
+  letter-spacing: 0.04em;
+}
+
+/* Footer */
+.login-footer {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--gray-dim);
+}

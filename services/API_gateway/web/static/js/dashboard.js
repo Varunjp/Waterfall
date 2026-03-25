@@ -175,10 +175,11 @@
         </div>
 
         <button
-          class="btn-purchase ${featured ? 'btn-purchase--featured' : ''}"
+          class="btn-purchase ${featured ? 'btn-purchase--featured' : ''} ${getMyRole() === 'viewer' ? 'btn-purchase--disabled' : ''}"
           data-plan-id="${escHtml(plan.planId)}"
           data-plan-name="${escHtml(plan.planName)}"
-        >Get ${escHtml(plan.planName)}</button>
+          ${getMyRole() === 'viewer' ? 'title="Viewers cannot purchase plans"' : ''}
+        >${getMyRole() === 'viewer' ? 'Unavailable' : `Get ${escHtml(plan.planName)}`}</button>
 
       </div>`;
   }
@@ -191,6 +192,10 @@
   });
 
   async function purchasePlan(planId, planName, btn) {
+    if (getMyRole() === 'viewer') {
+      showToast('Viewers cannot purchase plans. Contact your admin.', 'error');
+      return;
+    }
     const original  = btn.textContent;
     btn.disabled    = true;
     btn.textContent = 'Processing…';
@@ -263,6 +268,7 @@
               <option value="ALL">All</option>
               <option value="COMPLETED">Completed</option>
               <option value="FAILED">Failed</option>
+              <option value="CANCELLED">Cancelled</option>
               <option value="PENDING">Pending</option>
               <option value="SCHEDULED">Scheduled</option>
               <option value="QUEUED">Queued</option>
@@ -354,7 +360,7 @@
   }
 
   function renderStats(jobs) {
-    const c = { COMPLETED: 0, FAILED: 0, PENDING: 0, RUNNING: 0, SCHEDULED: 0, QUEUED: 0 };
+    const c = { COMPLETED: 0, FAILED: 0, CANCELED: 0, PENDING: 0, RUNNING: 0, SCHEDULED: 0, QUEUED: 0 };
     jobs.forEach(j => { if (c[j.status] !== undefined) c[j.status]++; });
 
     document.getElementById('stats-row').innerHTML = `
@@ -368,7 +374,7 @@
       </div>
       <div class="stat-card">
         <p class="stat-label">Failed</p>
-        <p class="stat-value failed">${c.FAILED}</p>
+        <p class="stat-value failed">${c.FAILED + c.CANCELED}</p>
       </div>
       <div class="stat-card">
         <p class="stat-label">Pending / Running</p>
@@ -464,7 +470,7 @@
     logsBody.innerHTML      = '<div class="logs-empty">Click refresh to load logs</div>';
     logsBtn.classList.remove('active');
 
-    // Retry only for FAILED; logs available for all jobs
+    // Retry — FAILED only
     if (job.status === 'FAILED') {
       retryBtn.style.display = 'block';
       retryBtn.onclick       = () => { closeModal(); window.retryJob(job.jobId); };
@@ -472,6 +478,44 @@
       retryBtn.style.display = 'none';
     }
 
+    // Update + Cancel — PENDING / SCHEDULED / QUEUED only
+    const isPending   = ['PENDING','SCHEDULED','QUEUED'].includes(job.status);
+    const updateBtn   = document.getElementById('modal-update-btn');
+    const cancelJobBtn = document.getElementById('modal-cancel-job-btn');
+    const editPanel   = document.getElementById('job-edit-panel');
+
+    if (isPending) {
+      // Pre-fill edit fields
+      try {
+        const parsed = JSON.parse(job.payload || '{}');
+        document.getElementById('edit-payload').value = JSON.stringify(parsed, null, 2);
+      } catch {
+        document.getElementById('edit-payload').value = job.payload || '';
+      }
+      // Pre-fill: show UTC time directly; store original to detect user changes
+      const scheduleEl = document.getElementById('edit-schedule');
+      if (job.scheduleAt) {
+        const utcVal = job.scheduleAt.replace('Z', '').substring(0, 16);
+        scheduleEl.value = utcVal;
+        scheduleEl.dataset.original = utcVal; // remember what we set
+      } else {
+        scheduleEl.value = '';
+        scheduleEl.dataset.original = '';
+      }
+      document.getElementById('edit-schedule').max = '';  // allow future for scheduling
+      document.getElementById('job-edit-error').textContent = '';
+      editPanel.style.display  = 'block';
+      updateBtn.style.display  = 'flex';
+      cancelJobBtn.style.display = 'flex';
+      updateBtn.onclick = () => updateJob(job.jobId);
+      cancelJobBtn.onclick = () => cancelJob(job.jobId);
+    } else {
+      editPanel.style.display   = 'none';
+      updateBtn.style.display   = 'none';
+      cancelJobBtn.style.display = 'none';
+    }
+
+    // Logs — all jobs
     logsBtn.style.display = 'flex';
     logsBtn.onclick = () => {
       const isOpen = logsPanel.style.display !== 'none';
@@ -482,6 +526,76 @@
     refreshBtn.onclick = () => fetchLogs(job.jobId);
 
     document.getElementById('modal-overlay').classList.add('open');
+  }
+
+  /* ── Update job ────────────────────────────────── */
+  async function updateJob(jobId) {
+    const payloadRaw  = document.getElementById('edit-payload').value.trim();
+    const scheduleVal = document.getElementById('edit-schedule').value;
+    const errEl       = document.getElementById('job-edit-error');
+    const updateBtn   = document.getElementById('modal-update-btn');
+    errEl.textContent = '';
+
+    // Build body with only set fields
+    const body = {};
+    if (payloadRaw) {
+      try { JSON.parse(payloadRaw); } // validate JSON
+      catch { errEl.textContent = 'Payload must be valid JSON.'; return; }
+      body.payload = payloadRaw;
+    }
+    // Only send schedule_at if user actually changed it from the pre-filled value
+    const scheduleEl    = document.getElementById('edit-schedule');
+    const originalVal   = scheduleEl.dataset.original || '';
+    const scheduleChanged = scheduleVal !== originalVal;
+    if (scheduleVal && scheduleChanged) {
+      body.schedule_at = scheduleVal.length === 16 ? `${scheduleVal}:00Z` : `${scheduleVal}Z`;
+    }
+    if (!Object.keys(body).length) {
+      errEl.textContent = 'Nothing to update — enter a payload or schedule time.';
+      return;
+    }
+
+    updateBtn.disabled = true;
+    updateBtn.querySelector('span').textContent = 'Saving…';
+    try {
+      const res = await fetch(`/api/v1/jobs/${jobId}`, {
+        method:  'PUT',
+        headers: { ...authHeader, 'Content-Type': 'application/json' },
+        body:    JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
+      closeModal();
+      showToast('Job updated — takes effect only if not yet picked.', 'success');
+      loadJobs(currentPage, currentFilter, currentStartDate, currentEndDate);
+    } catch (err) {
+      errEl.textContent = err.message;
+    } finally {
+      updateBtn.disabled = false;
+      updateBtn.querySelector('span').textContent = 'Update Job';
+    }
+  }
+
+  /* ── Cancel job ────────────────────────────────── */
+  async function cancelJob(jobId) {
+    const cancelJobBtn = document.getElementById('modal-cancel-job-btn');
+    cancelJobBtn.disabled = true;
+    cancelJobBtn.querySelector('span').textContent = 'Cancelling…';
+    try {
+      const res = await fetch(`/api/v1/jobs/${jobId}`, {
+        method:  'DELETE',
+        headers: authHeader,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
+      closeModal();
+      showToast('Job cancelled — only if not yet picked.', 'success');
+      loadJobs(currentPage, currentFilter, currentStartDate, currentEndDate);
+    } catch (err) {
+      document.getElementById('job-edit-error').textContent = err.message;
+      cancelJobBtn.disabled = false;
+      cancelJobBtn.querySelector('span').textContent = 'Cancel Job';
+    }
   }
 
   /* ── Logs ──────────────────────────────────────── */
@@ -569,6 +683,7 @@
           <p class="section-sub">Account Management</p>
           <h2>USERS</h2>
         </div>
+        ${isSuperAdmin ? `<button class="btn-create-user" onclick="openCreateUserModal()">+ Create User</button>` : ''}
       </div>
       <div class="table-wrap">
         <div class="table-toolbar">
@@ -641,22 +756,24 @@
 
   /* ── Toggle disable / enable ───────────────────── */
   window.toggleUser = async (userId, currentStatus, btn) => {
-    const action     = currentStatus === 'active' ? 'disable' : 'enable';
+    const newStatus  = currentStatus === 'active' ? 'blocked' : 'active';
     const origText   = btn.textContent;
     btn.disabled     = true;
     btn.textContent  = '…';
 
     try {
-      const res = await fetch(`/api/v1/users/${userId}/${action}`, {
-        method: 'POST', headers: authHeader,
+      const res = await fetch(`/api/v1/users/${userId}/status`, {
+        method:  'POST',
+        headers: { ...authHeader, 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ status: newStatus }),
       });
       if (!res.ok) throw new Error((await res.json()).message || 'Request failed');
-      showToast(`User ${action}d successfully`, 'success');
+      showToast(`User ${newStatus === 'active' ? 'enabled' : 'blocked'} successfully`, 'success');
       loadUsers();
     } catch (err) {
       btn.disabled    = false;
       btn.textContent = origText;
-      showToast(err.message || `Failed to ${action} user`, 'error');
+      showToast(err.message || 'Failed to update user status', 'error');
     }
   };
 
@@ -846,6 +963,63 @@
       if (fill) { fill.style.transition = 'width 0.9s cubic-bezier(0.16,1,0.3,1)'; }
     });
   }
+
+
+  /* ── Create user modal ─────────────────────────── */
+  window.openCreateUserModal = () => {
+    document.getElementById('create-user-email').value    = '';
+    document.getElementById('create-user-password').value = '';
+    document.getElementById('create-user-role').value     = 'viewer';
+    document.getElementById('create-user-appid').value    = '';
+    document.getElementById('create-user-error').textContent = '';
+    document.getElementById('create-user-overlay').classList.add('open');
+  };
+
+  window.closeCreateUserModal = () => {
+    document.getElementById('create-user-overlay').classList.remove('open');
+  };
+
+  document.getElementById('create-user-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('create-user-overlay')) closeCreateUserModal();
+  });
+
+  document.getElementById('create-user-save').addEventListener('click', async () => {
+    const email    = document.getElementById('create-user-email').value.trim();
+    const password = document.getElementById('create-user-password').value.trim();
+    const role     = document.getElementById('create-user-role').value;
+    const appId    = document.getElementById('create-user-appid').value.trim();
+    const errEl    = document.getElementById('create-user-error');
+    const saveBtn  = document.getElementById('create-user-save');
+
+    errEl.textContent = '';
+    if (!email)    { errEl.textContent = 'Email is required.';    return; }
+    if (!password) { errEl.textContent = 'Password is required.'; return; }
+    if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+
+    saveBtn.disabled    = true;
+    saveBtn.textContent = 'Creating…';
+
+    try {
+      const body = { email, password, role };
+      if (appId) body.app_id = appId;
+
+      const res = await fetch('/api/v1/users', {
+        method:  'POST',
+        headers: { ...authHeader, 'Content-Type': 'application/json' },
+        body:    JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
+      closeCreateUserModal();
+      showToast('User created successfully', 'success');
+      loadUsers();
+    } catch (err) {
+      errEl.textContent = err.message || 'Failed to create user.';
+    } finally {
+      saveBtn.disabled    = false;
+      saveBtn.textContent = 'Create User';
+    }
+  });
 
   /* ── Toast ─────────────────────────────────────── */
   function showToast(msg, type = 'success') {

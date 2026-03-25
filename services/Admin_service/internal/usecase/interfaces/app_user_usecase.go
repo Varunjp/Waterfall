@@ -13,4 +13,5 @@ type AppUserUsecase interface {
 	VerifyOtp(ctx context.Context,email,otp string)(string,error)
 	ResetPassword(ctx context.Context,token,password string) error
 	ListPlans(ctx context.Context) ([]*entities.Plan,error)
+	BlockUser(ctx context.Context,userId,status string)error
 }

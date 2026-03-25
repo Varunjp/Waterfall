@@ -1,7 +1,9 @@
 package service
 
 import (
+	domainErr "admin_service/internal/domain/errors"
 	"admin_service/internal/infrastructure/security"
+	"admin_service/internal/pkg/validation"
 	repo "admin_service/internal/repository/interfaces"
 )
 
@@ -15,6 +17,11 @@ func NewAdminService(r repo.AdminRepository,secret string) *AdminService {
 }
 
 func (s *AdminService) Login(email,password string)(string,error) {
+
+	if !validation.IsVaildEmail(email) {
+		return "",domainErr.ErrInvalidCredentials
+	}
+
 	admin,err := s.repo.FindByEmail(email)
 	if err != nil {
 		return "",err 

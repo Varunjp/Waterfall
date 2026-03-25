@@ -113,3 +113,14 @@ func (r *AppUserRepo) ListPlans() ([]*entities.Plan,error) {
 	}
 	return plans,nil 
 }
+
+func (r *AppUserRepo)BlockUser(userID,status string) error {
+
+	err := r.db.QueryRow(
+		`UPDATE app_users SET status = $1 WHERE id = $2`,
+		status,
+		userID,
+	).Err()
+
+	return err 
+}

@@ -179,6 +179,36 @@
             </div>
           </div>
 
+          <!-- Edit panel — only visible for PENDING/SCHEDULED/QUEUED jobs -->
+          <div id="job-edit-panel" style="display: none">
+            <div class="job-edit-divider">
+              <span>Edit Job</span>
+            </div>
+            <div class="user-field-group">
+              <label class="user-field-label" for="edit-payload"
+                >Payload <span class="user-field-optional">(JSON)</span></label
+              >
+              <textarea
+                class="user-field-input edit-textarea"
+                id="edit-payload"
+                placeholder='{"to":"user@example.com","body":"Hello"}'
+                rows="4"
+              ></textarea>
+            </div>
+            <div class="user-field-group">
+              <label class="user-field-label" for="edit-schedule"
+                >Schedule At
+                <span class="user-field-optional">(optional)</span></label
+              >
+              <input
+                type="datetime-local"
+                class="user-field-input"
+                id="edit-schedule"
+              />
+            </div>
+            <p class="user-modal-error" id="job-edit-error"></p>
+          </div>
+
           <!-- Logs panel — only visible for FAILED jobs -->
           <div id="logs-panel" style="display: none">
             <div class="logs-header">
@@ -232,6 +262,20 @@
           >
             ↻ Retry Job
           </button>
+          <button
+            class="btn-job-update"
+            id="modal-update-btn"
+            style="display: none"
+          >
+            <span>Update Job</span>
+          </button>
+          <button
+            class="btn-job-cancel"
+            id="modal-cancel-job-btn"
+            style="display: none"
+          >
+            <span>Cancel Job</span>
+          </button>
           <button class="btn-modal-close" onclick="closeModal()">Close</button>
         </div>
       </div>
@@ -268,7 +312,7 @@
             <select class="filter-select user-field-input" id="user-modal-role">
               <option value="super_admin">super_admin</option>
               <option value="admin">admin</option>
-              <option value="user">user</option>
+              <option value="viewer">viewer</option>
             </select>
           </div>
 
@@ -316,6 +360,89 @@
             Save Changes
           </button>
           <button class="btn-modal-close" onclick="closeUserModal()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Create User Modal ─────────────────────── -->
+    <div class="modal-overlay" id="create-user-overlay">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <p class="modal-tag">Super Admin</p>
+            <h3>CREATE USER</h3>
+          </div>
+          <button
+            class="btn-close"
+            onclick="closeCreateUserModal()"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="user-field-group">
+            <label class="user-field-label" for="create-user-email"
+              >Email</label
+            >
+            <input
+              type="email"
+              class="user-field-input"
+              id="create-user-email"
+              placeholder="user@example.com"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="user-field-group">
+            <label class="user-field-label" for="create-user-password"
+              >Password</label
+            >
+            <input
+              type="password"
+              class="user-field-input"
+              id="create-user-password"
+              placeholder="Min. 6 characters"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="user-field-group">
+            <label class="user-field-label" for="create-user-role">Role</label>
+            <select
+              class="filter-select user-field-input"
+              id="create-user-role"
+            >
+              <option value="viewer">viewer</option>
+              <option value="admin">admin</option>
+              <option value="super_admin">super_admin</option>
+            </select>
+          </div>
+
+          <div class="user-field-group">
+            <label class="user-field-label" for="create-user-appid"
+              >App ID <span class="user-field-optional">(optional)</span></label
+            >
+            <input
+              type="text"
+              class="user-field-input"
+              id="create-user-appid"
+              placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+              autocomplete="off"
+            />
+          </div>
+
+          <p class="user-modal-error" id="create-user-error"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-modal-retry" id="create-user-save">
+            Create User
+          </button>
+          <button class="btn-modal-close" onclick="closeCreateUserModal()">
             Cancel
           </button>
         </div>
