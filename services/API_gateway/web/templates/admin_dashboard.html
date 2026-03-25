@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/css/admin_dashboard.css" />
+  </head>
+  <body>
+
+    <!-- ── Sidebar ─────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <p class="brand-label">System Admin</p>
+        <h1>CONTROL<br>CENTRE</h1>
+      </div>
+      <nav class="sidebar-nav">
+        <p class="nav-group-label">Overview</p>
+        <button class="nav-btn active" data-section="overview">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/><rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/></svg>
+          Overview
+        </button>
+        <p class="nav-group-label">Manage</p>
+        <button class="nav-btn" data-section="apps">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="10" rx="1"/><path d="M5 15h6M8 12v3"/></svg>
+          Apps
+        </button>
+        <button class="nav-btn" data-section="jobs">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="3" rx=".5"/><rect x="1" y="7" width="14" height="3" rx=".5"/><rect x="1" y="12" width="9" height="2" rx=".5"/></svg>
+          Jobs
+        </button>
+        <button class="nav-btn" data-section="plans">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 5l7-3 7 3-7 3-7-3z"/><path d="M1 9l7 3 7-3"/><path d="M1 13l7 3 7-3"/></svg>
+          Plans
+        </button>
+        <p class="nav-group-label">Billing</p>
+        <button class="nav-btn" data-section="payments">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1"/><line x1="1" y1="7" x2="15" y2="7"/><line x1="4" y1="11" x2="7" y2="11"/></svg>
+          Payments
+        </button>
+        <button class="nav-btn" data-section="subscribers">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="2.5"/><path d="M1 13c0-2.76 2.24-5 5-5s5 2.24 5 5"/><path d="M11 7a2.5 2.5 0 0 0 0-5M15 13a4 4 0 0 0-4-4"/></svg>
+          Subscribers
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="nav-btn logout-btn" id="btn-logout">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H2v12h4"/><path d="M10 5l4 3-4 3"/><path d="M14 8H6"/></svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── Main ────────────────────────────────── -->
+    <div class="main">
+      <header class="topbar">
+        <span class="topbar-title" id="topbar-title">OVERVIEW</span>
+        <div class="topbar-right">
+          <span class="topbar-live">Live</span>
+        </div>
+      </header>
+      <div class="content-area" id="content-area"></div>
+    </div>
+
+    <!-- ══ App Users Modal ══════════════════════ -->
+    <div class="modal-overlay" id="app-users-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div><p class="modal-tag">App Users</p><h3 id="app-users-title">USERS</h3></div>
+          <button class="btn-close" onclick="closeAppUsers()">✕</button>
+        </div>
+        <div class="modal-body" id="app-users-body"><div class="state-loading">Loading</div></div>
+      </div>
+    </div>
+
+    <!-- ══ Edit Plan Modal ═══════════════════════ -->
+    <div class="modal-overlay" id="plan-modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div><p class="modal-tag" id="plan-modal-tag">Edit Plan</p><h3 id="plan-modal-title">PLAN</h3></div>
+          <button class="btn-close" onclick="closePlanModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="field-row">
+            <div class="user-field-group">
+              <label class="user-field-label" for="pm-name">Plan Name</label>
+              <input class="user-field-input" id="pm-name" type="text" placeholder="PRO" />
+            </div>
+            <div class="user-field-group">
+              <label class="user-field-label" for="pm-price">Price (cents)</label>
+              <input class="user-field-input" id="pm-price" type="number" placeholder="9999" min="0" />
+            </div>
+          </div>
+          <div class="user-field-group">
+            <label class="user-field-label" for="pm-limit">Monthly Job Limit</label>
+            <input class="user-field-input" id="pm-limit" type="number" placeholder="10000" min="1" />
+          </div>
+          <p class="user-modal-error" id="plan-modal-error"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-primary" id="plan-modal-save">Save Plan</button>
+          <button class="btn-modal-close" onclick="closePlanModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/admin_dashboard.js"></script>
+  </body>
+</html>

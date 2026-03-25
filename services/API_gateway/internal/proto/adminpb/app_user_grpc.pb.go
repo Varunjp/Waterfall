@@ -27,6 +27,7 @@ const (
 	AppUserService_RequestResetPassword_FullMethodName   = "/admin.AppUserService/RequestResetPassword"
 	AppUserService_VerifyPasswordResetOtp_FullMethodName = "/admin.AppUserService/VerifyPasswordResetOtp"
 	AppUserService_ResetPassword_FullMethodName          = "/admin.AppUserService/ResetPassword"
+	AppUserService_UpdateUserStatus_FullMethodName       = "/admin.AppUserService/UpdateUserStatus"
 )
 
 // AppUserServiceClient is the client API for AppUserService service.
@@ -40,6 +41,7 @@ type AppUserServiceClient interface {
 	RequestResetPassword(ctx context.Context, in *RequestResetPasswordRequest, opts ...grpc.CallOption) (*RequestResetPasswordResponse, error)
 	VerifyPasswordResetOtp(ctx context.Context, in *VerifyPasswordResetOtpRequest, opts ...grpc.CallOption) (*VerifyPasswordResetOtpResponse, error)
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
+	UpdateUserStatus(ctx context.Context, in *UpdateUserStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type appUserServiceClient struct {
@@ -120,6 +122,16 @@ func (c *appUserServiceClient) ResetPassword(ctx context.Context, in *ResetPassw
 	return out, nil
 }
 
+func (c *appUserServiceClient) UpdateUserStatus(ctx context.Context, in *UpdateUserStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AppUserService_UpdateUserStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppUserServiceServer is the server API for AppUserService service.
 // All implementations must embed UnimplementedAppUserServiceServer
 // for forward compatibility.
@@ -131,6 +143,7 @@ type AppUserServiceServer interface {
 	RequestResetPassword(context.Context, *RequestResetPasswordRequest) (*RequestResetPasswordResponse, error)
 	VerifyPasswordResetOtp(context.Context, *VerifyPasswordResetOtpRequest) (*VerifyPasswordResetOtpResponse, error)
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
+	UpdateUserStatus(context.Context, *UpdateUserStatusRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAppUserServiceServer()
 }
 
@@ -161,6 +174,9 @@ func (UnimplementedAppUserServiceServer) VerifyPasswordResetOtp(context.Context,
 }
 func (UnimplementedAppUserServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedAppUserServiceServer) UpdateUserStatus(context.Context, *UpdateUserStatusRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateUserStatus not implemented")
 }
 func (UnimplementedAppUserServiceServer) mustEmbedUnimplementedAppUserServiceServer() {}
 func (UnimplementedAppUserServiceServer) testEmbeddedByValue()                        {}
@@ -309,6 +325,24 @@ func _AppUserService_ResetPassword_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppUserService_UpdateUserStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppUserServiceServer).UpdateUserStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppUserService_UpdateUserStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppUserServiceServer).UpdateUserStatus(ctx, req.(*UpdateUserStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AppUserService_ServiceDesc is the grpc.ServiceDesc for AppUserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -343,6 +377,10 @@ var AppUserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResetPassword",
 			Handler:    _AppUserService_ResetPassword_Handler,
+		},
+		{
+			MethodName: "UpdateUserStatus",
+			Handler:    _AppUserService_UpdateUserStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

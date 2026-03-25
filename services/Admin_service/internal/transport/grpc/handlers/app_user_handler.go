@@ -106,6 +106,15 @@ func (h *AppUserHandler) ListPlans(ctx context.Context, req *pb.ListPlansRequest
 	return mapUPlans(plan),nil
 }
 
+func (h *AppUserHandler) UpdateUserStatus(ctx context.Context,req *pb.UpdateUserStatusRequest)(*emptypb.Empty,error) {
+
+	err := h.usecase.BlockUser(ctx,req.UserId,req.Status)
+	if err != nil {
+		return &emptypb.Empty{},err 
+	}
+	return &emptypb.Empty{},nil 
+}
+
 func mapUPlans(plans []*entities.Plan) *pb.ListPlansResponse {
 	resp := &pb.ListPlansResponse{}
 	for _,p := range plans {

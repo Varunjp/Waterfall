@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — Login</title>
+    <link rel="stylesheet" href="/static/css/admin_login.css" />
+  </head>
+  <body>
+    <div class="bg-grid"></div>
+    <div class="spotlight"></div>
+
+    <div class="login-wrap">
+      <!-- Brand mark -->
+      <div class="brand">
+        <span class="brand-line"></span>
+        <span class="brand-text">System Administration</span>
+        <span class="brand-line"></span>
+      </div>
+
+      <div class="login-card">
+        <!-- Top accent -->
+        <div class="card-accent"></div>
+
+        <div class="login-header">
+          <h1>ADMIN<br><em>ACCESS.</em></h1>
+          <p class="login-sub">Restricted area — authorised personnel only.</p>
+        </div>
+
+        <form id="adminLoginForm" novalidate>
+          <div class="field-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="admin@example.com" autocomplete="username" required />
+          </div>
+          <div class="field-group">
+            <label for="password">Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required />
+              <button type="button" class="pw-eye" id="pw-eye" aria-label="Show password">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+                  <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn-signin" id="submit-btn">
+            <span>Sign In</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+              <path d="M1 8h14M9 2l6 6-6 6"/>
+            </svg>
+          </button>
+          <p class="error-msg" id="login-error"></p>
+        </form>
+      </div>
+
+      <p class="login-footer">© 2026 — Internal use only</p>
+    </div>
+
+    <script>
+      // Password toggle
+      document.getElementById('pw-eye').addEventListener('click', () => {
+        const inp = document.getElementById('password');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+      });
+
+      document.getElementById('adminLoginForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn    = document.getElementById('submit-btn');
+        const errEl  = document.getElementById('login-error');
+        const email  = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        errEl.textContent = '';
+        btn.disabled = true;
+        btn.querySelector('span').textContent = 'Signing in…';
+
+        try {
+          const res  = await fetch('/api/v1/admin/login', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ email, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
+          if (!data.accessToken) throw new Error('No token received.');
+
+          document.cookie = `admin_token=${data.accessToken}; path=/; SameSite=Strict`;
+          window.location.href = '/admin/dashboard';
+        } catch (err) {
+          errEl.textContent = err.message || 'Invalid credentials.';
+        } finally {
+          btn.disabled = false;
+          btn.querySelector('span').textContent = 'Sign In';
+        }
+      };
+    </script>
+  </body>
+</html>

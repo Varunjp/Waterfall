@@ -64,6 +64,9 @@ func (s *AppUserService) AppLogin(email,password string)(string,error) {
 	if err := security.Compare(appUser.PasswordHash,password); err != nil {
 		return "",domainErr.ErrInvalidCredentials
 	}
+	if appUser.Status != "active" {
+		return "", domainErr.ErrUserBlocked
+	}
 	return security.GenerateJWT(s.secret,appUser.ID,appUser.Role,appUser.AppID)
 }
 
@@ -137,4 +140,15 @@ func (s *AppUserService) ListPlans(ctx context.Context) ([]*entities.Plan,error)
 	}
 
 	return plans,nil 
+}
+
+func (s *AppUserService) BlockUser(ctx context.Context,userId,status string)error {
+
+	err := s.repo.BlockUser(userId,status)
+	
+	if err != nil {
+		return err 
+	}
+
+	return nil 
 }

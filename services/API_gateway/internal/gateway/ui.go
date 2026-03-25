@@ -41,4 +41,8 @@ func RegisterUIRoutes(r *gin.Engine) {
 	r.GET("/payment-cancel",func(c *gin.Context) {
 		c.HTML(http.StatusOK,"payment_cancel.html",nil)
 	})
+
+	r.GET("/forgot-password",func(c *gin.Context) {
+		c.HTML(http.StatusOK,"forgot_password.html",nil)
+	})
 }

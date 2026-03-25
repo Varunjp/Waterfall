@@ -12,8 +12,9 @@ var MethodPermissions = map[string][]string{
 	"/admin.AdminService/UpdatePlan": {"platform_admin"},
 
 	// App management
-	"/admin.AppUserService/CreateUser": {"super_admin"},
-	"/admin.AppUserService/ListUsers":  {"super_admin", "admin", "viewer"},
+	"/admin.AppUserService/CreateUser":       {"super_admin"},
+	"/admin.AppUserService/ListUsers":        {"super_admin", "admin", "viewer"},
+	"/admin.AppUserService/UpdateUserStatus": {"super_admin", "admin"},
 }
 
 var publicMethods = map[string]bool{

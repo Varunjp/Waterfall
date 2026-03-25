@@ -22,7 +22,7 @@ func (r *AdminRepo) FindByEmail(email string) (*entities.PlatformAdmin,error) {
 	err := row.Scan(&padmin.ID,&padmin.Email,&padmin.PasswordHash,&padmin.Status,&padmin.CreatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil,nil 
+			return nil,err  
 		}
 		return nil,err 
 	}
