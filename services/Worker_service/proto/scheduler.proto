@@ -4,10 +4,19 @@ package scheduler;
 
 option go_package = "internal/grpc/schedulerpb";
 
+import "googleapis/google/api/annotations.proto";
+
 service Scheduler {
-  
   rpc Heartbeat(HeartbeatRequest) returns (Ack);
   rpc ReportResult(JobResultRequest) returns (Ack);
+  rpc RegisterWorker(RegisterWorkerRequest) returns (Ack);
+  rpc WorkerHeartbeat(WorkerHeartbeatRequest) returns (Ack);
+  rpc UnregisterWorker(UnregisterWorkerRequest) returns (Ack);
+  rpc GetTenantRuntime(GetTenantRuntimeRequest) returns (GetTenantRuntimeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/runtime/overview"
+    };
+  }
 }
 
 message HeartbeatRequest {
@@ -32,10 +41,75 @@ message JobResultRequest {
   int32 manual_retry = 9;
 }
 
+message RegisterWorkerRequest {
+  string app_id = 1;
+  string worker_id = 2;
+  repeated string job_types = 3;
+  int32 max_concurrency = 4;
+  int64 timestamp = 5;
+}
+
+message WorkerHeartbeatRequest {
+  string app_id = 1;
+  string worker_id = 2;
+  repeated string job_types = 3;
+  int32 active_jobs = 4;
+  int32 max_concurrency = 5;
+  int64 timestamp = 6;
+}
+
+message UnregisterWorkerRequest {
+  string app_id = 1;
+  string worker_id = 2;
+  int64 timestamp = 3;
+}
+
+message GetTenantRuntimeRequest {
+  string app_id = 1;
+}
+
+message GetTenantRuntimeResponse {
+  string app_id = 1;
+  int64 generated_at = 2;
+  int64 total_ready_jobs = 3;
+  int64 total_running_jobs = 4;
+  int64 total_workers = 5;
+  int64 online_workers = 6;
+  int64 busy_workers = 7;
+  repeated QueueRuntime queues = 8;
+  repeated WorkerRuntime workers = 9;
+}
+
+message QueueRuntime {
+  string job_type = 1;
+  int64 ready_jobs = 2;
+  int64 running_jobs = 3;
+  int64 registered_workers = 4;
+  int64 busy_workers = 5;
+  int64 oldest_ready_age_seconds = 6;
+}
+
+message WorkerRuntime {
+  string worker_id = 1;
+  repeated string job_types = 2;
+  int32 active_jobs = 3;
+  int32 max_concurrency = 4;
+  int64 last_seen = 5;
+  WorkerStatus status = 6;
+}
+
 enum JobResultStatus {
   JOB_RESULT_UNKNOWN = 0;
   JOB_RESULT_SUCCESS = 1;
   JOB_RESULT_FAILED  = 2;
+}
+
+enum WorkerStatus {
+  WORKER_STATUS_UNKNOWN = 0;
+  WORKER_STATUS_ONLINE = 1;
+  WORKER_STATUS_BUSY = 2;
+  WORKER_STATUS_STALE = 3;
+  WORKER_STATUS_OFFLINE = 4;
 }
 
 message Ack {

@@ -10,6 +10,7 @@ import (
 	grpcserver "scheduler_service/internal/grpc"
 	"scheduler_service/internal/logger"
 	"scheduler_service/internal/metrics"
+	"scheduler_service/internal/monitoring"
 	"scheduler_service/internal/producer"
 	redisClient "scheduler_service/internal/redis"
 	"scheduler_service/internal/repository"
@@ -22,8 +23,8 @@ import (
 )
 
 func main() {
-	
-	rootCtx,stop := signal.NotifyContext(
+
+	rootCtx, stop := signal.NotifyContext(
 		context.Background(),
 		os.Interrupt,
 		syscall.SIGTERM,
@@ -34,7 +35,7 @@ func main() {
 		log.Println("env not loaded")
 	}
 	cfg := config.Load()
-	log,err := logger.NewLogger("scheduler-service")
+	log, err := logger.NewLogger("scheduler-service")
 
 	if err != nil {
 		panic(err)
@@ -43,20 +44,21 @@ func main() {
 	log.Info("scheduler starting")
 
 	redisClient := redisClient.NewRedisClient(cfg.Redis.Addr)
-	adminRepo := repository.NewAdminDb(cfg.AdminDB.DSN)
+	adminRepo := repository.NewAdminDb(cfg.AdminDB.DSN, redisClient.Client)
 
-	kafkaConsumer := consumer.NewJobCreatedConsumer(cfg.Kafka.Brokers,cfg.Kafka.JobCreateTopic,cfg.Kafka.ConsumerGroup)
-	kafkaProducer := producer.NewKafkaProducer([]string{cfg.Kafka.Brokers},cfg.Kafka.JobUpdateTopic)
-	kafkaRunConsumer := consumer.NewJobCreatedConsumer(cfg.Kafka.Brokers,cfg.Kafka.JobStatusTopic,cfg.Kafka.ConsumerGroup)
+	kafkaConsumer := consumer.NewJobCreatedConsumer(cfg.Kafka.Brokers, cfg.Kafka.JobCreateTopic, cfg.Kafka.ConsumerGroup)
+	kafkaProducer := producer.NewKafkaProducer([]string{cfg.Kafka.Brokers}, cfg.Kafka.JobUpdateTopic)
+	kafkaRunConsumer := consumer.NewJobCreatedConsumer(cfg.Kafka.Brokers, cfg.Kafka.JobStatusTopic, cfg.Kafka.ConsumerGroup)
 
 	metricsP := metrics.NewMetrics()
+	runtimeStore := monitoring.NewStore(redisClient.Client)
 
-	assigner := usecase.NewAssigner(redisClient,adminRepo,metricsP,kafkaProducer)
-	stallMonitor := usecase.NewStallMonitor(redisClient,kafkaRunConsumer,kafkaProducer)
-	resultProcess := usecase.NewJobResultProcess(adminRepo,metricsP,kafkaProducer,log,3,redisClient)
+	assigner := usecase.NewAssigner(redisClient, adminRepo, metricsP, kafkaProducer, runtimeStore)
+	stallMonitor := usecase.NewStallMonitor(redisClient, kafkaRunConsumer, kafkaProducer, runtimeStore)
+	resultProcess := usecase.NewJobResultProcess(adminRepo, metricsP, kafkaProducer, log, 3, redisClient)
 
 	runner := scheduler.NewRunner(
-		kafkaConsumer,assigner,kafkaProducer,redisClient.Client,log,
+		kafkaConsumer, assigner, kafkaProducer, redisClient.Client, log,
 	)
 
 	runtime := scheduler.NewRuntime(log)
@@ -75,8 +77,10 @@ func main() {
 				metricsP,
 				resultProcess,
 				log,
+				runtimeStore,
+				cfg.JWTSecret,
 			); err != nil {
-				log.Error("grpc server failed",zap.Error(err))
+				log.Error("grpc server failed", zap.Error(err))
 			}
 		},
 
@@ -87,7 +91,7 @@ func main() {
 					cfg.Metrics.Port,
 					log,
 				); err != nil {
-					log.Error("metrics server failed",zap.Error(err))
+					log.Error("metrics server failed", zap.Error(err))
 				}
 			}
 		},

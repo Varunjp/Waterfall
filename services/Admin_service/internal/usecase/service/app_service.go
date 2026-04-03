@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"os"
 	"time"
 )
 
@@ -36,11 +37,14 @@ func (s *AppService) Register(name,email string) (string,error) {
 		return "",ErrInvaildName
 	}
 
+	planID := os.Getenv("FREE_PLAN_ID")
+
 	app := &entities.App{
 		AppName: name,
 		AppEmail: email,
 		Status: "active",
 		Tier: "free",
+		PlanID: planID,
 	}
 
 	appID,err := s.repo.Create(app);
@@ -49,6 +53,24 @@ func (s *AppService) Register(name,email string) (string,error) {
 		if errors.Is(err, domainErr.ErrAppEmailAlreadyExists) {
 			return "",domainErr.ErrAppEmailAlreadyExists
 		}
+		return "",err 
+	}
+
+	start := time.Now()
+	end := time.Now().AddDate(0, 1, 0)
+
+	subscription := &entities.Subscription{
+		AppID: appID,
+		PlanID: planID,
+		PlanName: "FREE",
+		Status: "active",
+		CurrentPeriodStart: start,
+		CurrentPeriodEnd: end,
+	}
+
+	err = s.repo.CreateFreePlan(subscription)
+
+	if err != nil {
 		return "",err 
 	}
 

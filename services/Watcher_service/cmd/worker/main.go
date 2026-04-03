@@ -63,7 +63,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	jobEventUC := usecase.NewConsumeJobUsecase(repo, logg,rd)
+	jobEventUC := usecase.NewConsumeJobUsecase(repo,adrepo, logg,rd)
 	jobEventConsumer := consumer.NewKafkaConsumer(
 		cfg.KafkaBroker,
 		cfg.JobTopic,
@@ -72,7 +72,7 @@ func main() {
 		logg,
 	)
 
-	jobRunUC := usecase.NewUpdateJobStatusUsecase(repo,adrepo)
+	jobRunUC := usecase.NewUpdateJobStatusUsecase(repo)
 	jobRunConsumer := consumer.NewJobRunConsumer(
 		cfg.KafkaBroker,
 		cfg.JobRunTopic,

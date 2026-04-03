@@ -7,4 +7,5 @@ type AppRepository interface {
 	CreateFirst(user *entities.AppUser) error
 	FindAll() ([]*entities.App,error)
 	UpdateStatus(appID, status string)error 
+	CreateFreePlan(sub *entities.Subscription) error 
 }

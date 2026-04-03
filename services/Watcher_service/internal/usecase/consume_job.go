@@ -14,12 +14,13 @@ import (
 
 type ConsumeJobUsecase struct {
 	repo   repository.JobRepository
+	adminRepo repository.AdminRepository
 	redis  *redis.Client
 	logger *zap.Logger
 }
 
-func NewConsumeJobUsecase(r repository.JobRepository, l *zap.Logger,rd *redis.Client) *ConsumeJobUsecase {
-	return &ConsumeJobUsecase{repo: r, logger: l,redis: rd}
+func NewConsumeJobUsecase(r repository.JobRepository, adrepo repository.AdminRepository, l *zap.Logger,rd *redis.Client) *ConsumeJobUsecase {
+	return &ConsumeJobUsecase{repo: r, adminRepo:  adrepo,logger: l,redis: rd}
 }
 
 func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) error {
@@ -43,7 +44,18 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 			job.Status = domain.StatusScheduled
 		}
 
-		return uc.repo.Insert(ctx, job)
+		err := uc.repo.Insert(ctx, job)
+
+		if err != nil {
+			return err 
+		}
+
+		err = uc.adminRepo.UpdateUsageIncr(ctx,event.AppID)
+		
+		if err != nil {
+			return err 
+		}
+		return nil 
 	case domain.JobUpdated:
 		updated,err := uc.repo.UpdatePayload(ctx, event.JobID, event.Payload,event.Timestamp,event.ScheduleModifed)
 		if err != nil {
@@ -60,6 +72,12 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 		}
 		if !updated {
 			return errors.New("job cannot be cancelled (already running or finished)")
+		}
+
+		err = uc.adminRepo.UpdateUsageDecr(ctx,event.AppID)
+
+		if err != nil {
+			return err 
 		}
 
 		key := fmt.Sprintf("usage:%s:%s",event.AppID,time.Now().Format("2006-01"))

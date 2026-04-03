@@ -23,7 +23,7 @@ func main() {
 
 	cfg := config.Load()
 
-	ctx,stop := signal.NotifyContext(
+	ctx, stop := signal.NotifyContext(
 		context.Background(),
 		os.Interrupt,
 		syscall.SIGTERM,
@@ -39,6 +39,8 @@ func main() {
 		cfg.AppID,
 		cfg.WorkerID,
 		cfg.JobTypes,
+		cfg.MaxConcurrency,
+		cfg.HeartbeatInterval,
 	)
 	// delete
 	fmt.Println("worker started..")

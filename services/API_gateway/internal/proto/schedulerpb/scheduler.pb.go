@@ -981,7 +981,7 @@ const file_proto_scheduler_proto_rawDesc = "" +
 	"\x0eRegisterWorker\x12 .scheduler.RegisterWorkerRequest\x1a\x0e.scheduler.Ack\x12D\n" +
 	"\x0fWorkerHeartbeat\x12!.scheduler.WorkerHeartbeatRequest\x1a\x0e.scheduler.Ack\x12F\n" +
 	"\x10UnregisterWorker\x12\".scheduler.UnregisterWorkerRequest\x1a\x0e.scheduler.Ack\x12}\n" +
-	"\x10GetTenantRuntime\x12\".scheduler.GetTenantRuntimeRequest\x1a#.scheduler.GetTenantRuntimeResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/runtime/overviewB\x1bZ\x19internal/grpc/schedulerpbb\x06proto3"
+	"\x10GetTenantRuntime\x12\".scheduler.GetTenantRuntimeRequest\x1a#.scheduler.GetTenantRuntimeResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/runtime/overviewB\x1cZ\x1ainternal/proto/schedulerpbb\x06proto3"
 
 var (
 	file_proto_scheduler_proto_rawDescOnce sync.Once

@@ -5,6 +5,7 @@ import (
 	domainerr "admin_service/internal/domain/errors"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/lib/pq"
 )
@@ -21,14 +22,15 @@ func (r *AppRepo) Create(app *entities.App) (string,error) {
 	var appID string 
 
 	err := r.db.QueryRow(`
-		INSERT INTO apps (app_name, app_email, status, tier)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO apps (app_name, app_email, status, tier, plan_id)
+		VALUES ($1, $2, $3, $4,$5)
 		RETURNING app_id
 	`,
 		app.AppName,
 		app.AppEmail,
 		app.Status,
 		app.Tier,
+		app.PlanID,
 	).Scan(&appID)
 
 	if err != nil {
@@ -102,4 +104,39 @@ func (r *AppRepo)CreateFirst(user *entities.AppUser) error {
 	}
 	
 	return nil 
+}
+
+func (r *AppRepo) CreateFreePlan(sub *entities.Subscription) error {
+
+	query := `
+	INSERT INTO subscriptions (
+		app_id,
+		plan_id,
+		stripe_subscription_id,
+		status,
+		current_period_start,
+		current_period_end,
+		created_at
+	)
+	VALUES ($1,$2,$3,$4,$5,$6,$7)
+	ON CONFLICT (app_id)
+	DO UPDATE SET
+		plan_id = EXCLUDED.plan_id,
+		current_period_start = EXCLUDED.current_period_start,
+		current_period_end = EXCLUDED.current_period_end,
+		updated_at = NOW();
+	`
+
+	_, err := r.db.Exec(
+		query,
+		sub.AppID,
+		sub.PlanID,
+		sub.StripeSubscriptionID,
+		sub.Status,
+		sub.CurrentPeriodStart,
+		sub.CurrentPeriodEnd,
+		time.Now(),
+	)
+
+	return err
 }

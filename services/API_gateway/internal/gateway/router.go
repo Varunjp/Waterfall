@@ -5,6 +5,7 @@ import (
 	"api_gateway/internal/middleware"
 	"api_gateway/internal/proto/adminpb"
 	"api_gateway/internal/proto/jobpb"
+	"api_gateway/internal/proto/schedulerpb"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -46,13 +47,22 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 		panic(err)
 	}
 	err = adminpb.RegisterAppServiceHandlerFromEndpoint(
-		ctx,gwMux,cfg.AdminServiceURL,opts,
+		ctx, gwMux, cfg.AdminServiceURL, opts,
 	)
 	if err != nil {
 		panic(err)
 	}
 	err = adminpb.RegisterAppUserServiceHandlerFromEndpoint(
-		ctx,gwMux,cfg.AdminServiceURL,opts,
+		ctx, gwMux, cfg.AdminServiceURL, opts,
+	)
+	if err != nil {
+		panic(err)
+	}
+	err = schedulerpb.RegisterSchedulerHandlerFromEndpoint(
+		ctx,
+		gwMux,
+		cfg.SchedulerServiceURL,
+		opts,
 	)
 	if err != nil {
 		panic(err)
@@ -66,21 +76,21 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 		middleware.LoggingMiddleware(),
 		middleware.AuthMiddleware(cfg.JWTSecret),
 		middleware.NoCacheMiddleware(),
-		middleware.RateLimitMiddleware(rdb,cfg.RateLimit),
+		middleware.RateLimitMiddleware(rdb, cfg.RateLimit),
 	)
 
-	r.GET("/health",func(c *gin.Context){
-		c.JSON(200,gin.H{"status":"ok"})
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	r.Any("/api/*any",gin.WrapH(gwMux))
+	r.Any("/api/*any", gin.WrapH(gwMux))
 
-	r.Any("/billing/*path",gin.WrapH(billingProxy))
+	r.Any("/billing/*path", gin.WrapH(billingProxy))
 
 	RegisterUIRoutes(r)
 
 	return &http.Server{
-		Addr: ":"+cfg.Port,
+		Addr:    ":" + cfg.Port,
 		Handler: r,
 	}
 }
@@ -103,11 +113,11 @@ func customErrorHandler(
 	})
 }
 
-func headerMatcher(key string) (string,bool) {
+func headerMatcher(key string) (string, bool) {
 	switch key {
-	case "Authorization","x-api-key":
-		return key,true 
+	case "Authorization", "x-api-key":
+		return key, true
 	default:
-		return key,false 
+		return key, false
 	}
 }

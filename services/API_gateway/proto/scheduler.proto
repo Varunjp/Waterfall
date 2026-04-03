@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package scheduler;
 
-option go_package = "internal/grpc/schedulerpb";
+option go_package = "internal/proto/schedulerpb";
 
 import "googleapis/google/api/annotations.proto";
 
@@ -20,22 +20,20 @@ service Scheduler {
 }
 
 message HeartbeatRequest {
-  string job_id     = 1;
-  string app_id     = 2;
-  string worker_id  = 3;
-  int64  progress   = 4; 
-  int64  timestamp  = 5; 
+  string job_id = 1;
+  string app_id = 2;
+  string worker_id = 3;
+  int64 progress = 4;
+  int64 timestamp = 5;
 }
 
 message JobResultRequest {
-  string job_id     = 1;
-  string app_id     = 2;
-  string worker_id  = 3;
-
+  string job_id = 1;
+  string app_id = 2;
+  string worker_id = 3;
   JobResultStatus status = 4;
-  string error_message   = 5;
-  string stacktrace      = 6;
-
+  string error_message = 5;
+  string stacktrace = 6;
   int64 timestamp = 7;
   int32 retry = 8;
   int32 manual_retry = 9;
@@ -101,7 +99,7 @@ message WorkerRuntime {
 enum JobResultStatus {
   JOB_RESULT_UNKNOWN = 0;
   JOB_RESULT_SUCCESS = 1;
-  JOB_RESULT_FAILED  = 2;
+  JOB_RESULT_FAILED = 2;
 }
 
 enum WorkerStatus {
