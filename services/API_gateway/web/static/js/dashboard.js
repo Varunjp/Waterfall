@@ -17,7 +17,8 @@
   let currentEndDate   = null;
   let totalJobs        = 0;
   const LIMIT          = 10;
-  let currentUserRole  = null; // decoded from token
+  let currentUserRole      = null; // decoded from token
+  let jobsAutoRefreshTimer = null; // 3-second auto-refresh while on jobs tab
 
   /* ── Helpers ───────────────────────────────────── */
   function fmt(dateStr) {
@@ -53,10 +54,15 @@
       document.querySelectorAll('.nav-btn[data-section]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('topbar-title').textContent = btn.dataset.section.toUpperCase();
-      // Stop monitor polling when leaving
+      // Stop monitor polling when leaving monitor
       if (btn.dataset.section !== 'monitor') {
         clearInterval(monitorRefreshTimer);
         destroyCharts();
+      }
+      // Stop jobs auto-refresh when leaving jobs tab
+      if (btn.dataset.section !== 'jobs') {
+        clearInterval(jobsAutoRefreshTimer);
+        jobsAutoRefreshTimer = null;
       }
       loadSection(currentSection);
     });
@@ -67,15 +73,12 @@
     area.style.animation = 'none';
     requestAnimationFrame(() => {
       area.style.animation = '';
-      if (section === 'jobs')        loadJobs(0);
-      else if (section === 'plans')  loadPlans();
+      if (section === 'jobs')              loadJobs(0);
+      else if (section === 'plans')        loadPlans();
       else if (section === 'users')        loadUsers();
       else if (section === 'subscription') loadSubscription();
       else if (section === 'monitor')      loadMonitor();
-      else if (section === 'metrics')      loadMetrics();
-      else if (section === 'dlq')          loadDLQ();
-      else if (section === 'loadtest')     loadLoadTest();
-      else                               renderPlaceholder(section);
+      else                                 renderPlaceholder(section);
     });
   }
 
@@ -366,11 +369,44 @@
       document.getElementById('table-body').innerHTML =
         `<div class="state-empty">Failed to load jobs</div>`;
     }
+
+    // Start 3-second silent auto-refresh while on jobs tab
+    startJobsAutoRefresh();
+  }
+
+  function startJobsAutoRefresh() {
+    clearInterval(jobsAutoRefreshTimer);
+    jobsAutoRefreshTimer = setInterval(async () => {
+      if (currentSection !== 'jobs') return;
+      // Don't refresh if a modal is open
+      if (document.getElementById('modal-overlay').classList.contains('open')) return;
+      await silentRefreshJobs();
+    }, 3000);
+  }
+
+  async function silentRefreshJobs() {
+    try {
+      const params = new URLSearchParams({ limit: LIMIT, offset: currentPage });
+      if (currentFilter !== 'ALL')  params.set('status',    currentFilter);
+      if (currentStartDate)         params.set('startDate', currentStartDate);
+      if (currentEndDate)           params.set('endDate',   currentEndDate);
+      const res  = await fetch(`/api/v1/jobs?${params}`, { headers: authHeader });
+      const data = await res.json();
+      const jobs = data.jobs || [];
+      totalJobs  = data.total || jobs.length;
+      renderStats(jobs);
+      renderTable(jobs);
+      renderPagination(currentPage, totalJobs);
+    } catch { /* silent — don't disrupt the user */ }
   }
 
   function renderStats(jobs) {
-    const c = { COMPLETED: 0, FAILED: 0, CANCELED: 0, PENDING: 0, RUNNING: 0, SCHEDULED: 0, QUEUED: 0 };
+    const c = { COMPLETED: 0, FAILED: 0, CANCELED: 0, CANCELLED: 0, PENDING: 0, RUNNING: 0, SCHEDULED: 0, QUEUED: 0 };
     jobs.forEach(j => { if (c[j.status] !== undefined) c[j.status]++; });
+
+    const succeeded = c.COMPLETED;
+    const failed    = c.FAILED + c.CANCELED + c.CANCELLED;
+    const active    = c.PENDING + c.RUNNING + c.SCHEDULED + c.QUEUED;
 
     document.getElementById('stats-row').innerHTML = `
       <div class="stat-card">
@@ -379,15 +415,15 @@
       </div>
       <div class="stat-card">
         <p class="stat-label">Completed</p>
-        <p class="stat-value success">${c.COMPLETED}</p>
+        <p class="stat-value success">${succeeded}</p>
       </div>
       <div class="stat-card">
         <p class="stat-label">Failed</p>
-        <p class="stat-value failed">${c.FAILED + c.CANCELED}</p>
+        <p class="stat-value failed">${failed}</p>
       </div>
       <div class="stat-card">
         <p class="stat-label">Pending / Running</p>
-        <p class="stat-value">${c.PENDING + c.RUNNING + c.SCHEDULED + c.QUEUED}</p>
+        <p class="stat-value">${active}</p>
       </div>`;
   }
 
@@ -672,14 +708,27 @@
      USERS
   ══════════════════════════════════════════════════ */
 
-  /* Decode JWT payload to get the logged-in user's role */
+  /* Decode JWT payload — cached after first call */
+  let _jwtCache = null;
+  function decodeJwt() {
+    if (_jwtCache) return _jwtCache;
+    try {
+      _jwtCache = JSON.parse(atob(token.split('.')[1]));
+    } catch { _jwtCache = {}; }
+    return _jwtCache;
+  }
+
   function getMyRole() {
     if (currentUserRole) return currentUserRole;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      currentUserRole = payload.role || payload.Role || '';
-    } catch { currentUserRole = ''; }
+    const p = decodeJwt();
+    currentUserRole = p.role || p.Role || '';
     return currentUserRole;
+  }
+
+  function getMyAppId() {
+    const p = decodeJwt();
+    // Common JWT claim names for app_id
+    return p.app_id || p.appId || p.AppId || p.app || p.sub || '';
   }
 
   async function loadUsers() {
@@ -1067,7 +1116,6 @@
     area.innerHTML = `
       <div class="section-header">
         <div>
-          <p class="section-sub">Observability &amp; Diagnostics</p>
           <h2>MONITOR</h2>
         </div>
         <div style="display:flex;align-items:center;gap:12px">
@@ -1097,7 +1145,7 @@
     document.getElementById('monitor-body').innerHTML = `
 
       <!-- ── Row 1: Key metrics ── -->
-      <div class="stats-row" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px">
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
         <div class="stat-card">
           <p class="stat-label">Jobs Created</p>
           <p class="stat-value" id="mon-created">—</p>
@@ -1109,14 +1157,6 @@
         <div class="stat-card">
           <p class="stat-label">Failed</p>
           <p class="stat-value failed" id="mon-failed">—</p>
-        </div>
-        <div class="stat-card">
-          <p class="stat-label">Retries</p>
-          <p class="stat-value" id="mon-retries">—</p>
-        </div>
-        <div class="stat-card">
-          <p class="stat-label">Queue Depth</p>
-          <p class="stat-value" id="mon-qdepth">—</p>
         </div>
       </div>
 
@@ -1177,7 +1217,7 @@
       <div class="monitor-grid--wide">
         <div class="monitor-card">
           <p class="monitor-card-label">
-            Job Throughput — Last 12 Hours
+            Job Throughput — Today (UTC)
             <span class="live-pill">Live</span>
           </p>
           <div class="chart-container--tall">
@@ -1186,18 +1226,12 @@
         </div>
       </div>
 
-      <!-- ── Row 4: Retry rate chart + Workflow viz ── -->
-      <div class="monitor-grid" style="margin-bottom:16px">
-        <div class="monitor-card">
-          <p class="monitor-card-label">Retry Rate — Last 12 Hours</p>
-          <div class="chart-container">
-            <canvas id="chart-retry"></canvas>
-          </div>
-        </div>
+      <!-- ── Row 4: Job Workflow full width ── -->
+      <div class="monitor-grid--wide" style="margin-bottom:16px">
         <div class="monitor-card">
           <p class="monitor-card-label">Job Workflow</p>
-          <div class="workflow-canvas">
-            <svg class="workflow-svg" id="workflow-svg" viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="workflow-canvas" style="height:240px">
+            <svg class="workflow-svg" id="workflow-svg" viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg"></svg>
           </div>
         </div>
       </div>
@@ -1207,15 +1241,18 @@
         <div class="monitor-card">
           <div class="dlq-toolbar">
             <p class="monitor-card-label" style="margin-bottom:0">
-              Dead Letter Queue
-              <span class="dlq-count-badge" id="dlq-count-badge">0 jobs</span>
+              Failed Jobs
+              <span class="dlq-count-badge" id="dlq-count-badge">— jobs</span>
             </p>
-            <div class="dlq-actions">
-              <button class="btn-dlq-retry-all" id="btn-dlq-retry-all">↻ Retry All</button>
-              <button class="btn-dlq-clear" id="btn-dlq-clear">Purge DLQ</button>
+          </div>
+          <div id="dlq-body"><div class="dlq-empty">Loading…</div></div>
+          <div id="dlq-pagination" style="display:none;padding:12px 0 0 0;display:flex;align-items:center;justify-content:space-between">
+            <span class="pagination-info" id="dlq-page-info">—</span>
+            <div class="pagination-btns">
+              <button class="btn-page" id="btn-dlq-prev" disabled>← Prev</button>
+              <button class="btn-page" id="btn-dlq-next" disabled>Next →</button>
             </div>
           </div>
-          <div id="dlq-body"><div class="dlq-empty">Loading DLQ…</div></div>
         </div>
       </div>
 
@@ -1270,7 +1307,6 @@
       </div>`;
 
     renderWorkflowDiagram();
-    bindDLQActions();
     bindLoadTestActions();
   }
 
@@ -1279,49 +1315,59 @@
     const btn = document.getElementById('btn-mon-refresh');
     if (btn) btn.classList.add('spinning');
     try {
-      const [overview, jobsData] = await Promise.all([
+      // Always fetch today's full UTC day: 00:00:00Z → 23:59:59Z
+      // This matches the API format: /api/v1/jobs/metrics?from=2026-04-04T00:00:00Z&to=2026-04-04T23:59:59Z&bucket=hour
+      const nowUTC      = new Date();
+      const todayUTC    = nowUTC.toISOString().slice(0, 10); // "YYYY-MM-DD"
+      const metricsFrom = `${todayUTC}T00:00:00Z`;
+      const metricsTo   = `${todayUTC}T23:59:59Z`;
+
+      const [overview, jobsData, stats, metrics] = await Promise.all([
         fetch('/api/v1/runtime/overview', { headers: authHeader })
           .then(r => r.ok ? r.json() : null)
           .catch(() => null),
-        fetch('/api/v1/jobs?limit=200&offset=0', { headers: authHeader })
+        fetch('/api/v1/jobs?limit=50&offset=0', { headers: authHeader })
           .then(r => r.json())
           .catch(() => ({ jobs: [], total: 0 })),
+        fetch('/api/v1/jobs/stats', { headers: authHeader })
+          .then(r => r.ok ? r.json() : null)
+          .catch(() => null),
+        fetch(`/api/v1/jobs/metrics?from=${metricsFrom}&to=${metricsTo}&bucket=hour`, { headers: authHeader })
+          .then(r => r.ok ? r.json() : null)
+          .catch(() => null),
       ]);
-      applyOverviewMetrics(overview, jobsData);
+      applyOverviewMetrics(overview, jobsData, stats, metrics);
       await fetchDLQ();
     } finally {
       if (btn) btn.classList.remove('spinning');
     }
   }
 
-  /* ── Map runtime/overview + jobs list → all monitor panels ── */
-  function applyOverviewMetrics(ov, jobsData) {
+  /* ── Map runtime/overview + jobs list + stats → all monitor panels ── */
+  function applyOverviewMetrics(ov, jobsData, stats, metrics) {
     const jobs = jobsData?.jobs || [];
 
-    // ── Job counts from jobs list (historical totals) ──
-    let created = jobsData?.total || jobs.length;
-    let success = 0, failed = 0, retries = 0, pending = 0, running = 0,
-        scheduled = 0, queued = 0, cancelled = 0;
-    jobs.forEach(j => {
-      if (j.status === 'COMPLETED')                            success++;
-      if (j.status === 'FAILED')                               failed++;
-      if (j.status === 'CANCELLED' || j.status === 'CANCELED') cancelled++;
-      if (j.status === 'PENDING')                              pending++;
-      if (j.status === 'RUNNING')                              running++;
-      if (j.status === 'SCHEDULED')                            scheduled++;
-      if (j.status === 'QUEUED')                               queued++;
-      retries += (j.retry || 0);
-    });
+    // ── 1. Top stat cards — use /api/v1/jobs/stats when available ──
+    // Stats API returns: { totalJobs, totalSuccessJobs, totalFailedJobs }
+    const created = stats?.totalJobs        ?? (jobsData?.total || jobs.length);
+    const success = stats?.totalSuccessJobs ?? jobs.filter(j => j.status === 'COMPLETED').length;
+    const failed  = stats?.totalFailedJobs  ?? jobs.filter(j => j.status === 'FAILED' || j.status === 'CANCELED' || j.status === 'CANCELLED').length;
 
-    // ── 1. Top stat cards ──
-    // Queue depth: prefer live runtime values (totalReadyJobs + totalRunningJobs)
-    const liveReady   = ov ? parseInt(ov.totalReadyJobs   || 0) : (pending + queued);
-    const liveRunning = ov ? parseInt(ov.totalRunningJobs || 0) : running;
-    setText('mon-created', created);
-    setText('mon-success', success);
-    setText('mon-failed',  failed);
-    setText('mon-retries', retries);
-    setText('mon-qdepth',  liveReady + liveRunning);
+    setText('mon-created', created.toLocaleString());
+    setText('mon-success', success.toLocaleString());
+    setText('mon-failed',  failed.toLocaleString());
+
+    // ── Still compute per-status counts from jobs list for charts/lag/workers ──
+    let pending = 0, running = 0, scheduled = 0, queued = 0, cancelled = 0, successCount = 0, failedCount = 0;
+    jobs.forEach(j => {
+      if (j.status === 'COMPLETED')                              successCount++;
+      else if (j.status === 'FAILED')                            failedCount++;
+      else if (j.status === 'CANCELLED' || j.status === 'CANCELED') cancelled++;
+      else if (j.status === 'PENDING')                           pending++;
+      else if (j.status === 'RUNNING')                           running++;
+      else if (j.status === 'SCHEDULED')                         scheduled++;
+      else if (j.status === 'QUEUED')                            queued++;
+    });
 
     // ── 2. Queue lag — oldestReadyAgeSeconds from runtime queues ──
     const queues = ov?.queues || [];
@@ -1422,8 +1468,7 @@
 
     // ── 6. Charts ──
     drawStatusChart({ success, failed, pending: pending + queued, running, scheduled, cancelled });
-    drawThroughputChart(jobs);
-    drawRetryChart(jobs);
+    drawThroughputChart(metrics);
   }
 
   function setText(id, val) {
@@ -1485,38 +1530,32 @@
     });
   }
 
-  /* ── Throughput line chart ── */
-  function drawThroughputChart(jobs) {
+  /* ── Throughput line chart — uses GET /api/v1/jobs/metrics?from&to&bucket=hour ── */
+  function drawThroughputChart(metrics) {
     const canvas = document.getElementById('chart-throughput');
     if (!canvas) return;
     if (chartInstances['throughput']) chartInstances['throughput'].destroy();
 
-    // Bucket jobs into last 12 hourly slots by createdAt
-    const now    = Date.now();
-    const hours  = 12;
-    const slot   = 3600 * 1000;
-    const labels = [];
-    const created  = new Array(hours).fill(0);
-    const succeeded = new Array(hours).fill(0);
-    const failedArr = new Array(hours).fill(0);
+    const buckets = metrics?.buckets || [];
 
-    for (let i = hours - 1; i >= 0; i--) {
-      const d = new Date(now - i * slot);
-      labels.push(d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }));
-    }
-
-    jobs.forEach(j => {
-      const jTime = new Date(j.createdAt).getTime();
-      const diff  = now - jTime;
-      const idx   = hours - 1 - Math.floor(diff / slot);
-      if (idx >= 0 && idx < hours) {
-        created[idx]++;
-        if (j.status === 'COMPLETED') succeeded[idx]++;
-        if (j.status === 'FAILED')    failedArr[idx]++;
-      }
-    });
+    // Slice "HH:MM" directly from the UTC ISO string — no Date() conversion,
+    // so the label is exactly what the DB returned (e.g. "2026-04-04T10:00:00Z" → "10:00")
+    const labels    = buckets.map(b => b.ts.slice(11, 16));
+    const created   = buckets.map(b => Number(b.created  ?? 0));
+    const succeeded = buckets.map(b => Number(b.completed ?? 0));
+    const failedArr = buckets.map(b => Number(b.failed    ?? 0));
 
     const ctx = canvas.getContext('2d');
+
+    if (!buckets.length) {
+      chartInstances['throughput'] = new Chart(ctx, {
+        type: 'line',
+        data: { labels: ['No data'], datasets: [{ label: 'No data', data: [0], borderColor: 'rgba(245,245,240,0.2)' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
+      });
+      return;
+    }
+
     chartInstances['throughput'] = new Chart(ctx, {
       type: 'line',
       data: {
@@ -1525,35 +1564,35 @@
           {
             label: 'Created',
             data: created,
-            borderColor: 'rgba(245,245,240,0.5)',
+            borderColor: 'rgba(245,245,240,0.6)',
             backgroundColor: 'rgba(245,245,240,0.04)',
-            fill: true,
-            tension: 0.4,
-            pointRadius: 3,
-            pointBackgroundColor: 'rgba(245,245,240,0.6)',
+            fill: true, tension: 0.3,
+            pointRadius: 4, pointHoverRadius: 6,
+            pointBackgroundColor: 'rgba(245,245,240,0.8)',
             borderWidth: 1.5,
+            spanGaps: false,
           },
           {
             label: 'Completed',
             data: succeeded,
-            borderColor: 'rgba(168,240,184,0.8)',
-            backgroundColor: 'rgba(168,240,184,0.06)',
-            fill: true,
-            tension: 0.4,
-            pointRadius: 3,
-            pointBackgroundColor: 'rgba(168,240,184,0.8)',
+            borderColor: 'rgba(168,240,184,0.9)',
+            backgroundColor: 'rgba(168,240,184,0.07)',
+            fill: true, tension: 0.3,
+            pointRadius: 4, pointHoverRadius: 6,
+            pointBackgroundColor: 'rgba(168,240,184,0.9)',
             borderWidth: 1.5,
+            spanGaps: false,
           },
           {
             label: 'Failed',
             data: failedArr,
-            borderColor: 'rgba(240,168,168,0.8)',
-            backgroundColor: 'rgba(240,168,168,0.06)',
-            fill: true,
-            tension: 0.4,
-            pointRadius: 3,
-            pointBackgroundColor: 'rgba(240,168,168,0.8)',
+            borderColor: 'rgba(240,168,168,0.9)',
+            backgroundColor: 'rgba(240,168,168,0.07)',
+            fill: true, tension: 0.3,
+            pointRadius: 4, pointHoverRadius: 6,
+            pointBackgroundColor: 'rgba(240,168,168,0.9)',
             borderWidth: 1.5,
+            spanGaps: false,
           },
         ],
       },
@@ -1566,8 +1605,7 @@
             labels: {
               color: '#777770',
               font: { family: 'DM Sans', size: 10 },
-              boxWidth: 10,
-              padding: 14,
+              boxWidth: 10, padding: 14,
             },
           },
           tooltip: {
@@ -1576,89 +1614,26 @@
             borderWidth: 1,
             titleColor: '#f5f5f0',
             bodyColor: '#777770',
+            callbacks: {
+              title: items => `${items[0].label} UTC`,
+            },
           },
         },
         scales: {
           x: {
             grid: { color: 'rgba(245,245,240,0.04)' },
-            ticks: { color: '#3a3a38', font: { size: 9 } },
+            ticks: { color: '#777770', font: { size: 9 }, maxTicksLimit: 13 },
           },
           y: {
             beginAtZero: true,
             grid: { color: 'rgba(245,245,240,0.04)' },
-            ticks: { color: '#3a3a38', font: { size: 9 }, stepSize: 1 },
+            ticks: { color: '#777770', font: { size: 9 }, precision: 0 },
           },
         },
       },
     });
   }
 
-  /* ── Retry rate bar chart ── */
-  function drawRetryChart(jobs) {
-    const canvas = document.getElementById('chart-retry');
-    if (!canvas) return;
-    if (chartInstances['retry']) chartInstances['retry'].destroy();
-
-    const now   = Date.now();
-    const hours = 12;
-    const slot  = 3600 * 1000;
-    const labels = [];
-    const retries = new Array(hours).fill(0);
-
-    for (let i = hours - 1; i >= 0; i--) {
-      const d = new Date(now - i * slot);
-      labels.push(d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }));
-    }
-
-    jobs.forEach(j => {
-      if (!j.retry) return;
-      const jTime = new Date(j.updatedAt || j.createdAt).getTime();
-      const diff  = now - jTime;
-      const idx   = hours - 1 - Math.floor(diff / slot);
-      if (idx >= 0 && idx < hours) retries[idx] += j.retry;
-    });
-
-    const ctx = canvas.getContext('2d');
-    chartInstances['retry'] = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Retries',
-          data: retries,
-          backgroundColor: 'rgba(240,230,168,0.5)',
-          borderColor: 'rgba(240,230,168,0.8)',
-          borderWidth: 1,
-          borderRadius: 2,
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#161616',
-            borderColor: 'rgba(245,245,240,0.12)',
-            borderWidth: 1,
-            titleColor: '#f5f5f0',
-            bodyColor: '#777770',
-          },
-        },
-        scales: {
-          x: {
-            grid: { color: 'rgba(245,245,240,0.04)' },
-            ticks: { color: '#3a3a38', font: { size: 9 } },
-          },
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(245,245,240,0.04)' },
-            ticks: { color: '#3a3a38', font: { size: 9 }, stepSize: 1 },
-          },
-        },
-      },
-    });
-  }
 
   /* ── Workers ── */
   /* ── renderWorkersFromOverview — called by applyOverviewMetrics ── */
@@ -1710,96 +1685,106 @@
   }
 
   /* ── DLQ ── */
-  async function fetchDLQ() {
+  /* ── DLQ: paginated failed jobs from /api/v1/jobs?status=FAILED ── */
+  let dlqPage  = 0;
+  const DLQ_LIMIT = 10;
+  let dlqTotal = 0;
+
+  async function fetchDLQ(page) {
+    if (page === undefined) page = dlqPage;
+    dlqPage = page;
+
     const dlqBody = document.getElementById('dlq-body');
-    const badge   = document.getElementById('dlq-count-badge');
     if (!dlqBody) return;
+    dlqBody.innerHTML = '<div class="dlq-empty" style="padding:24px">Loading…</div>';
 
     try {
-      // Try real DLQ endpoint first
-      const res  = await fetch('/api/v1/jobs/dlq', { headers: authHeader });
-      if (!res.ok) throw new Error('no dlq endpoint');
+      const params = new URLSearchParams({ status: 'FAILED', limit: DLQ_LIMIT, offset: page });
+      const res  = await fetch(`/api/v1/jobs?${params}`, { headers: authHeader });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      const jobs = data.jobs || data || [];
-      renderDLQ(jobs);
-    } catch {
-      // Fallback: fetch FAILED jobs with exhausted retries
-      try {
-        const res  = await fetch('/api/v1/jobs?status=FAILED&limit=20', { headers: authHeader });
-        const data = await res.json();
-        const failed = (data.jobs || []).filter(j => j.retry >= j.maxRetry && j.maxRetry > 0);
-        renderDLQ(failed);
-      } catch {
-        if (dlqBody) dlqBody.innerHTML = '<div class="dlq-empty">DLQ unavailable</div>';
-      }
+      const jobs = data.jobs || [];
+      dlqTotal   = data.total || jobs.length;
+      renderDLQ(jobs, page, dlqTotal);
+    } catch (err) {
+      dlqBody.innerHTML = `<div class="dlq-empty">Failed to load: ${escHtml(err.message)}</div>`;
     }
   }
 
-  function renderDLQ(jobs) {
-    const badge  = document.getElementById('dlq-count-badge');
+  function renderDLQ(jobs, page, total) {
+    const badge   = document.getElementById('dlq-count-badge');
     const dlqBody = document.getElementById('dlq-body');
+    const pagEl   = document.getElementById('dlq-pagination');
+    const infoEl  = document.getElementById('dlq-page-info');
+    const prevBtn = document.getElementById('btn-dlq-prev');
+    const nextBtn = document.getElementById('btn-dlq-next');
     if (!dlqBody) return;
 
-    if (badge) badge.textContent = `${jobs.length} job${jobs.length !== 1 ? 's' : ''}`;
+    if (badge) badge.textContent = `${total} job${total !== 1 ? 's' : ''}`;
 
     if (!jobs.length) {
-      dlqBody.innerHTML = '<div class="dlq-empty">✓ Dead letter queue is empty</div>';
+      dlqBody.innerHTML = '<div class="dlq-empty">✓ No failed jobs</div>';
+      if (pagEl) pagEl.style.display = 'none';
       return;
     }
 
     dlqBody.innerHTML = `
-      <div style="border:1px solid var(--border);border-top:none">
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border);background:var(--surface-3)">
-          <span style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-mid);flex:1">Job ID</span>
-          <span style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-mid);width:90px">Type</span>
-          <span style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-mid);flex:1">Reason</span>
-          <span style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-mid);width:50px;text-align:right">Retry</span>
-          <span style="width:70px"></span>
-        </div>
-        ${jobs.map(j => `
-          <div class="dlq-row">
-            <span class="dlq-job-id" title="${escHtml(j.jobId)}">${escHtml(j.jobId)}</span>
-            <span class="dlq-type">${escHtml(j.type || '—')}</span>
-            <span class="dlq-reason">Max retries exceeded</span>
-            <span class="dlq-retries">${j.retry ?? 0}/${j.maxRetry ?? 0}</span>
-            <button class="btn-dlq-row-retry" onclick="window.retryJob('${escHtml(j.jobId)}');fetchDLQ()">↻ Retry</button>
-          </div>`).join('')}
-      </div>`;
-  }
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="padding:8px 14px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-mid);text-align:left;font-weight:500">Job ID</th>
+            <th style="padding:8px 14px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-mid);text-align:left;font-weight:500">Type</th>
+            <th style="padding:8px 14px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-mid);text-align:left;font-weight:500">Retry</th>
+            <th style="padding:8px 14px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-mid);text-align:left;font-weight:500">Failed At</th>
+            <th style="padding:8px 14px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-mid);text-align:right;font-weight:500">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${jobs.map(j => `
+            <tr style="border-bottom:1px solid var(--border)" onmouseover="this.style.background='rgba(245,245,240,0.02)'" onmouseout="this.style.background=''">
+              <td style="padding:11px 14px">
+                <span class="cell-id" title="${escHtml(j.jobId)}">${escHtml(j.jobId)}</span>
+              </td>
+              <td style="padding:11px 14px;font-size:12px;color:var(--gray-light)">${escHtml(j.type || '—')}</td>
+              <td style="padding:11px 14px;font-size:12px;color:var(--status-failed)">${j.retry ?? 0} / ${j.maxRetry ?? 0}</td>
+              <td style="padding:11px 14px;font-size:11px;color:var(--gray-mid)">${fmt(j.updatedAt)}</td>
+              <td style="padding:11px 14px;text-align:right">
+                <button class="btn-dlq-row-retry" onclick="window._dlqRetry('${escHtml(j.jobId)}', this)">↻ Retry</button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
 
-  function bindDLQActions() {
-    const retryAllBtn = document.getElementById('btn-dlq-retry-all');
-    const clearBtn    = document.getElementById('btn-dlq-clear');
-
-    if (retryAllBtn) {
-      retryAllBtn.addEventListener('click', async () => {
-        retryAllBtn.disabled    = true;
-        retryAllBtn.textContent = 'Retrying…';
-        try {
-          const res  = await fetch('/api/v1/jobs?status=FAILED&limit=100', { headers: authHeader });
-          const data = await res.json();
-          const failed = (data.jobs || []).filter(j => j.retry >= j.maxRetry && j.maxRetry > 0);
-          await Promise.all(failed.map(j =>
-            fetch(`/api/v1/jobs/${j.jobId}/retry`, { method: 'POST', headers: authHeader }).catch(() => {})
-          ));
-          showToast(`Retried ${failed.length} DLQ jobs`, 'success');
-          await fetchDLQ();
-        } catch {
-          showToast('Failed to retry DLQ jobs', 'error');
-        } finally {
-          retryAllBtn.disabled    = false;
-          retryAllBtn.textContent = '↻ Retry All';
-        }
-      });
+    // Pagination
+    if (pagEl) pagEl.style.display = 'flex';
+    const from = total === 0 ? 0 : page + 1;
+    const to   = Math.min(page + DLQ_LIMIT, total);
+    if (infoEl) infoEl.textContent = `${from}–${to} of ${total}`;
+    if (prevBtn) {
+      prevBtn.disabled = page <= 0;
+      prevBtn.onclick  = () => fetchDLQ(page - DLQ_LIMIT);
     }
-
-    if (clearBtn) {
-      clearBtn.addEventListener('click', async () => {
-        if (!confirm('Purge all DLQ jobs? This cannot be undone.')) return;
-        showToast('DLQ purge — endpoint not implemented on backend', 'error');
-      });
+    if (nextBtn) {
+      nextBtn.disabled = page + DLQ_LIMIT >= total;
+      nextBtn.onclick  = () => fetchDLQ(page + DLQ_LIMIT);
     }
   }
+
+  window._dlqRetry = async (jobId, btn) => {
+    const orig = btn.textContent;
+    btn.disabled    = true;
+    btn.textContent = '…';
+    try {
+      const res = await fetch(`/api/v1/jobs/${jobId}/retry`, { method: 'POST', headers: authHeader });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      showToast('Job queued for retry', 'success');
+      await fetchDLQ(dlqPage);
+    } catch (err) {
+      showToast(`Retry failed: ${err.message}`, 'error');
+      btn.disabled    = false;
+      btn.textContent = orig;
+    }
+  };
 
   /* ── Workflow visualization ── */
   function renderWorkflowDiagram() {
@@ -1807,14 +1792,14 @@
     if (!svg) return;
 
     const nodes = [
-      { id: 'created',   x: 30,  y: 85, label: 'CREATED',   color: '#f5f5f0' },
-      { id: 'queued',    x: 120, y: 85, label: 'QUEUED',    color: '#f0e6a8' },
-      { id: 'running',   x: 220, y: 85, label: 'RUNNING',   color: '#a8d4f0' },
-      { id: 'completed', x: 330, y: 40, label: 'COMPLETED', color: '#a8f0b8' },
-      { id: 'failed',    x: 330, y: 130, label: 'FAILED',   color: '#f0a8a8' },
-      { id: 'retry',     x: 220, y: 155, label: 'RETRY',    color: '#f0e6a8' },
-      { id: 'cancelled', x: 120, y: 155, label: 'CANCELLED', color: '#777770' },
-      { id: 'scheduled', x: 30,  y: 155, label: 'SCHEDULED', color: '#e0e0da' },
+      { id: 'created',   x: 20,  y: 90, label: 'CREATED',   color: '#f5f5f0' },
+      { id: 'scheduled', x: 140, y: 40, label: 'SCHEDULED', color: '#e0e0da' },
+      { id: 'queued',    x: 260, y: 90, label: 'QUEUED',    color: '#f0e6a8' },
+      { id: 'running',   x: 390, y: 90, label: 'RUNNING',   color: '#a8d4f0' },
+      { id: 'completed', x: 530, y: 40, label: 'COMPLETED', color: '#a8f0b8' },
+      { id: 'failed',    x: 530, y: 140, label: 'FAILED',   color: '#f0a8a8' },
+      { id: 'retry',     x: 390, y: 155, label: 'RETRY',    color: '#f0e6a8' },
+      { id: 'cancelled', x: 260, y: 155, label: 'CANCELLED', color: '#777770' },
     ];
 
     const edges = [
@@ -1914,9 +1899,12 @@
         `${(dispatched / Math.max(0.001, (Date.now() - startTime) / 1000)).toFixed(1)}/s`;
     }
 
-    // Simulate batched dispatch
-    const batchSize  = mode === 'spike' ? count : concurrency;
-    const intervalMs = mode === 'spike' ? 50 : mode === 'backpressure' ? 300 : 120;
+    // Batch config per mode:
+    // spike       — send all jobs at once in one burst
+    // backpressure — 1 job at a time, 500ms apart (stresses queue consumer)
+    // steady       — concurrency jobs per batch, 150ms between batches
+    const batchSize  = mode === 'spike' ? count : mode === 'backpressure' ? 1 : concurrency;
+    const intervalMs = mode === 'spike' ? 0 : mode === 'backpressure' ? 500 : 150;
 
     async function dispatchBatch() {
       if (!loadTestRunning || dispatched >= count) {
@@ -1926,19 +1914,25 @@
 
       const batch = Math.min(batchSize, count - dispatched);
 
-      // Try to actually POST to the jobs API; fall back to simulation
+      // POST to /api/v1/jobs with the correct body shape
+      const appId = getMyAppId();
       const promises = Array.from({ length: batch }, async () => {
         try {
+          const body = {
+            type,
+            payload: JSON.stringify({ to: 'test@mail.com', body: 'Hello', source: 'load_test', index: dispatched, mode }),
+          };
+          if (appId) body.app_id = appId;
+
           const res = await fetch('/api/v1/jobs', {
             method:  'POST',
             headers: { ...authHeader, 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ type, payload: JSON.stringify({ test: true, batch: dispatched }) }),
+            body:    JSON.stringify(body),
           });
-          if (res.ok) accepted++;
-          else        rejected++;
+          if (res.ok) { accepted++; }
+          else        { rejected++; }
         } catch {
-          // Simulate success if API doesn't exist
-          Math.random() > 0.05 ? accepted++ : rejected++;
+          rejected++;
         }
         dispatched++;
       });

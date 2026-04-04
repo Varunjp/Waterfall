@@ -15,3 +15,16 @@ type Job struct {
 	UpdatedAt 	time.Time
 	ScheduledAt time.Time
 }
+
+type JobStats struct {
+	TotalJobs        int32
+    TotalSuccessJobs int32
+    TotalFailedJobs  int32
+}
+
+type MetricBucket struct {
+	TS        string
+	Created   int32
+	Completed int32
+	Failed    int32
+}

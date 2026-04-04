@@ -46,6 +46,18 @@ service JobService {
       };
     }
 
+    rpc GetJobStats(GetJobStatsRequest) returns (GetJobStatsResponse) {
+      option (google.api.http) = {
+          get: "/api/v1/jobs/stats"
+      };
+    }
+
+    rpc GetJobMetrics(GetJobMetricsRequest) returns (GetJobMetricsResponse) {
+      option (google.api.http) = {
+        get: "/api/v1/jobs/metrics"
+      };
+    }
+
     rpc GetJobAdminLogs(GetJobLogsAdminRequest) returns (GetJobLogsResponse);
 
     rpc RetryJob(RetryJobRequest) returns (RetryJobResponse) {
@@ -136,4 +148,29 @@ message RetryJobRequest {
 
 message RetryJobResponse {
   string new_job_id = 1;
+}
+
+message GetJobStatsRequest {}
+
+message GetJobStatsResponse {
+  int32 total_jobs = 1;
+  int32 total_success_jobs = 2;
+  int32 total_failed_jobs = 3;
+}
+
+message GetJobMetricsRequest {
+  google.protobuf.Timestamp from = 1;
+  google.protobuf.Timestamp to = 2;
+  string bucket = 3; // hour, day
+}
+
+message MetricBucket {
+  string ts = 1;
+  int32 created = 2;
+  int32 completed = 3;
+  int32 failed = 4;
+}
+
+message GetJobMetricsResponse {
+  repeated MetricBucket buckets = 1;
 }

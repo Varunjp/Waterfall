@@ -100,6 +100,28 @@ func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,er
 	return job.JobID,nil 
 }
 
+func (uc *DashboardUsecase) GetJobStats(ctx context.Context)(*domain.JobStats,error) {
+	
+	appID,err := middleware.AppIDFromContext(ctx)
+	if err != nil {
+		log.Println(err.Error())
+		return nil,err 
+	}
+
+	return uc.jobs.GetJobStats(ctx,appID)
+}
+
+func (uc *DashboardUsecase) GetJobMetrics(ctx context.Context,from,to time.Time,bucket string)([]domain.MetricBucket,error) {
+
+	appID,err := middleware.AppIDFromContext(ctx)
+	if err != nil {
+		log.Println(err.Error())
+		return nil,err 
+	}
+
+	return uc.jobs.GetJobMetrics(ctx,appID,from,to,bucket)
+}
+
 func isValidTime(t *time.Time) bool {
 	if t == nil {
 		return false

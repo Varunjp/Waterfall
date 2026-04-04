@@ -36,7 +36,7 @@
   }
 
   function fmtMoney(cents) {
-    return (cents / 100).toLocaleString('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:2 });
+    return (cents).toLocaleString('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:2 });
   }
 
   function badge(status) {
