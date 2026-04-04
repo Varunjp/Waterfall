@@ -87,13 +87,19 @@
               <input class="user-field-input" id="pm-name" type="text" placeholder="PRO" />
             </div>
             <div class="user-field-group">
-              <label class="user-field-label" for="pm-price">Price (cents)</label>
-              <input class="user-field-input" id="pm-price" type="number" placeholder="9999" min="0" />
+              <label class="user-field-label" for="pm-price">Price (₹ Rupees)</label>
+              <input class="user-field-input" id="pm-price" type="number" placeholder="999" min="0" />
             </div>
           </div>
-          <div class="user-field-group">
-            <label class="user-field-label" for="pm-limit">Monthly Job Limit</label>
-            <input class="user-field-input" id="pm-limit" type="number" placeholder="10000" min="1" />
+          <div class="field-row">
+            <div class="user-field-group">
+              <label class="user-field-label" for="pm-limit">Monthly Job Limit</label>
+              <input class="user-field-input" id="pm-limit" type="number" placeholder="10000" min="1" />
+            </div>
+            <div class="user-field-group">
+              <label class="user-field-label" for="pm-stripe">Stripe Price ID</label>
+              <input class="user-field-input" id="pm-stripe" type="text" placeholder="price_0soir_9832" />
+            </div>
           </div>
           <p class="user-modal-error" id="plan-modal-error"></p>
         </div>

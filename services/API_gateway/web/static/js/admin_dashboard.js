@@ -341,9 +341,10 @@
     const plan = planId ? allPlans.find(p => p.planId === planId) : null;
     $('plan-modal-tag').textContent   = plan ? 'Edit Plan' : 'New Plan';
     $('plan-modal-title').textContent = plan ? plan.planName : 'CREATE';
-    $('pm-name').value   = plan?.planName    || '';
-    $('pm-price').value  = plan?.planprice   || '';
-    $('pm-limit').value  = plan?.monthlyLimit|| '';
+    $('pm-name').value   = plan?.planName      || '';
+    $('pm-price').value  = plan?.planprice     || '';
+    $('pm-limit').value  = plan?.monthlyLimit  || '';
+    $('pm-stripe').value = plan?.stripePriceId || plan?.stripePriceID || '';
     $('plan-modal-error').textContent = '';
     $('plan-modal-overlay').dataset.planId = planId || '';
     $('plan-modal-overlay').classList.add('open');
@@ -353,20 +354,29 @@
   $('plan-modal-overlay').addEventListener('click', e => { if(e.target===$('plan-modal-overlay')) closePlanModal(); });
 
   $('plan-modal-save').addEventListener('click', async () => {
-    const planId = $('plan-modal-overlay').dataset.planId;
-    const body   = { planName: $('pm-name').value.trim(), planprice: Number($('pm-price').value), monthlyLimit: Number($('pm-limit').value) };
-    const errEl  = $('plan-modal-error');
-    const btn    = $('plan-modal-save');
+    const planId   = $('plan-modal-overlay').dataset.planId;
+    const errEl    = $('plan-modal-error');
+    const btn      = $('plan-modal-save');
     errEl.textContent = '';
 
-    if (!body.planName) { errEl.textContent = 'Plan name is required.'; return; }
-    if (!body.planprice || body.planprice < 0) { errEl.textContent = 'Valid price required.'; return; }
-    if (!body.monthlyLimit || body.monthlyLimit < 1) { errEl.textContent = 'Job limit must be ≥ 1.'; return; }
+    // Build body with only non-empty fields
+    const body = {};
+    const nameVal   = $('pm-name').value.trim();
+    const priceVal  = $('pm-price').value.trim();
+    const limitVal  = $('pm-limit').value.trim();
+    const stripeVal = $('pm-stripe').value.trim();
+
+    if (nameVal)   body.name          = nameVal;
+    if (priceVal)  body.price         = Number(priceVal);
+    if (limitVal)  body.jobLimit      = Number(limitVal);
+    if (stripeVal) body.stripePriceID = stripeVal;
+
+    if (!Object.keys(body).length) { errEl.textContent = 'Enter at least one field to update.'; return; }
 
     btn.disabled = true; btn.textContent = 'Saving…';
     try {
       const url    = planId ? `/api/v1/admin/plans/${planId}` : '/api/v1/admin/plans';
-      const method = planId ? 'PUT' : 'POST';
+      const method = 'PUT';
       const res    = await fetch(url, { method, headers: H, body: JSON.stringify(body) });
       const data   = await res.json().catch(()=>({}));
       if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
