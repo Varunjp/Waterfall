@@ -67,6 +67,7 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 	if err != nil {
 		panic(err)
 	}
+
 	billingProxy := NewReverseProxy(cfg.BillingServiceURL)
 
 	r := gin.New()

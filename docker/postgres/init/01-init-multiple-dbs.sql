@@ -1,0 +1,1 @@
+CREATE DATABASE waterfall_admins;

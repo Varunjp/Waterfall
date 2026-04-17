@@ -20,16 +20,11 @@ import (
 
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
-
-	"github.com/joho/godotenv"
 )
 
 // need to add redis for checking last poll time in case of failure
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("no .env file found, using system envs")
-	}
 
 	cfg := config.Load()
 	validateConfig(cfg)

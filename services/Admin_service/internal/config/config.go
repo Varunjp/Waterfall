@@ -4,85 +4,88 @@ import (
 	"admin_service/internal/domain/entities"
 	"admin_service/internal/infrastructure/security"
 	repo "admin_service/internal/repository/interfaces"
+	"database/sql"
 	"strconv"
 	"strings"
 )
 
 type Config struct {
-	GrpcPort string
-	HTTPPort string 
-	DBUrl    string
-	JWTKey   string
-	RedisAddr string 
-	RedisPassword string 
-	RedisDB  int 
-	SmtpHost string 
-	SmtpPort string 
-	SmtpUser string 
-	Smtppass string 
-	Stripe stripeConfig 
+	GrpcPort      string
+	HTTPPort      string
+	DBUrl         string
+	JWTKey        string
+	RedisAddr     string
+	RedisPassword string
+	RedisDB       int
+	SmtpHost      string
+	SmtpPort      string
+	SmtpUser      string
+	Smtppass      string
+	Stripe        stripeConfig
 }
 
 type stripeConfig struct {
-	WebhookSecret string 
-	SecretKey 	  string 
-	SuccessURL    string 
-	CancelURL 	  string
+	WebhookSecret string
+	SecretKey     string
+	SuccessURL    string
+	CancelURL     string
 }
 
 func Load() *Config {
 	redisDB, _ := strconv.Atoi(GetEnv("REDIS_DB", "0"))
 	return &Config{
 		GrpcPort: GetEnv("GRPC_PORT", "50051"),
-		HTTPPort: GetEnv("HTTP_PORT",""),
+		HTTPPort: GetEnv("HTTP_PORT", ""),
 		DBUrl: "postgres://" +
 			GetEnv("DB_USER", "") + ":" +
 			GetEnv("DB_PASSWORD", "") + "@" +
 			GetEnv("DB_HOST", "") + ":" +
 			GetEnv("DB_PORT", "") + "/" +
 			GetEnv("DB_NAME", "") + "?sslmode=disable",
-		JWTKey: GetEnv("JWT_SECRET", ""),
-		RedisAddr: GetEnv("REDIS_ADDR",""),
-		RedisPassword: GetEnv("REDIS_PASSWORD",""),
-		RedisDB: redisDB,
-		SmtpHost: GetEnv("SMTP_HOST",""),
-		SmtpPort: GetEnv("SMTP_PORT",""),
-		SmtpUser: GetEnv("SMTP_USER",""),
-		Smtppass: GetEnv("SMTP_PASS",""),
+		JWTKey:        GetEnv("JWT_SECRET", ""),
+		RedisAddr:     GetEnv("REDIS_ADDR", ""),
+		RedisPassword: GetEnv("REDIS_PASSWORD", ""),
+		RedisDB:       redisDB,
+		SmtpHost:      GetEnv("SMTP_HOST", ""),
+		SmtpPort:      GetEnv("SMTP_PORT", ""),
+		SmtpUser:      GetEnv("SMTP_USER", ""),
+		Smtppass:      GetEnv("SMTP_PASS", ""),
 		Stripe: stripeConfig{
-			WebhookSecret: GetEnv("STRIPE_WEBHOOK_SECRET",""),
-			SecretKey: GetEnv("STRIPE_SECRET_KEY",""),
-			SuccessURL: GetEnv("STRIPE_SUCCESS_URL",""),
-			CancelURL: GetEnv("STRIPE_CANCEL_URL",""),
+			WebhookSecret: GetEnv("STRIPE_WEBHOOK_SECRET", ""),
+			SecretKey:     GetEnv("STRIPE_SECRET_KEY", ""),
+			SuccessURL:    GetEnv("STRIPE_SUCCESS_URL", ""),
+			CancelURL:     GetEnv("STRIPE_CANCEL_URL", ""),
 		},
 	}
 }
 
 func BootstrapAdmin(db repo.AdminRepository) error {
 
-	email := GetEnv("PLATFORM_ADMIN_EMAIL","")
-	pass := GetEnv("PLATFORM_ADMIN_PASSWORD","")
+	email := GetEnv("PLATFORM_ADMIN_EMAIL", "")
+	pass := GetEnv("PLATFORM_ADMIN_PASSWORD", "")
 
 	email = strings.ToLower(strings.TrimSpace(email))
 
-	existing,err := db.FindByEmail(email)
+	existing, err := db.FindByEmail(email)
 	if err != nil {
-		return err 
+		if err != sql.ErrNoRows {
+			return err
+		}
 	}
 
 	if existing != nil {
-		return nil 
+		return nil
 	}
 
-	hash,err := security.Hash(pass)
+	hash, err := security.Hash(pass)
 	if err != nil {
-		return err 
+		return err
 	}
 
 	admin := &entities.PlatformAdmin{
-		Email: email,
+		Email:        email,
 		PasswordHash: hash,
-		Status: "active",
+		Status:       "active",
 	}
 
 	return db.Create(admin)

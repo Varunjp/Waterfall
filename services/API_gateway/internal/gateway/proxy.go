@@ -1,20 +1,32 @@
 package gateway
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 )
 
 func NewReverseProxy(target string) *httputil.ReverseProxy {
-	url,_ := url.Parse(target)
+	if target == "" {
+		panic("reverse proxy target is empty")
+	}
 
-	proxy := httputil.NewSingleHostReverseProxy(url)
+	if !strings.Contains(target, "://") {
+		target = "http://" + target
+	}
 
+	targetURL, err := url.Parse(target)
+	if err != nil {
+		panic(fmt.Sprintf("invalid reverse proxy target %q: %v", target, err))
+	}
+
+	proxy := httputil.NewSingleHostReverseProxy(targetURL)
+	originalDirector := proxy.Director
 	proxy.Director = func(req *http.Request) {
-		req.URL.Scheme = url.Scheme
-		req.URL.Host = url.Host
-		req.Host = url.Host
+		originalDirector(req)
+		req.Host = targetURL.Host
 	}
 
 	return proxy

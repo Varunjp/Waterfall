@@ -11,16 +11,10 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
 	
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("failed to load env")
-	}
-
 	cfg := config.Load()
 
 	ctx,cancel := context.WithCancel(context.Background())

@@ -3,6 +3,8 @@ package config
 import (
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -24,6 +26,8 @@ type Config struct {
 }
 
 func Load() *Config {
+	_ = godotenv.Load()
+	
 	pollInterval := 20
 	if value := os.Getenv("WATCHER_POLL_INTERVAL_SECONDS"); value != "" {
 		if parsed, err := strconv.Atoi(value); err == nil && parsed > 0 {

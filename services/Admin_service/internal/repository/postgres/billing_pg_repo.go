@@ -199,7 +199,7 @@ func (r *BillingPGRepo) BlockAppBilling(
 	return err
 }
 
-func (r *BillingPGRepo)GetSubscription(ctx context.Context,appID string)(*entities.Subscription,error) {
+func (r *BillingPGRepo) GetSubscription(ctx context.Context, appID string) (*entities.Subscription, error) {
 
 	query := `
 		SELECT app_id,plan_id,status,current_period_start,current_period_end,created_at
@@ -211,26 +211,33 @@ func (r *BillingPGRepo)GetSubscription(ctx context.Context,appID string)(*entiti
 		ctx,
 		query,
 		appID,
-	).Scan(&s.AppID,&s.PlanID,&s.Status,&s.CurrentPeriodStart,&s.CurrentPeriodEnd,&s.CreatedAt)
+	).Scan(&s.AppID, &s.PlanID, &s.Status, &s.CurrentPeriodStart, &s.CurrentPeriodEnd, &s.CreatedAt)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
 	pquery := `SELECT name,monthly_job_limit FROM plans WHERE plan_id=$1;`
 
-	err = r.db.QueryRowContext(ctx,pquery,s.PlanID).Scan(&s.PlanName,&s.PlanLimit)
+	err = r.db.QueryRowContext(ctx, pquery, s.PlanID).Scan(&s.PlanName, &s.PlanLimit)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	mquery := `SELECT jobs_executed FROM usage_monthly WHERE app_id = $1 AND month = date_trunc('month', CURRENT_DATE);`
-	err = r.db.QueryRowContext(ctx,mquery,s.AppID).Scan(&s.CurrentLimit)
+	mquery := `
+		SELECT COALESCE((
+			SELECT jobs_executed
+			FROM usage_monthly
+			WHERE app_id = $1
+			AND month = date_trunc('month', CURRENT_DATE)
+		), 0)
+	`
+	err = r.db.QueryRowContext(ctx, mquery, s.AppID).Scan(&s.CurrentLimit)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	return &s,nil 
+	return &s, nil
 }

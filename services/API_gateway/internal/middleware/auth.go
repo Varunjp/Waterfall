@@ -20,6 +20,7 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 		"/api/v1/apps": true,
 		"/billing/webhook":true,
 		"/billing/checkout":true,
+		// "/billing/subscription":true,
 		"/":true,
 		"/login":true,
 		"/payment-success":true,
@@ -58,6 +59,7 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
 			return
 		}
+
 		c.Set("user", claims)
 		c.Next()
 	}

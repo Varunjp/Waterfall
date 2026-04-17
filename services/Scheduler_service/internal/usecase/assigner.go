@@ -51,6 +51,7 @@ func (a *Assigner) Assign(ctx context.Context, job domain.Job) error {
 	if limit == 0 {
 		return ErrQuotaExceeded
 	}
+
 	stream := fmt.Sprintf("stream:jobs:%s:%s", job.AppID, job.Type)
 	group := fmt.Sprintf("workers:%s:%s", job.AppID, job.Type)
 
