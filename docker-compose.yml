@@ -1,6 +1,24 @@
-version: "3.9"
+# version: "3.9"
 
 services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass123
+      POSTGRES_DB: jobs_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   redis:
     image: redis:7
     ports:
@@ -25,6 +43,130 @@ services:
       - --kafka-addr
       - PLAINTEXT://0.0.0.0:9092
       - --advertise-kafka-addr
-      - PLAINTEXT://localhost:9092
+      - PLAINTEXT://redpanda:9092
     ports:
       - "9092:9092"
+
+  migrate_jobs:
+    image: migrate/migrate
+    container_name: migrate_jobs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/Job_Service/migrations:/migrations
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://postgres:pass123@postgres:5432/jobs_db?sslmode=disable",
+        "up",
+      ]
+
+  migrate_admin:
+    image: migrate/migrate
+    container_name: migrate_admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/Admin_service/migrations:/migrations
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://postgres:pass123@postgres:5432/waterfall_admins?sslmode=disable",
+        "up",
+      ]
+
+  admin_service:
+    build: ./services/Admin_service
+    container_name: admin_service
+    ports:
+      - "8080:8080"
+      - "50054:50054"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      migrate_admin:
+        condition: service_completed_successfully
+    env_file:
+      - ./services/Admin_service/.env
+
+  job_service:
+    build: ./services/Job_Service
+    container_name: job_service
+    ports:
+      - "50051:50051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      redpanda:
+        condition: service_started
+      migrate_jobs:
+        condition: service_completed_successfully
+      migrate_admin:
+        condition: service_completed_successfully
+    env_file:
+      - ./services/Job_Service/.env
+
+  scheduler_service:
+    build: ./services/Scheduler_service
+    container_name: scheduler_service
+    ports:
+      - "50052:50052"
+      - "9100:9100"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      redpanda:
+        condition: service_started
+    env_file:
+      - ./services/Scheduler_service/.env
+
+  watcher_service:
+    build: ./services/Watcher_service
+    container_name: watcher_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_started
+      scheduler_service:
+        condition: service_started
+      migrate_jobs:
+        condition: service_completed_successfully
+      migrate_admin:
+        condition: service_completed_successfully
+    env_file:
+      - ./services/Watcher_service/.env
+
+  api_gateway:
+    build:
+      context: ./services/API_gateway
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    ports:
+      - "8081:8081"
+    depends_on:
+      admin_service:
+        condition: service_started
+      job_service:
+        condition: service_started
+      scheduler_service:
+        condition: service_started
+      redis:
+        condition: service_started
+    env_file:
+      - ./services/API_gateway/.env
+
+volumes:
+  postgres_data:

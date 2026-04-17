@@ -847,6 +847,274 @@ func (x *RetryJobResponse) GetNewJobId() string {
 	return ""
 }
 
+type GetJobStatsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetJobStatsRequest) Reset() {
+	*x = GetJobStatsRequest{}
+	mi := &file_proto_job_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetJobStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetJobStatsRequest) ProtoMessage() {}
+
+func (x *GetJobStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_job_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetJobStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetJobStatsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_job_proto_rawDescGZIP(), []int{14}
+}
+
+type GetJobStatsResponse struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	TotalJobs        int32                  `protobuf:"varint,1,opt,name=total_jobs,json=totalJobs,proto3" json:"total_jobs,omitempty"`
+	TotalSuccessJobs int32                  `protobuf:"varint,2,opt,name=total_success_jobs,json=totalSuccessJobs,proto3" json:"total_success_jobs,omitempty"`
+	TotalFailedJobs  int32                  `protobuf:"varint,3,opt,name=total_failed_jobs,json=totalFailedJobs,proto3" json:"total_failed_jobs,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *GetJobStatsResponse) Reset() {
+	*x = GetJobStatsResponse{}
+	mi := &file_proto_job_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetJobStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetJobStatsResponse) ProtoMessage() {}
+
+func (x *GetJobStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_job_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetJobStatsResponse.ProtoReflect.Descriptor instead.
+func (*GetJobStatsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_job_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetJobStatsResponse) GetTotalJobs() int32 {
+	if x != nil {
+		return x.TotalJobs
+	}
+	return 0
+}
+
+func (x *GetJobStatsResponse) GetTotalSuccessJobs() int32 {
+	if x != nil {
+		return x.TotalSuccessJobs
+	}
+	return 0
+}
+
+func (x *GetJobStatsResponse) GetTotalFailedJobs() int32 {
+	if x != nil {
+		return x.TotalFailedJobs
+	}
+	return 0
+}
+
+type GetJobMetricsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	From          *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
+	To            *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
+	Bucket        string                 `protobuf:"bytes,3,opt,name=bucket,proto3" json:"bucket,omitempty"` // hour, day
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetJobMetricsRequest) Reset() {
+	*x = GetJobMetricsRequest{}
+	mi := &file_proto_job_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetJobMetricsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetJobMetricsRequest) ProtoMessage() {}
+
+func (x *GetJobMetricsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_job_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetJobMetricsRequest.ProtoReflect.Descriptor instead.
+func (*GetJobMetricsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_job_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetJobMetricsRequest) GetFrom() *timestamppb.Timestamp {
+	if x != nil {
+		return x.From
+	}
+	return nil
+}
+
+func (x *GetJobMetricsRequest) GetTo() *timestamppb.Timestamp {
+	if x != nil {
+		return x.To
+	}
+	return nil
+}
+
+func (x *GetJobMetricsRequest) GetBucket() string {
+	if x != nil {
+		return x.Bucket
+	}
+	return ""
+}
+
+type MetricBucket struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ts            string                 `protobuf:"bytes,1,opt,name=ts,proto3" json:"ts,omitempty"`
+	Created       int32                  `protobuf:"varint,2,opt,name=created,proto3" json:"created,omitempty"`
+	Completed     int32                  `protobuf:"varint,3,opt,name=completed,proto3" json:"completed,omitempty"`
+	Failed        int32                  `protobuf:"varint,4,opt,name=failed,proto3" json:"failed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MetricBucket) Reset() {
+	*x = MetricBucket{}
+	mi := &file_proto_job_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MetricBucket) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MetricBucket) ProtoMessage() {}
+
+func (x *MetricBucket) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_job_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MetricBucket.ProtoReflect.Descriptor instead.
+func (*MetricBucket) Descriptor() ([]byte, []int) {
+	return file_proto_job_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *MetricBucket) GetTs() string {
+	if x != nil {
+		return x.Ts
+	}
+	return ""
+}
+
+func (x *MetricBucket) GetCreated() int32 {
+	if x != nil {
+		return x.Created
+	}
+	return 0
+}
+
+func (x *MetricBucket) GetCompleted() int32 {
+	if x != nil {
+		return x.Completed
+	}
+	return 0
+}
+
+func (x *MetricBucket) GetFailed() int32 {
+	if x != nil {
+		return x.Failed
+	}
+	return 0
+}
+
+type GetJobMetricsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Buckets       []*MetricBucket        `protobuf:"bytes,1,rep,name=buckets,proto3" json:"buckets,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetJobMetricsResponse) Reset() {
+	*x = GetJobMetricsResponse{}
+	mi := &file_proto_job_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetJobMetricsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetJobMetricsResponse) ProtoMessage() {}
+
+func (x *GetJobMetricsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_job_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetJobMetricsResponse.ProtoReflect.Descriptor instead.
+func (*GetJobMetricsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_job_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetJobMetricsResponse) GetBuckets() []*MetricBucket {
+	if x != nil {
+		return x.Buckets
+	}
+	return nil
+}
+
 var File_proto_job_proto protoreflect.FileDescriptor
 
 const file_proto_job_proto_rawDesc = "" +
@@ -912,7 +1180,24 @@ const file_proto_job_proto_rawDesc = "" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"0\n" +
 	"\x10RetryJobResponse\x12\x1c\n" +
 	"\n" +
-	"new_job_id\x18\x01 \x01(\tR\bnewJobId2\xc6\x05\n" +
+	"new_job_id\x18\x01 \x01(\tR\bnewJobId\"\x14\n" +
+	"\x12GetJobStatsRequest\"\x8e\x01\n" +
+	"\x13GetJobStatsResponse\x12\x1d\n" +
+	"\n" +
+	"total_jobs\x18\x01 \x01(\x05R\ttotalJobs\x12,\n" +
+	"\x12total_success_jobs\x18\x02 \x01(\x05R\x10totalSuccessJobs\x12*\n" +
+	"\x11total_failed_jobs\x18\x03 \x01(\x05R\x0ftotalFailedJobs\"\x8a\x01\n" +
+	"\x14GetJobMetricsRequest\x12.\n" +
+	"\x04from\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x04from\x12*\n" +
+	"\x02to\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x02to\x12\x16\n" +
+	"\x06bucket\x18\x03 \x01(\tR\x06bucket\"n\n" +
+	"\fMetricBucket\x12\x0e\n" +
+	"\x02ts\x18\x01 \x01(\tR\x02ts\x12\x18\n" +
+	"\acreated\x18\x02 \x01(\x05R\acreated\x12\x1c\n" +
+	"\tcompleted\x18\x03 \x01(\x05R\tcompleted\x12\x16\n" +
+	"\x06failed\x18\x04 \x01(\x05R\x06failed\"D\n" +
+	"\x15GetJobMetricsResponse\x12+\n" +
+	"\abuckets\x18\x01 \x03(\v2\x11.job.MetricBucketR\abuckets2\x8a\a\n" +
 	"\n" +
 	"JobService\x12M\n" +
 	"\tCreateJob\x12\x15.job.CreateJobRequest\x1a\x10.job.JobResponse\"\x17\x82\xd3\xe4\x93\x02\x11:\x01*\"\f/api/v1/jobs\x12V\n" +
@@ -921,7 +1206,9 @@ const file_proto_job_proto_rawDesc = "" +
 	"\bListJobs\x12\x14.job.ListJobsRequest\x1a\x15.job.ListJobsResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\f/api/v1/jobs\x12`\n" +
 	"\x0eListFailedJobs\x12\x1a.job.ListFailedJobsRequest\x1a\x15.job.ListJobsResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/jobs/failed\x12a\n" +
 	"\n" +
-	"GetJobLogs\x12\x16.job.GetJobLogsRequest\x1a\x17.job.GetJobLogsResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/jobs/{job_id}/logs\x12G\n" +
+	"GetJobLogs\x12\x16.job.GetJobLogsRequest\x1a\x17.job.GetJobLogsResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/jobs/{job_id}/logs\x12\\\n" +
+	"\vGetJobStats\x12\x17.job.GetJobStatsRequest\x1a\x18.job.GetJobStatsResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/jobs/stats\x12d\n" +
+	"\rGetJobMetrics\x12\x19.job.GetJobMetricsRequest\x1a\x1a.job.GetJobMetricsResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/jobs/metrics\x12G\n" +
 	"\x0fGetJobAdminLogs\x12\x1b.job.GetJobLogsAdminRequest\x1a\x17.job.GetJobLogsResponse\x12_\n" +
 	"\bRetryJob\x12\x14.job.RetryJobRequest\x1a\x15.job.RetryJobResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/jobs/{job_id}/retryB\x16Z\x14internal/proto/jobpbb\x06proto3"
 
@@ -937,7 +1224,7 @@ func file_proto_job_proto_rawDescGZIP() []byte {
 	return file_proto_job_proto_rawDescData
 }
 
-var file_proto_job_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_proto_job_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_proto_job_proto_goTypes = []any{
 	(*CreateJobRequest)(nil),       // 0: job.CreateJobRequest
 	(*UpdateJobRequest)(nil),       // 1: job.UpdateJobRequest
@@ -953,36 +1240,48 @@ var file_proto_job_proto_goTypes = []any{
 	(*GetJobLogsResponse)(nil),     // 11: job.GetJobLogsResponse
 	(*RetryJobRequest)(nil),        // 12: job.RetryJobRequest
 	(*RetryJobResponse)(nil),       // 13: job.RetryJobResponse
-	(*timestamppb.Timestamp)(nil),  // 14: google.protobuf.Timestamp
+	(*GetJobStatsRequest)(nil),     // 14: job.GetJobStatsRequest
+	(*GetJobStatsResponse)(nil),    // 15: job.GetJobStatsResponse
+	(*GetJobMetricsRequest)(nil),   // 16: job.GetJobMetricsRequest
+	(*MetricBucket)(nil),           // 17: job.MetricBucket
+	(*GetJobMetricsResponse)(nil),  // 18: job.GetJobMetricsResponse
+	(*timestamppb.Timestamp)(nil),  // 19: google.protobuf.Timestamp
 }
 var file_proto_job_proto_depIdxs = []int32{
-	14, // 0: job.CreateJobRequest.schedule_at:type_name -> google.protobuf.Timestamp
-	14, // 1: job.UpdateJobRequest.schedule_at:type_name -> google.protobuf.Timestamp
-	14, // 2: job.ListJobsRequest.startDate:type_name -> google.protobuf.Timestamp
-	14, // 3: job.ListJobsRequest.endDate:type_name -> google.protobuf.Timestamp
+	19, // 0: job.CreateJobRequest.schedule_at:type_name -> google.protobuf.Timestamp
+	19, // 1: job.UpdateJobRequest.schedule_at:type_name -> google.protobuf.Timestamp
+	19, // 2: job.ListJobsRequest.startDate:type_name -> google.protobuf.Timestamp
+	19, // 3: job.ListJobsRequest.endDate:type_name -> google.protobuf.Timestamp
 	6,  // 4: job.ListJobsResponse.jobs:type_name -> job.Job
 	10, // 5: job.GetJobLogsResponse.logs:type_name -> job.JobLog
-	0,  // 6: job.JobService.CreateJob:input_type -> job.CreateJobRequest
-	1,  // 7: job.JobService.UpdateJob:input_type -> job.UpdateJobRequest
-	2,  // 8: job.JobService.CancelJob:input_type -> job.CancelJobRequest
-	4,  // 9: job.JobService.ListJobs:input_type -> job.ListJobsRequest
-	5,  // 10: job.JobService.ListFailedJobs:input_type -> job.ListFailedJobsRequest
-	8,  // 11: job.JobService.GetJobLogs:input_type -> job.GetJobLogsRequest
-	9,  // 12: job.JobService.GetJobAdminLogs:input_type -> job.GetJobLogsAdminRequest
-	12, // 13: job.JobService.RetryJob:input_type -> job.RetryJobRequest
-	3,  // 14: job.JobService.CreateJob:output_type -> job.JobResponse
-	3,  // 15: job.JobService.UpdateJob:output_type -> job.JobResponse
-	3,  // 16: job.JobService.CancelJob:output_type -> job.JobResponse
-	7,  // 17: job.JobService.ListJobs:output_type -> job.ListJobsResponse
-	7,  // 18: job.JobService.ListFailedJobs:output_type -> job.ListJobsResponse
-	11, // 19: job.JobService.GetJobLogs:output_type -> job.GetJobLogsResponse
-	11, // 20: job.JobService.GetJobAdminLogs:output_type -> job.GetJobLogsResponse
-	13, // 21: job.JobService.RetryJob:output_type -> job.RetryJobResponse
-	14, // [14:22] is the sub-list for method output_type
-	6,  // [6:14] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	19, // 6: job.GetJobMetricsRequest.from:type_name -> google.protobuf.Timestamp
+	19, // 7: job.GetJobMetricsRequest.to:type_name -> google.protobuf.Timestamp
+	17, // 8: job.GetJobMetricsResponse.buckets:type_name -> job.MetricBucket
+	0,  // 9: job.JobService.CreateJob:input_type -> job.CreateJobRequest
+	1,  // 10: job.JobService.UpdateJob:input_type -> job.UpdateJobRequest
+	2,  // 11: job.JobService.CancelJob:input_type -> job.CancelJobRequest
+	4,  // 12: job.JobService.ListJobs:input_type -> job.ListJobsRequest
+	5,  // 13: job.JobService.ListFailedJobs:input_type -> job.ListFailedJobsRequest
+	8,  // 14: job.JobService.GetJobLogs:input_type -> job.GetJobLogsRequest
+	14, // 15: job.JobService.GetJobStats:input_type -> job.GetJobStatsRequest
+	16, // 16: job.JobService.GetJobMetrics:input_type -> job.GetJobMetricsRequest
+	9,  // 17: job.JobService.GetJobAdminLogs:input_type -> job.GetJobLogsAdminRequest
+	12, // 18: job.JobService.RetryJob:input_type -> job.RetryJobRequest
+	3,  // 19: job.JobService.CreateJob:output_type -> job.JobResponse
+	3,  // 20: job.JobService.UpdateJob:output_type -> job.JobResponse
+	3,  // 21: job.JobService.CancelJob:output_type -> job.JobResponse
+	7,  // 22: job.JobService.ListJobs:output_type -> job.ListJobsResponse
+	7,  // 23: job.JobService.ListFailedJobs:output_type -> job.ListJobsResponse
+	11, // 24: job.JobService.GetJobLogs:output_type -> job.GetJobLogsResponse
+	15, // 25: job.JobService.GetJobStats:output_type -> job.GetJobStatsResponse
+	18, // 26: job.JobService.GetJobMetrics:output_type -> job.GetJobMetricsResponse
+	11, // 27: job.JobService.GetJobAdminLogs:output_type -> job.GetJobLogsResponse
+	13, // 28: job.JobService.RetryJob:output_type -> job.RetryJobResponse
+	19, // [19:29] is the sub-list for method output_type
+	9,  // [9:19] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_proto_job_proto_init() }
@@ -996,7 +1295,7 @@ func file_proto_job_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_job_proto_rawDesc), len(file_proto_job_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

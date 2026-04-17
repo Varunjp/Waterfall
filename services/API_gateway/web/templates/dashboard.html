@@ -49,6 +49,15 @@
           Plans
         </button>
 
+        <button class="nav-btn" data-section="monitor">
+          <!-- icon: activity -->
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="1 9 4 5 7 8 10 3 13 6 15 4"/>
+            <line x1="1" y1="14" x2="15" y2="14"/>
+          </svg>
+          Monitor
+        </button>
+
         <button class="nav-btn" data-section="users">
           <!-- icon: users -->
           <svg
@@ -79,6 +88,8 @@
           </svg>
           Subscription
         </button>
+
+
       </nav>
 
       <div class="sidebar-footer">
@@ -445,6 +456,26 @@
           <button class="btn-modal-close" onclick="closeCreateUserModal()">
             Cancel
           </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <!-- ── Workflow Visualization Modal ─────────── -->
+    <div class="modal-overlay" id="workflow-modal-overlay">
+      <div class="modal modal--wide" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <p class="modal-tag">Job Pipeline</p>
+            <h3>WORKFLOW</h3>
+          </div>
+          <button class="btn-close" onclick="closeWorkflowModal()" aria-label="Close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="workflow-viz-container"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-close" onclick="closeWorkflowModal()">Close</button>
         </div>
       </div>
     </div>

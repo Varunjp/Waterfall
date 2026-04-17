@@ -133,6 +133,42 @@ func (h *JobHandler) RetryJob(ctx context.Context, req *jobpb.RetryJobRequest)(*
 	return &jobpb.RetryJobResponse{NewJobId: id},nil 
 }
 
+func (h *JobHandler) GetJobStats(ctx context.Context,req *jobpb.GetJobStatsRequest)(*jobpb.GetJobStatsResponse,error) {
+
+	stats,err := h.dc.GetJobStats(ctx)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return &jobpb.GetJobStatsResponse{
+		TotalJobs: stats.TotalJobs,
+		TotalSuccessJobs: stats.TotalSuccessJobs,
+		TotalFailedJobs: stats.TotalFailedJobs,
+	},nil 
+}
+
+func (h *JobHandler) GetJobMetrics(ctx context.Context,req *jobpb.GetJobMetricsRequest)(*jobpb.GetJobMetricsResponse,error) {
+	data ,err := h.dc.GetJobMetrics(ctx,req.From.AsTime(),req.To.AsTime(),req.Bucket)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	resp := &jobpb.GetJobMetricsResponse{}
+
+	for _,item := range data {
+		resp.Buckets = append(resp.Buckets, &jobpb.MetricBucket{
+			Ts: item.TS,
+			Created: item.Created,
+			Completed: item.Completed,
+			Failed: item.Failed,
+		})
+	}
+
+	return resp,nil 
+}
+
 func mapJobs(jobs []domain.Job,total,limit,offset int) *jobpb.ListJobsResponse {
 	resp := &jobpb.ListJobsResponse{}
 	for _, j := range jobs {

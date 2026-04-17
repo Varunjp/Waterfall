@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 	"worker_service/internal/domain"
 	"worker_service/internal/executor"
@@ -16,27 +17,55 @@ import (
 )
 
 type Runner struct {
-	redis    *redis.Client
-	grpc     GRPC
-	appID    string
-	workerID string
-	jobTypes []string
+	redis             *redis.Client
+	grpc              GRPC
+	appID             string
+	workerID          string
+	jobTypes          []string
+	maxConcurrency    int
+	heartbeatInterval time.Duration
+	activeJobs        int32
 }
 
 type GRPC interface {
 	Heartbeat(ctx context.Context, jobID, appID, workerID string, progress int64)
-	ReportResult(ctx context.Context, jobID, appID, workerID string, success bool, errMsg string, retry int,manual_retry int)
+	ReportResult(ctx context.Context, jobID, appID, workerID string, success bool, errMsg string, retry int, manual_retry int)
+	RegisterWorker(ctx context.Context, appID, workerID string, jobTypes []string, maxConcurrency int)
+	WorkerHeartbeat(ctx context.Context, appID, workerID string, jobTypes []string, activeJobs int, maxConcurrency int)
+	UnregisterWorker(ctx context.Context, appID, workerID string)
 }
 
-func NewRunner(redis *redis.Client, grpc GRPC, appID, workerID string, jobTypes []string) *Runner {
-	return &Runner{redis: redis, grpc: grpc, appID: appID, workerID: workerID, jobTypes: jobTypes}
+func NewRunner(
+	redis *redis.Client,
+	grpc GRPC,
+	appID, workerID string,
+	jobTypes []string,
+	maxConcurrency int,
+	heartbeatInterval time.Duration,
+) *Runner {
+	return &Runner{
+		redis:             redis,
+		grpc:              grpc,
+		appID:             appID,
+		workerID:          workerID,
+		jobTypes:          jobTypes,
+		maxConcurrency:    maxConcurrency,
+		heartbeatInterval: heartbeatInterval,
+	}
 }
 
 func (r *Runner) Run(ctx context.Context) {
+	r.grpc.RegisterWorker(ctx, r.appID, r.workerID, r.jobTypes, r.maxConcurrency)
+	go r.workerHeartbeatLoop(ctx)
+
 	for _, jobType := range r.jobTypes {
 		go r.consume(ctx, jobType)
 	}
 	<-ctx.Done()
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	r.grpc.UnregisterWorker(shutdownCtx, r.appID, r.workerID)
 }
 
 func (r *Runner) consume(ctx context.Context, jobType string) {
@@ -88,6 +117,8 @@ func (r *Runner) read(ctx context.Context, stream, group, id string) {
 func (r *Runner) handleJob(ctx context.Context, stream, group, msgID string, job *domain.Job) {
 	hbCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
+	atomic.AddInt32(&r.activeJobs, 1)
+	defer atomic.AddInt32(&r.activeJobs, -1)
 
 	r.grpc.Heartbeat(hbCtx, job.JobID, r.appID, r.workerID, 0)
 
@@ -107,12 +138,33 @@ func (r *Runner) handleJob(ctx context.Context, stream, group, msgID string, job
 	err := executor.Execute(ctx, job.Payload)
 
 	if err != nil {
-		r.grpc.ReportResult(ctx, job.JobID, r.appID, r.workerID, false, err.Error(), job.Retry,job.ManualRetry)
+		r.grpc.ReportResult(ctx, job.JobID, r.appID, r.workerID, false, err.Error(), job.Retry, job.ManualRetry)
 	} else {
-		r.grpc.ReportResult(ctx, job.JobID, r.appID, r.workerID, true, "", job.Retry,job.ManualRetry)
+		r.grpc.ReportResult(ctx, job.JobID, r.appID, r.workerID, true, "", job.Retry, job.ManualRetry)
 	}
 
 	r.redis.XAck(stream, group, msgID)
+}
+
+func (r *Runner) workerHeartbeatLoop(ctx context.Context) {
+	interval := r.heartbeatInterval
+	if interval <= 0 {
+		interval = 10 * time.Second
+	}
+
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	r.grpc.WorkerHeartbeat(ctx, r.appID, r.workerID, r.jobTypes, int(atomic.LoadInt32(&r.activeJobs)), r.maxConcurrency)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			r.grpc.WorkerHeartbeat(ctx, r.appID, r.workerID, r.jobTypes, int(atomic.LoadInt32(&r.activeJobs)), r.maxConcurrency)
+		}
+	}
 }
 
 func parseJob(msg redis.XMessage) (*domain.Job, error) {

@@ -25,6 +25,8 @@ const (
 	JobService_ListJobs_FullMethodName        = "/job.JobService/ListJobs"
 	JobService_ListFailedJobs_FullMethodName  = "/job.JobService/ListFailedJobs"
 	JobService_GetJobLogs_FullMethodName      = "/job.JobService/GetJobLogs"
+	JobService_GetJobStats_FullMethodName     = "/job.JobService/GetJobStats"
+	JobService_GetJobMetrics_FullMethodName   = "/job.JobService/GetJobMetrics"
 	JobService_GetJobAdminLogs_FullMethodName = "/job.JobService/GetJobAdminLogs"
 	JobService_RetryJob_FullMethodName        = "/job.JobService/RetryJob"
 )
@@ -39,6 +41,8 @@ type JobServiceClient interface {
 	ListJobs(ctx context.Context, in *ListJobsRequest, opts ...grpc.CallOption) (*ListJobsResponse, error)
 	ListFailedJobs(ctx context.Context, in *ListFailedJobsRequest, opts ...grpc.CallOption) (*ListJobsResponse, error)
 	GetJobLogs(ctx context.Context, in *GetJobLogsRequest, opts ...grpc.CallOption) (*GetJobLogsResponse, error)
+	GetJobStats(ctx context.Context, in *GetJobStatsRequest, opts ...grpc.CallOption) (*GetJobStatsResponse, error)
+	GetJobMetrics(ctx context.Context, in *GetJobMetricsRequest, opts ...grpc.CallOption) (*GetJobMetricsResponse, error)
 	GetJobAdminLogs(ctx context.Context, in *GetJobLogsAdminRequest, opts ...grpc.CallOption) (*GetJobLogsResponse, error)
 	RetryJob(ctx context.Context, in *RetryJobRequest, opts ...grpc.CallOption) (*RetryJobResponse, error)
 }
@@ -111,6 +115,26 @@ func (c *jobServiceClient) GetJobLogs(ctx context.Context, in *GetJobLogsRequest
 	return out, nil
 }
 
+func (c *jobServiceClient) GetJobStats(ctx context.Context, in *GetJobStatsRequest, opts ...grpc.CallOption) (*GetJobStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetJobStatsResponse)
+	err := c.cc.Invoke(ctx, JobService_GetJobStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *jobServiceClient) GetJobMetrics(ctx context.Context, in *GetJobMetricsRequest, opts ...grpc.CallOption) (*GetJobMetricsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetJobMetricsResponse)
+	err := c.cc.Invoke(ctx, JobService_GetJobMetrics_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *jobServiceClient) GetJobAdminLogs(ctx context.Context, in *GetJobLogsAdminRequest, opts ...grpc.CallOption) (*GetJobLogsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetJobLogsResponse)
@@ -141,6 +165,8 @@ type JobServiceServer interface {
 	ListJobs(context.Context, *ListJobsRequest) (*ListJobsResponse, error)
 	ListFailedJobs(context.Context, *ListFailedJobsRequest) (*ListJobsResponse, error)
 	GetJobLogs(context.Context, *GetJobLogsRequest) (*GetJobLogsResponse, error)
+	GetJobStats(context.Context, *GetJobStatsRequest) (*GetJobStatsResponse, error)
+	GetJobMetrics(context.Context, *GetJobMetricsRequest) (*GetJobMetricsResponse, error)
 	GetJobAdminLogs(context.Context, *GetJobLogsAdminRequest) (*GetJobLogsResponse, error)
 	RetryJob(context.Context, *RetryJobRequest) (*RetryJobResponse, error)
 	mustEmbedUnimplementedJobServiceServer()
@@ -170,6 +196,12 @@ func (UnimplementedJobServiceServer) ListFailedJobs(context.Context, *ListFailed
 }
 func (UnimplementedJobServiceServer) GetJobLogs(context.Context, *GetJobLogsRequest) (*GetJobLogsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetJobLogs not implemented")
+}
+func (UnimplementedJobServiceServer) GetJobStats(context.Context, *GetJobStatsRequest) (*GetJobStatsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetJobStats not implemented")
+}
+func (UnimplementedJobServiceServer) GetJobMetrics(context.Context, *GetJobMetricsRequest) (*GetJobMetricsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetJobMetrics not implemented")
 }
 func (UnimplementedJobServiceServer) GetJobAdminLogs(context.Context, *GetJobLogsAdminRequest) (*GetJobLogsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetJobAdminLogs not implemented")
@@ -306,6 +338,42 @@ func _JobService_GetJobLogs_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _JobService_GetJobStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetJobStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobServiceServer).GetJobStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JobService_GetJobStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobServiceServer).GetJobStats(ctx, req.(*GetJobStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _JobService_GetJobMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetJobMetricsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobServiceServer).GetJobMetrics(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JobService_GetJobMetrics_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobServiceServer).GetJobMetrics(ctx, req.(*GetJobMetricsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _JobService_GetJobAdminLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetJobLogsAdminRequest)
 	if err := dec(in); err != nil {
@@ -372,6 +440,14 @@ var JobService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetJobLogs",
 			Handler:    _JobService_GetJobLogs_Handler,
+		},
+		{
+			MethodName: "GetJobStats",
+			Handler:    _JobService_GetJobStats_Handler,
+		},
+		{
+			MethodName: "GetJobMetrics",
+			Handler:    _JobService_GetJobMetrics_Handler,
 		},
 		{
 			MethodName: "GetJobAdminLogs",

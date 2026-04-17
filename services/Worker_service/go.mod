@@ -3,11 +3,16 @@ module worker_service
 go 1.25.5
 
 require (
+	google.golang.org/genproto/googleapis/api v0.0.0-20251029180050-ab9386a59fda
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.10
 )
 
-require go.uber.org/multierr v1.10.0 // indirect
+require (
+	github.com/onsi/ginkgo v1.16.5 // indirect
+	github.com/onsi/gomega v1.39.1 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
+)
 
 require (
 	github.com/go-redis/redis v6.15.9+incompatible

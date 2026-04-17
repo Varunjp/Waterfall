@@ -38,7 +38,13 @@ func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,o
 		endDate = nil 
 	}
 
-	return uc.jobs.ListByApp(ctx,appID,status,limit,offset,startDate,endDate)
+	jobs,limit,err := uc.jobs.ListByApp(ctx,appID,status,limit,offset,startDate,endDate)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	return jobs,limit,err
 }
 
 func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context,limit,offset int)([]domain.Job,int,error) {
@@ -75,11 +81,7 @@ func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,er
 	if err != nil {
 		return "",err 
 	}
-	err = uc.redis.CheckQuota(ctx,job.AppID)
-	if err != nil {
-		return "",err 
-	}
-
+	
 	err = uc.queue.Publish(ctx, queue.JobEvent{
 		JobID: job.JobID,
 		AppID: job.AppID,
@@ -93,11 +95,30 @@ func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,er
 	if err != nil {
 		return "",err 
 	}
-	err = uc.redis.Incr(ctx,job.AppID)
-	if err != nil {
-		return "",err
-	}
+	
 	return job.JobID,nil 
+}
+
+func (uc *DashboardUsecase) GetJobStats(ctx context.Context)(*domain.JobStats,error) {
+	
+	appID,err := middleware.AppIDFromContext(ctx)
+	if err != nil {
+		log.Println(err.Error())
+		return nil,err 
+	}
+
+	return uc.jobs.GetJobStats(ctx,appID)
+}
+
+func (uc *DashboardUsecase) GetJobMetrics(ctx context.Context,from,to time.Time,bucket string)([]domain.MetricBucket,error) {
+
+	appID,err := middleware.AppIDFromContext(ctx)
+	if err != nil {
+		log.Println(err.Error())
+		return nil,err 
+	}
+
+	return uc.jobs.GetJobMetrics(ctx,appID,from,to,bucket)
 }
 
 func isValidTime(t *time.Time) bool {

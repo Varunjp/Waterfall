@@ -20,16 +20,11 @@ import (
 
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
-
-	"github.com/joho/godotenv"
 )
 
 // need to add redis for checking last poll time in case of failure
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("no .env file found, using system envs")
-	}
 
 	cfg := config.Load()
 	validateConfig(cfg)
@@ -63,7 +58,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	jobEventUC := usecase.NewConsumeJobUsecase(repo, logg,rd)
+	jobEventUC := usecase.NewConsumeJobUsecase(repo,adrepo, logg,rd)
 	jobEventConsumer := consumer.NewKafkaConsumer(
 		cfg.KafkaBroker,
 		cfg.JobTopic,
@@ -72,7 +67,7 @@ func main() {
 		logg,
 	)
 
-	jobRunUC := usecase.NewUpdateJobStatusUsecase(repo,adrepo)
+	jobRunUC := usecase.NewUpdateJobStatusUsecase(repo)
 	jobRunConsumer := consumer.NewJobRunConsumer(
 		cfg.KafkaBroker,
 		cfg.JobRunTopic,

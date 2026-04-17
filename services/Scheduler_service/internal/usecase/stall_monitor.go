@@ -6,6 +6,7 @@ import (
 	"log"
 	"scheduler_service/internal/consumer"
 	"scheduler_service/internal/domain"
+	"scheduler_service/internal/monitoring"
 	"scheduler_service/internal/producer"
 	redisClient "scheduler_service/internal/redis"
 	"time"
@@ -14,116 +15,131 @@ import (
 )
 
 type StallMonitor struct {
-	redis *redisClient.Client
+	redis          *redisClient.Client
 	runnerConsumer *consumer.JobCreatedConsumer
-	producer *producer.KafkaProducer
+	producer       *producer.KafkaProducer
+	runtime        *monitoring.Store
 }
 
-func NewStallMonitor(r *redisClient.Client, rc *consumer.JobCreatedConsumer ,p *producer.KafkaProducer) *StallMonitor {
-	return &StallMonitor{redis: r,runnerConsumer: rc,producer: p}
+func NewStallMonitor(
+	r *redisClient.Client,
+	rc *consumer.JobCreatedConsumer,
+	p *producer.KafkaProducer,
+	store *monitoring.Store,
+) *StallMonitor {
+	return &StallMonitor{
+		redis:          r,
+		runnerConsumer: rc,
+		producer:       p,
+		runtime:        store,
+	}
 }
 
 func (s *StallMonitor) Run(ctx context.Context) {
-	ticker := time.NewTicker(10 *time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
-			return 
+			return
 		case <-ticker.C:
-			msg,err := s.runnerConsumer.Read(ctx)
+			msg, err := s.runnerConsumer.Read(ctx)
 			if err != nil {
 				if ctx.Err() != nil {
-					return 
+					return
 				}
-				log.Println("kafka read failed",err)
+				log.Println("kafka read failed", err)
 				continue
 			}
 
-			s.scan(ctx,msg)
+			s.scan(ctx, msg)
 		}
 	}
 }
 
-func (s *StallMonitor) scan(ctx context.Context,raw []byte) {
+func (s *StallMonitor) scan(ctx context.Context, raw []byte) {
 
 	var job domain.Job
-	if err := json.Unmarshal(raw,&job); err != nil {
-		log.Println("invalid job payload",err)
-		return 
+	if err := json.Unmarshal(raw, &job); err != nil {
+		log.Println("invalid job payload", err)
+		return
 	}
 
-	hbKey := "heartbeat:"+job.JobID
-	ts,err := s.redis.Get(ctx,hbKey).Int64()
+	hbKey := "heartbeat:" + job.JobID
+	ts, err := s.redis.Get(ctx, hbKey).Int64()
 
 	if err == redis.Nil {
-		s.handlestall(ctx,job.JobID,job)
-		return 
+		s.handlestall(ctx, job.JobID, job)
+		return
 	}
 
 	if err != nil {
-		return 
+		return
 	}
 
 	now := time.Now().Unix()
 
 	if now-ts > 30 {
-		s.handlestall(ctx,job.JobID,job)
+		s.handlestall(ctx, job.JobID, job)
 	}
 }
 
-func (s *StallMonitor) handlestall(ctx context.Context,jobID string,stjob domain.Job) {
-	metaKey := "running:"+jobID 
+func (s *StallMonitor) handlestall(ctx context.Context, jobID string, stjob domain.Job) {
+	if s.runtime != nil {
+		_ = s.runtime.ReleaseJob(ctx, jobID, time.Now().UTC())
+	}
 
-	raw,err := s.redis.Get(ctx,metaKey).Result()
+	metaKey := "running:" + jobID
+
+	raw, err := s.redis.Get(ctx, metaKey).Result()
 
 	if err == redis.Nil {
 		stjob.Retry++
 		if stjob.Retry > stjob.MaxRetries {
-			s.producer.Publish(ctx,map[string]any{
-				"job_id":stjob.JobID,
-				"app_id":stjob.AppID,
-				"Status": "DLQ",
+			s.producer.Publish(ctx, map[string]any{
+				"job_id":  stjob.JobID,
+				"app_id":  stjob.AppID,
+				"Status":  "DLQ",
 				"retries": stjob.Retry,
 			})
-			return 
+			return
 		}
-		
-		s.producer.Publish(ctx,map[string]any{
+
+		s.producer.Publish(ctx, map[string]any{
 			"job_id": stjob.JobID,
-			"app_id":stjob.AppID,
+			"app_id": stjob.AppID,
 			"status": "JOB_RETRY",
-			"retry": stjob.Retry,
+			"retry":  stjob.Retry,
 		})
 	}
 
 	if err != nil {
-		return 
+		return
 	}
 
 	var job domain.Job
-	json.Unmarshal([]byte(raw),&job)
+	json.Unmarshal([]byte(raw), &job)
 
 	job.Retry++
 
 	if job.Retry > job.MaxRetries {
 
-		s.producer.Publish(ctx,map[string]any{
-			"job_id":job.JobID,
-			"app_id":job.AppID,
-			"Status": "DLQ",
+		s.producer.Publish(ctx, map[string]any{
+			"job_id":  job.JobID,
+			"app_id":  job.AppID,
+			"Status":  "DLQ",
 			"retries": job.Retry,
 		})
 
-		return 
+		return
 	}
-	s.producer.Publish(ctx,map[string]any{
+	s.producer.Publish(ctx, map[string]any{
 		"job_id": job.JobID,
-		"app_id":job.AppID,
+		"app_id": job.AppID,
 		"status": "JOB_RETRY",
-		"retry": job.Retry,
+		"retry":  job.Retry,
 	})
 
-	s.redis.LPush(ctx,"job:ingress",raw)
+	s.redis.LPush(ctx, "job:ingress", raw)
 }

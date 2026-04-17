@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -16,55 +16,57 @@ func NewAdminRepo(db *pgxpool.Pool) AdminRepository {
 	return &adminrepo{db: db}
 }
 
-func (a *adminrepo) GetPlanID(ctx context.Context,appID string)(string,error) {
-	
+func (a *adminrepo) GetPlanID(ctx context.Context, appID string) (string, error) {
+
 	pidquery := `SELECT plan_id
 	FROM subscriptions 
 	WHERE app_id = $1 
-	AND status = 'active'
+	AND LOWER(status) = 'active'
 	AND current_period_end > NOW()`
 
-	var planId string 
+	var planId string
 
-	err := a.db.QueryRow(ctx,pidquery,appID).Scan(&planId)
+	err := a.db.QueryRow(ctx, pidquery, appID).Scan(&planId)
 
-	if errors.Is(err,sql.ErrNoRows) {
-		return "",errors.New("no active subsription")
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", errors.New("no active subsription")
 	}
 
-	if err != nil  {
-		return "",err 
+	if err != nil {
+		return "", err
 	}
 
-	return planId,nil 
+	return planId, nil
 }
 
-func (a *adminrepo) GetPlanDetails(ctx context.Context,planID string)(int,error) {
+func (a *adminrepo) GetPlanDetails(ctx context.Context, planID string) (int, error) {
 	pquery := `SELECT monthly_job_limit FROM plans WHERE plan_id = $1`
 
 	var totalLimit int
 
-	err := a.db.QueryRow(ctx,pquery,planID).Scan(&totalLimit)
+	err := a.db.QueryRow(ctx, pquery, planID).Scan(&totalLimit)
 
 	if err != nil {
-		return -1,err 
+		return -1, err
 	}
 
-	return totalLimit,nil 
+	return totalLimit, nil
 }
 
-func (a *adminrepo) GetMonthlyUsage(ctx context.Context,appID string)(int,error) {
-	uquery := `SELECT COALESCE(jobs_executed,0) 
-	FROM usage_monthly 
-	WHERE app_id = $1
-	AND month = date_trunc('month',CURRENT_DATE)`
+func (a *adminrepo) GetMonthlyUsage(ctx context.Context, appID string) (int, error) {
+	uquery := `SELECT COALESCE((
+		SELECT jobs_executed
+		FROM usage_monthly
+		WHERE app_id = $1
+		AND month = date_trunc('month',CURRENT_DATE)
+	), 0)`
 
-	var monthlyUsage int 
-	err := a.db.QueryRow(ctx,uquery,appID).Scan(&monthlyUsage)
+	var monthlyUsage int
+	err := a.db.QueryRow(ctx, uquery, appID).Scan(&monthlyUsage)
 
 	if err != nil {
-		return 0,err 
+		return 0, err
 	}
 
-	return monthlyUsage,nil 
+	return monthlyUsage, nil
 }

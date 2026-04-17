@@ -7,13 +7,14 @@ import (
 )
 
 type Config struct {
-	Env        string
-	Scheduler  SchedulerConfig
-	Kafka      KafkaConfig
-	Redis      RedisConfig
-	AdminDB    AdminDBConfig
-	GRPC       GRPCConfig
-	Metrics    MetricsConfig
+	Env       string
+	Scheduler SchedulerConfig
+	Kafka     KafkaConfig
+	Redis     RedisConfig
+	AdminDB   AdminDBConfig
+	GRPC      GRPCConfig
+	Metrics   MetricsConfig
+	JWTSecret string
 }
 
 type SchedulerConfig struct {
@@ -21,12 +22,12 @@ type SchedulerConfig struct {
 }
 
 type KafkaConfig struct {
-	Brokers          string
-	JobCreateTopic   string
-	JobUpdateTopic   string
-	JobStatusTopic   string 
-	JobUsageTopic	 string 
-	ConsumerGroup    string
+	Brokers        string
+	JobCreateTopic string
+	JobUpdateTopic string
+	JobStatusTopic string
+	JobUsageTopic  string
+	ConsumerGroup  string
 }
 
 type RedisConfig struct {
@@ -61,7 +62,7 @@ func Load() Config {
 			JobCreateTopic: mustEnv("KAFKA_JOB_CREATE_TOPIC"),
 			JobUpdateTopic: mustEnv("KAFKA_JOB_UPDATE_TOPIC"),
 			JobStatusTopic: mustEnv("KAFKA_JOB_STATUS_TOPIC"),
-			JobUsageTopic: mustEnv("KAFKA_JOB_USAGE_TOPIC"),
+			JobUsageTopic:  mustEnv("KAFKA_JOB_USAGE_TOPIC"),
 			ConsumerGroup:  mustEnv("KAFKA_CONSUMER_GROUP"),
 		},
 
@@ -83,6 +84,8 @@ func Load() Config {
 			Enabled: mustEnvBool("METRICS_ENABLED"),
 			Port:    mustEnv("METRICS_PORT"),
 		},
+
+		JWTSecret: mustEnv("JWT_SECRET"),
 	}
 
 	return cfg

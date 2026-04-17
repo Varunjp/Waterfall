@@ -22,7 +22,7 @@ func(r *PlanRepo) CreatePlan(plan *entities.Plan)error {
 
 	_,err := r.db.Exec(`
 		INSERT INTO plans(name,monthly_job_limit,price,stripe_price_id)
-		VALUES ($1,$2,$3)
+		VALUES ($1,$2,$3,$4)
 	`,plan.Name,plan.MonthlyJobLimit,plan.Price,spriceId)
 
 	return err 
@@ -80,9 +80,13 @@ func(r *PlanRepo)UpdatePlan(plan *entities.Plan)(*entities.Plan,error){
 	}
 
 	if plan.StripeID != "" {
-		query += fmt.Sprintf("stripe_price_id=$%d",i)
+		query += fmt.Sprintf("stripe_price_id=$%d,",i)
 		args = append(args, plan.StripeID)
 		i++
+	}
+
+	if len(args) == 0 {
+		return nil, fmt.Errorf("no fields provided for update")
 	}
 
 	query = strings.TrimSuffix(query, ",")
@@ -90,6 +94,7 @@ func(r *PlanRepo)UpdatePlan(plan *entities.Plan)(*entities.Plan,error){
 	args = append(args, plan.PlanID)
 
 	_, err := r.db.Exec(query, args...)
+	
 	if err != nil {
 		return nil,err
 	}

@@ -5,6 +5,7 @@ import (
 	domainerr "admin_service/internal/domain/errors"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/lib/pq"
 )
@@ -17,22 +18,29 @@ func NewAppRepo(db *sql.DB) *AppRepo {
 	return &AppRepo{db}
 }
 
-func (r *AppRepo) Create(app *entities.App) (string,error) {
-	var appID string 
+func (r *AppRepo) Create(app *entities.App) (string, error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return "", err
+	}
 
-	err := r.db.QueryRow(`
-		INSERT INTO apps (app_name, app_email, status, tier)
-		VALUES ($1, $2, $3, $4)
+	var appID string
+
+	err = tx.QueryRow(`
+		INSERT INTO apps (app_name, app_email, status, tier, plan_id)
+		VALUES ($1, $2, $3, $4,$5)
 		RETURNING app_id
 	`,
 		app.AppName,
 		app.AppEmail,
 		app.Status,
 		app.Tier,
+		app.PlanID,
 	).Scan(&appID)
 
 	if err != nil {
-		var pqErr *pq.Error  
+		tx.Rollback()
+		var pqErr *pq.Error
 
 		if errors.As(err, &pqErr) {
 			if pqErr.Code == "23505" {
@@ -40,23 +48,37 @@ func (r *AppRepo) Create(app *entities.App) (string,error) {
 				case "emaill_unique":
 					return "", domainerr.ErrAppEmailAlreadyExists
 				case "name_unique":
-					return "",domainerr.ErrAppNameAlreadyExists
+					return "", domainerr.ErrAppNameAlreadyExists
 				}
 			}
 		}
 
-		return "",err 
+		return "", err
 	}
 
-	return appID,nil 
+	_, err = tx.Exec(`
+		INSERT INTO usage_monthly (app_id, month, jobs_executed)
+		VALUES ($1, date_trunc('month', CURRENT_DATE), 0)
+		ON CONFLICT (app_id, month) DO NOTHING
+	`, appID)
+	if err != nil {
+		tx.Rollback()
+		return "", err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return "", err
+	}
+
+	return appID, nil
 }
 
-func (r *AppRepo) FindAll()([]*entities.App,error) {
-	rows,err := r.db.Query(`
+func (r *AppRepo) FindAll() ([]*entities.App, error) {
+	rows, err := r.db.Query(`
 		SELECT app_id,app_name,app_email,status,tier, created_at, updated_at FROM apps ORDER BY created_at DESC
 	`)
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -73,23 +95,23 @@ func (r *AppRepo) FindAll()([]*entities.App,error) {
 			&a.UpdatedAt,
 		)
 		if err != nil {
-			return nil,err 
+			return nil, err
 		}
 		apps = append(apps, &a)
 	}
-	return apps,nil 
+	return apps, nil
 }
 
-func(r *AppRepo) UpdateStatus(appID, status string) error {
-	_,err := r.db.Exec(`
+func (r *AppRepo) UpdateStatus(appID, status string) error {
+	_, err := r.db.Exec(`
 		UPDATE apps
 		SET status=$1
 		WHERE app_id=$2
-	`,status,appID)
-	return err 
+	`, status, appID)
+	return err
 }
 
-func (r *AppRepo)CreateFirst(user *entities.AppUser) error {
+func (r *AppRepo) CreateFirst(user *entities.AppUser) error {
 
 	_, err := r.db.Exec(`
 		INSERT INTO app_users
@@ -98,8 +120,43 @@ func (r *AppRepo)CreateFirst(user *entities.AppUser) error {
 	`, user.AppID, user.Email, user.PasswordHash, user.Role, user.Status)
 
 	if err != nil {
-		return err 
+		return err
 	}
-	
-	return nil 
+
+	return nil
+}
+
+func (r *AppRepo) CreateFreePlan(sub *entities.Subscription) error {
+
+	query := `
+	INSERT INTO subscriptions (
+		app_id,
+		plan_id,
+		stripe_subscription_id,
+		status,
+		current_period_start,
+		current_period_end,
+		created_at
+	)
+	VALUES ($1,$2,$3,$4,$5,$6,$7)
+	ON CONFLICT (app_id)
+	DO UPDATE SET
+		plan_id = EXCLUDED.plan_id,
+		current_period_start = EXCLUDED.current_period_start,
+		current_period_end = EXCLUDED.current_period_end,
+		updated_at = NOW();
+	`
+
+	_, err := r.db.Exec(
+		query,
+		sub.AppID,
+		sub.PlanID,
+		sub.StripeSubscriptionID,
+		sub.Status,
+		sub.CurrentPeriodStart,
+		sub.CurrentPeriodEnd,
+		time.Now(),
+	)
+
+	return err
 }

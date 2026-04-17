@@ -45,4 +45,13 @@ func RegisterUIRoutes(r *gin.Engine) {
 	r.GET("/forgot-password",func(c *gin.Context) {
 		c.HTML(http.StatusOK,"forgot_password.html",nil)
 	})
+
+	r.GET("/admin/dashboard",func(c *gin.Context) {
+		token,err := c.Cookie("token")
+		if err != nil || token == "" {
+			c.Redirect(http.StatusFound,"/admin")
+			return 
+		}
+		c.HTML(http.StatusOK,"admin_dashboard.html",nil)
+	})
 }
