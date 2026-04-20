@@ -7,6 +7,8 @@ type Subscription struct {
 	PlanID               string
 	PlanName 			 string 
 	PlanLimit 			 int 
+	FreeLimit 			 int 
+	FreeUsage            int 
 	Status               string
 	CurrentLimit 		 int 
 	StripeSubscriptionID string

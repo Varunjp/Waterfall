@@ -239,5 +239,16 @@ func (r *BillingPGRepo) GetSubscription(ctx context.Context, appID string) (*ent
 		return nil, err
 	}
 
+	fquery := `
+		SELECT COALESCE(free_limit,0), COALESCE(free_usage,0)
+		FROM apps
+		WHERE app_id = $1
+	`
+	err = r.db.QueryRowContext(ctx,fquery,s.AppID).Scan(&s.FreeLimit,&s.FreeUsage)
+
+	if err != nil {
+		return nil,err 
+	}
+
 	return &s, nil
 }

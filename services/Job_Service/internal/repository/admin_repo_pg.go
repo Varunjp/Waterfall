@@ -70,3 +70,20 @@ func (a *adminrepo) GetMonthlyUsage(ctx context.Context, appID string) (int, err
 
 	return monthlyUsage, nil
 }
+
+func (a *adminrepo) GetFreeQuota(ctx context.Context, appID string) (int, int, error) {
+	query := `
+		SELECT COALESCE(free_limit, 0), COALESCE(free_usage, 0)
+		FROM apps
+		WHERE app_id = $1
+	`
+
+	var freeLimit, freeUsage int
+	err := a.db.QueryRow(ctx, query, appID).Scan(&freeLimit, &freeUsage)
+
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return freeLimit, freeUsage, nil
+}

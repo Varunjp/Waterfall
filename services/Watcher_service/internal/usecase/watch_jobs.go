@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 	"watcher_service/internal/domain"
 	"watcher_service/internal/producer"
@@ -85,12 +84,6 @@ func (uc *WatchJobsUsecase) Run(ctx context.Context) error {
 			MaxRetries: job.MaxRetries,
 			ManualRetry: job.ManualRetry,
 		}
-
-		//delete
-		fmt.Println()
-		fmt.Println("Check new event:")
-		fmt.Println(event)
-		fmt.Println()
 
 		if err := uc.jobStatusproducer.Publish(ctx, job.JobID, event); err != nil {
 			uc.logger.Error("kafka publish failed",

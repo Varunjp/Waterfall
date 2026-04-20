@@ -37,7 +37,6 @@ func(r *PlanRepo) GetPlans()([]*entities.Plan,error){
 		return nil,err 
 	}
 	defer rows.Close()
-
 	var plans []*entities.Plan
 	for rows.Next() {
 		var p entities.Plan

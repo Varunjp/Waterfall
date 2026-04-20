@@ -22,14 +22,14 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  function fmt(d) {
+  function fmtLegacy(d) {
     if (!d) return '—';
     const dt = new Date(d);
     if (isNaN(dt)) return d;
     return dt.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false });
   }
 
-  function fmtDate(d) {
+  function fmtDateLegacy(d) {
     if (!d) return '—';
     const dt = new Date(d);
     return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
@@ -37,6 +37,51 @@
 
   function fmtMoney(cents) {
     return (cents).toLocaleString('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:2 });
+  }
+
+  function parseDate(dateStr) {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  function timeZoneLabel(date) {
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZoneName: 'short',
+      }).formatToParts(date);
+      const tzPart = parts.find(part => part.type === 'timeZoneName');
+      return tzPart ? tzPart.value : '';
+    } catch {
+      return '';
+    }
+  }
+
+  function fmt(d) {
+    const dt = parseDate(d);
+    if (!dt) return d || 'â€”';
+    const text = dt.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false });
+    const tz = timeZoneLabel(dt);
+    return tz ? `${text} ${tz}` : text;
+  }
+
+  function fmtDate(d) {
+    const dt = parseDate(d);
+    if (!dt) return d || 'â€”';
+    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  }
+
+  function toLocalInputValue(dateStr) {
+    const d = parseDate(dateStr);
+    if (!d) return '';
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 10);
+  }
+
+  function toUTCDateBoundary(dateStr, endOfDay = false) {
+    if (!dateStr) return null;
+    const local = new Date(`${dateStr}${endOfDay ? 'T23:59:59.999' : 'T00:00:00.000'}`);
+    return Number.isNaN(local.getTime()) ? null : local.toISOString();
   }
 
   function badge(status) {
@@ -244,9 +289,9 @@
             </select>
             <span class="toolbar-divider"></span>
             <span class="toolbar-label">From</span>
-            <input type="date" class="filter-date" id="j-start" max="${today}" value="${start?start.substring(0,10):''}" />
+            <input type="date" class="filter-date" id="j-start" max="${today}" value="${start ? toLocalInputValue(start) : ''}" />
             <span class="toolbar-label">To</span>
-            <input type="date" class="filter-date" id="j-end"   max="${today}" value="${end?end.substring(0,10):''}" />
+            <input type="date" class="filter-date" id="j-end"   max="${today}" value="${end ? toLocalInputValue(end) : ''}" />
             <button class="btn-filter" id="j-apply">Apply</button>
             <button class="btn-filter-outline" id="j-clear">Clear</button>
           </div>
@@ -261,7 +306,7 @@
 
     $('j-apply').addEventListener('click', () => {
       const s = startEl.value, e = endEl.value;
-      loadJobs(0, $('j-status').value, s ? `${s}T00:00:00Z` : null, e ? `${e}T23:59:59Z` : null);
+      loadJobs(0, $('j-status').value, toUTCDateBoundary(s), toUTCDateBoundary(e, true));
     });
     $('j-clear').addEventListener('click', () => { startEl.value=''; endEl.value=''; loadJobs(0, $('j-status').value, null, null); });
     $('j-status').addEventListener('change', e => loadJobs(0, e.target.value, state.jobs.start, state.jobs.end));
@@ -405,9 +450,9 @@
             <input type="text" class="filter-select" id="pay-app" placeholder="App ID or name" style="width:160px" value="${esc(appId)}" />
             <span class="toolbar-divider"></span>
             <span class="toolbar-label">From</span>
-            <input type="date" class="filter-date" id="pay-start" max="${today}" value="${start?start.substring(0,10):''}" />
+            <input type="date" class="filter-date" id="pay-start" max="${today}" value="${start ? toLocalInputValue(start) : ''}" />
             <span class="toolbar-label">To</span>
-            <input type="date" class="filter-date" id="pay-end"   max="${today}" value="${end?end.substring(0,10):''}" />
+            <input type="date" class="filter-date" id="pay-end"   max="${today}" value="${end ? toLocalInputValue(end) : ''}" />
             <button class="btn-filter" id="pay-apply">Apply</button>
             <button class="btn-filter-outline" id="pay-clear">Clear</button>
           </div>
@@ -422,7 +467,7 @@
 
     $('pay-apply').addEventListener('click', () => {
       const s = startEl.value, e = endEl.value;
-      loadPayments(0, $('pay-app').value.trim(), s?`${s}T00:00:00Z`:null, e?`${e}T23:59:59Z`:null);
+      loadPayments(0, $('pay-app').value.trim(), toUTCDateBoundary(s), toUTCDateBoundary(e, true));
     });
     $('pay-clear').addEventListener('click', () => { $('pay-app').value=''; startEl.value=''; endEl.value=''; loadPayments(0,'',null,null); });
 
