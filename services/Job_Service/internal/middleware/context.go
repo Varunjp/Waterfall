@@ -42,6 +42,7 @@ var publicMethods = map[string]bool{
 	"/job.JobService/CreateJob":  true,
 	"/job.JobService/UpdateJob":  true,
 	"/job.JobService/CancelJob":  true,
+	"/job.JobService/CreateTestJob": true,
 }
 
 var appAdmin = map[string]bool {

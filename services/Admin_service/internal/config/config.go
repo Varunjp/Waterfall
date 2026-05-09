@@ -51,10 +51,10 @@ func Load() *Config {
 		SmtpUser:      GetEnv("SMTP_USER", ""),
 		Smtppass:      GetEnv("SMTP_PASS", ""),
 		Stripe: stripeConfig{
-			WebhookSecret: GetEnv("STRIPE_WEBHOOK_SECRET", ""),
-			SecretKey:     GetEnv("STRIPE_SECRET_KEY", ""),
-			SuccessURL:    GetEnv("STRIPE_SUCCESS_URL", ""),
-			CancelURL:     GetEnv("STRIPE_CANCEL_URL", ""),
+			WebhookSecret: strings.TrimSpace(GetEnv("STRIPE_WEBHOOK_SECRET", "")),
+			SecretKey:     strings.TrimSpace(GetEnv("STRIPE_SECRET_KEY", "")),
+			SuccessURL:    strings.TrimSpace(GetEnv("STRIPE_SUCCESS_URL", "")),
+			CancelURL:     strings.TrimSpace(GetEnv("STRIPE_CANCEL_URL", "")),
 		},
 	}
 }

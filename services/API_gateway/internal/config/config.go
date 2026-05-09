@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Port                string
+	PPROF 				string 
 	JobServiceURL       string
 	AdminServiceURL     string
 	SchedulerServiceURL string
@@ -23,6 +24,7 @@ func Load() *Config {
 	
 	return &Config{
 		Port:                getEnv("PORT", "8081"),
+		PPROF: 				 getEnv("PPROFPORT","6060"),
 		JobServiceURL:       getEnv("JOB_SERVICE_URL", "localhost:50051"),
 		AdminServiceURL:     getEnv("ADMIN_SERVICE_URL", ""),
 		SchedulerServiceURL: getEnv("SCHEDULER_SERVICE_URL", "localhost:50052"),

@@ -65,6 +65,21 @@
     return tz ? `${text} ${tz}` : text;
   }
 
+  function fmtUTC(d) {
+    const dt = parseDate(d);
+    if (!dt) return d || 'Ã¢â‚¬â€';
+    const text = dt.toLocaleString('en-GB', {
+      day:'2-digit',
+      month:'short',
+      year:'numeric',
+      hour:'2-digit',
+      minute:'2-digit',
+      hour12:false,
+      timeZone:'UTC',
+    });
+    return `${text} UTC`;
+  }
+
   function fmtDate(d) {
     const dt = parseDate(d);
     if (!dt) return d || 'â€”';
@@ -330,8 +345,8 @@
         <td>${esc(j.type||'—')}</td>
         <td>${badge(j.status)}</td>
         <td>${j.retry??0} / ${j.maxRetry??0}</td>
-        <td>${fmt(j.scheduleAt)}</td>
-        <td>${fmt(j.createdAt)}</td>
+        <td>${fmtUTC(j.scheduleAt)}</td>
+        <td>${fmtUTC(j.createdAt)}</td>
       </tr>`).join('');
 
       $('jobs-body').innerHTML = `<table>

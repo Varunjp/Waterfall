@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	JobService_CreateJob_FullMethodName       = "/job.JobService/CreateJob"
+	JobService_CreateTestJob_FullMethodName   = "/job.JobService/CreateTestJob"
 	JobService_UpdateJob_FullMethodName       = "/job.JobService/UpdateJob"
 	JobService_CancelJob_FullMethodName       = "/job.JobService/CancelJob"
 	JobService_ListJobs_FullMethodName        = "/job.JobService/ListJobs"
@@ -36,6 +37,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type JobServiceClient interface {
 	CreateJob(ctx context.Context, in *CreateJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
+	CreateTestJob(ctx context.Context, in *CreateTestJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
 	UpdateJob(ctx context.Context, in *UpdateJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
 	CancelJob(ctx context.Context, in *CancelJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
 	ListJobs(ctx context.Context, in *ListJobsRequest, opts ...grpc.CallOption) (*ListJobsResponse, error)
@@ -59,6 +61,16 @@ func (c *jobServiceClient) CreateJob(ctx context.Context, in *CreateJobRequest, 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(JobResponse)
 	err := c.cc.Invoke(ctx, JobService_CreateJob_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *jobServiceClient) CreateTestJob(ctx context.Context, in *CreateTestJobRequest, opts ...grpc.CallOption) (*JobResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JobResponse)
+	err := c.cc.Invoke(ctx, JobService_CreateTestJob_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -160,6 +172,7 @@ func (c *jobServiceClient) RetryJob(ctx context.Context, in *RetryJobRequest, op
 // for forward compatibility.
 type JobServiceServer interface {
 	CreateJob(context.Context, *CreateJobRequest) (*JobResponse, error)
+	CreateTestJob(context.Context, *CreateTestJobRequest) (*JobResponse, error)
 	UpdateJob(context.Context, *UpdateJobRequest) (*JobResponse, error)
 	CancelJob(context.Context, *CancelJobRequest) (*JobResponse, error)
 	ListJobs(context.Context, *ListJobsRequest) (*ListJobsResponse, error)
@@ -181,6 +194,9 @@ type UnimplementedJobServiceServer struct{}
 
 func (UnimplementedJobServiceServer) CreateJob(context.Context, *CreateJobRequest) (*JobResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateJob not implemented")
+}
+func (UnimplementedJobServiceServer) CreateTestJob(context.Context, *CreateTestJobRequest) (*JobResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateTestJob not implemented")
 }
 func (UnimplementedJobServiceServer) UpdateJob(context.Context, *UpdateJobRequest) (*JobResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateJob not implemented")
@@ -244,6 +260,24 @@ func _JobService_CreateJob_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(JobServiceServer).CreateJob(ctx, req.(*CreateJobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _JobService_CreateTestJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTestJobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobServiceServer).CreateTestJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JobService_CreateTestJob_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobServiceServer).CreateTestJob(ctx, req.(*CreateTestJobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -420,6 +454,10 @@ var JobService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateJob",
 			Handler:    _JobService_CreateJob_Handler,
+		},
+		{
+			MethodName: "CreateTestJob",
+			Handler:    _JobService_CreateTestJob_Handler,
 		},
 		{
 			MethodName: "UpdateJob",

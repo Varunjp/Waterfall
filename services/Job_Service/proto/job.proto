@@ -15,6 +15,13 @@ service JobService {
       };
     }
 
+    rpc CreateTestJob(CreateTestJobRequest) returns (JobResponse) {
+      option (google.api.http) = {
+        post: "/api/v1/jobs-test"
+        body: "*"
+      };
+    }
+
     rpc UpdateJob(UpdateJobRequest) returns (JobResponse) {
       option (google.api.http) = {
           put: "/api/v1/jobs/{job_id}"
@@ -73,6 +80,12 @@ message CreateJobRequest {
     string type = 2;
     string payload = 3;
     google.protobuf.Timestamp schedule_at = 4;
+}
+
+message CreateTestJobRequest {
+  string app_id = 1;
+  string type = 2;
+  string payload = 3;
 }
 
 message UpdateJobRequest {

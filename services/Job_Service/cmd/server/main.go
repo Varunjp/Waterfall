@@ -47,9 +47,10 @@ func main() {
 	}
 	rr := redisRepo.NewRedisRepo(rc.Client,adminRepo)
 	queueProducer := queue.NewKafkaProducer([]string{cfg.KafkaBrokers[0]},cfg.KafkaTopic)
-
+	testProducer := producer.NewTestKafkaProducer(cfg.KafkaBrokers,cfg.TestTopic)
 	producer := producer.NewKafkaProducer(cfg.KafkaBrokers,cfg.KafkaTopic)
-	uc := usecase.NewJobUsecase(producer,logg,rr)
+	
+	uc := usecase.NewJobUsecase(producer,testProducer,logg,rr)
 	dc := usecase.NewDashboardUsecase(jobRepo,logRepo,queueProducer,rr)
 	h := handler.NewJobHandler(uc,*dc)
 

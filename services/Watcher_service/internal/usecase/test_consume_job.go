@@ -3,63 +3,27 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 	"watcher_service/internal/domain"
 	"watcher_service/internal/repository"
 
-	"github.com/go-redis/redis"
 	"go.uber.org/zap"
 )
 
-type ConsumeJobUsecase struct {
+type ConsumeTestJobUsecase struct {
 	repo      repository.JobRepository
 	adminRepo repository.AdminRepository
-	redis     *redis.Client
 	logger    *zap.Logger
 }
 
-func NewConsumeJobUsecase(r repository.JobRepository, adrepo repository.AdminRepository, l *zap.Logger, rd *redis.Client) *ConsumeJobUsecase {
-	return &ConsumeJobUsecase{repo: r, adminRepo: adrepo, logger: l, redis: rd}
+func NewConsumetestJobUsecase(r repository.JobRepository, adrepo repository.AdminRepository, l *zap.Logger) *ConsumeTestJobUsecase{
+	return &ConsumeTestJobUsecase{repo: r, adminRepo: adrepo, logger: l}
 }
 
-func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) error {
+func (uc *ConsumeTestJobUsecase) Handle(ctx context.Context, event domain.JobEvent) error {
 
 	switch event.EventType {
-	case domain.JobCreated:
-		now := time.Now().UTC()
-		scheduledAt := event.Timestamp.UTC()
-		job := domain.Job{
-			JobID:       event.JobID,
-			AppID:       event.AppID,
-			Type:        event.Type,
-			Payload:     event.Payload,
-			CreatedAt:   now,
-			UpdatedAt:   now,
-			ScheduleAt:  scheduledAt,
-			ManualRetry: 0,
-		}
-
-		if scheduledAt.After(now) {
-			job.Status = domain.StatusPending
-		} else {
-			job.Status = domain.StatusScheduled
-		}
-
-		err := uc.repo.Insert(ctx, job)
-
-		if err != nil {
-			return err
-		}
-
-		err = uc.adminRepo.UpdateUsageIncr(ctx, event.AppID)
-
-		if err != nil {
-			return err
-		}
-		return nil
 	case domain.JobTestCreated:
-		
 		now := time.Now().UTC()
 		job := domain.Job {
 			JobID: event.JobID,
@@ -100,13 +64,6 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 
 		err = uc.adminRepo.UpdateUsageDecr(ctx, event.AppID)
 
-		if err != nil {
-			return err
-		}
-
-		key := fmt.Sprintf("usage:%s:%s", event.AppID, time.Now().UTC().Format("2006-01"))
-		freeUsageKey := fmt.Sprintf("free-usage:%s", event.AppID)
-		err = uc.redis.Del(key, freeUsageKey).Err()
 		if err != nil {
 			return err
 		}

@@ -16,108 +16,126 @@ import (
 
 type BillingController struct {
 	service service.BillingService
-	cfg  *config.Config
+	cfg     *config.Config
 }
 
-func NewBillingController(s service.BillingService,cfg *config.Config)*BillingController{
+func NewBillingController(s service.BillingService, cfg *config.Config) *BillingController {
 	return &BillingController{
 		service: s,
-		cfg: cfg,
+		cfg:     cfg,
 	}
 }
 
 type CheckoutRequest struct {
-	PlanID  string `json:"plan_id"`
+	PlanID string `json:"plan_id"`
 }
 
 type CheckoutResponse struct {
 	CheckoutURL string `json:"checkout_url"`
 }
 
-func (c *BillingController) CreateCheckout(w http.ResponseWriter,r *http.Request) {
+func (c *BillingController) CreateCheckout(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	var req CheckoutRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 
 	if err != nil {
-		http.Error(w,"invalid request body",http.StatusBadRequest)
-		return 
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
 	}
 	appID := middleware.GetAppID(ctx)
 
 	if appID == "" {
-		http.Error(w,"unauthorized",http.StatusUnauthorized)
-		return 
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
 	}
 
-	url,err := c.service.CreateChecoutSession(
+	url, err := c.service.CreateChecoutSession(
 		ctx,
 		service.CreateCheckoutRequest{
-			AppID: appID,
+			AppID:  appID,
 			PlanID: req.PlanID,
 		},
 	)
 
 	if err != nil {
-		http.Error(w,err.Error(),http.StatusInternalServerError)
-		return 
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	resp := CheckoutResponse{
 		CheckoutURL: url.CheckoutURL,
 	}
-	w.Header().Set("Content-Type","application/json")
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
 
-func (c *BillingController) StripeWebhook(w http.ResponseWriter,r *http.Request) {
-	
-	payload,err := io.ReadAll(r.Body)
+func (c *BillingController) StripeWebhook(w http.ResponseWriter, r *http.Request) {
+	if c.cfg.Stripe.WebhookSecret == "" {
+		log.Println("stripe webhook config error: STRIPE_WEBHOOK_SECRET is not set")
+		http.Error(w, "webhook not configured", http.StatusInternalServerError)
+		return
+	}
+
+	payload, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println("read error:", err)
-		http.Error(w,"unable to read body",http.StatusBadRequest)
-		return 
+		http.Error(w, "unable to read body", http.StatusBadRequest)
+		return
 	}
 
 	sigHeader := r.Header.Get("Stripe-Signature")
+	if sigHeader == "" {
+		log.Println("stripe webhook signature error: missing Stripe-Signature header")
+		http.Error(w, "missing signature", http.StatusBadRequest)
+		return
+	}
 
-	event,err := webhook.ConstructEventWithOptions(
+	event, err := webhook.ConstructEventWithOptions(
 		payload,
 		sigHeader,
 		c.cfg.Stripe.WebhookSecret,
 		webhook.ConstructEventOptions{
-		IgnoreAPIVersionMismatch: true,
+			IgnoreAPIVersionMismatch: true,
 		},
 	)
 
 	if err != nil {
-		log.Println("signature error:", err)
-		http.Error(w,"invalid signature",http.StatusBadRequest)
-		return 
+		log.Printf("stripe webhook signature error: %v (payload_bytes=%d)", err, len(payload))
+		http.Error(w, "invalid signature", http.StatusBadRequest)
+		return
 	}
+
+	log.Println("stripe webhook event:", event.Type)
 
 	switch event.Type {
 	case "checkout.session.completed":
 		var session stripe.CheckoutSession
-		err := json.Unmarshal(event.Data.Raw,&session)
+		err := json.Unmarshal(event.Data.Raw, &session)
 		if err != nil {
-			http.Error(w,"invalid payload",http.StatusBadRequest)
-			return 
+			log.Println("checkout.session.completed unmarshal error:", err)
+			http.Error(w, "invalid payload", http.StatusBadRequest)
+			return
 		}
 
 		appID := session.Metadata["app_id"]
 		planID := session.Metadata["plan_id"]
 
 		if appID == "" || planID == "" {
-			log.Println("missing metadata", session.ID)
-			http.Error(w, "missing metadata", http.StatusBadRequest)
+			log.Println("checkout.session.completed missing app metadata, ignoring session:", session.ID)
+			w.WriteHeader(http.StatusOK)
 			return
 		}
 
 		subscriptionID := ""
 		if session.Subscription != nil {
 			subscriptionID = session.Subscription.ID
+		}
+		if subscriptionID == "" {
+			log.Println("checkout.session.completed missing subscription:", session.ID)
+			http.Error(w, "missing subscription", http.StatusBadRequest)
+			return
 		}
 
 		err = c.service.ActivateSubscription(
@@ -128,8 +146,9 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter,r *http.Request)
 		)
 
 		if err != nil {
-			http.Error(w,err.Error(),http.StatusInternalServerError)
-			return 
+			log.Println("activate subscription error:", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		err = c.service.HandlePaymentSuccess(
@@ -139,19 +158,20 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter,r *http.Request)
 		)
 
 		if err != nil {
-			http.Error(w,err.Error(),http.StatusInternalServerError)
+			log.Println("payment success handler error:", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	case "invoice.payment_succeeded":
 		var invoice stripe.Invoice
-		if err := json.Unmarshal(event.Data.Raw,&invoice);err != nil {
-			log.Println("unmarshal error:",err)
-			break 
+		if err := json.Unmarshal(event.Data.Raw, &invoice); err != nil {
+			log.Println("unmarshal error:", err)
+			break
 		}
 
 		if invoice.Subscription == nil {
 			log.Println("subscription missing in invoice")
-			break 
+			break
 		}
 
 		// subscriptionID := invoice.Subscription.ID
@@ -165,11 +185,18 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter,r *http.Request)
 		// if err != nil {
 		// 	log.Println("service error:", err)
 		// }
-	
+
 	case "invoice.payment_failed":
 
 		var invoice stripe.Invoice
-		json.Unmarshal(event.Data.Raw,&invoice)
+		if err := json.Unmarshal(event.Data.Raw, &invoice); err != nil {
+			log.Println("invoice.payment_failed unmarshal error:", err)
+			break
+		}
+		if invoice.Subscription == nil {
+			log.Println("subscription missing in failed invoice")
+			break
+		}
 
 		err := c.service.HandlePaymentFailure(
 			context.Background(),
@@ -177,13 +204,17 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter,r *http.Request)
 		)
 
 		if err != nil {
-			http.Error(w,err.Error(),http.StatusInternalServerError)
-			return 
+			log.Println("payment failure handler error:", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-	
+
 	case "customer.subscription.deleted":
 		var sub stripe.Subscription
-		json.Unmarshal(event.Data.Raw, &sub)
+		if err := json.Unmarshal(event.Data.Raw, &sub); err != nil {
+			log.Println("customer.subscription.deleted unmarshal error:", err)
+			break
+		}
 
 		err := c.service.CancelSubscription(
 			context.Background(),
@@ -191,10 +222,11 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter,r *http.Request)
 		)
 
 		if err != nil {
+			log.Println("cancel subscription handler error:", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-	default: 
+	default:
 	}
 
 	w.WriteHeader(http.StatusOK)
