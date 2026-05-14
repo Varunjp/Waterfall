@@ -27,14 +27,14 @@ func NewAppService(r repo.AppRepository,tp repo.AddToPlanRepo) *AppService {
 	return &AppService{repo: r,toplan: tp}
 }
 
-func (s *AppService) Register(name,email string) (string,error) {
+func (s *AppService) Register(name,email string) (string,string,string,error) {
 	
 	if !validation.IsVaildEmail(email) {
-		return "",ErrInvalidEmail
+		return "","","",ErrInvalidEmail
 	}
 
 	if !validation.IsValidName(name) {
-		return "",ErrInvaildName
+		return "","","",ErrInvaildName
 	}
 
 	planID := os.Getenv("FREE_PLAN_ID")
@@ -51,9 +51,9 @@ func (s *AppService) Register(name,email string) (string,error) {
 
 	if  err != nil {
 		if errors.Is(err, domainErr.ErrAppEmailAlreadyExists) {
-			return "",domainErr.ErrAppEmailAlreadyExists
+			return "","","",domainErr.ErrAppEmailAlreadyExists
 		}
-		return "",err 
+		return "","","",err 
 	}
 
 	start := time.Now()
@@ -71,7 +71,7 @@ func (s *AppService) Register(name,email string) (string,error) {
 	err = s.repo.CreateFreePlan(subscription)
 
 	if err != nil {
-		return "",err 
+		return "","","",err 
 	}
 
 	// Logic: need to implement super user here
@@ -94,16 +94,16 @@ func (s *AppService) Register(name,email string) (string,error) {
 	err = s.repo.CreateFirst(appUser)
 
 	if err != nil {
-		return "",err 
+		return "","","",err 
 	}
 	ctx := context.Background()
 	err = s.toplan.AddToDefault(ctx,appID)
 
 	if err != nil {
-		return "",err
+		return "","","",err
 	}
 
-	return appID,nil 
+	return appID,name,pass,nil 
 }
 
 func (s *AppService) List()([]*entities.App,error) {

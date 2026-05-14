@@ -43,6 +43,8 @@ message RegisterAppRequest {
 
 message RegisterAppResponse {
   string app_id = 1;
+  string app_name = 2;
+  string app_password = 3;
 }
 
 message ListAppsRequest {}

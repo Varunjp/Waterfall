@@ -15,10 +15,28 @@ func RegisterUIRoutes(r *gin.Engine) {
 	r.GET("/",func(c *gin.Context) {
 		token,err := c.Cookie("token")
 		if err != nil || token == "" {
-			c.Redirect(http.StatusFound,"/login")
+			c.Redirect(http.StatusFound,"/home")
 			return 
 		}
 		c.HTML(http.StatusOK,"dashboard.html",nil)
+	})
+
+	r.GET("/home",func(c *gin.Context) {
+		token,err := c.Cookie("token")
+		if err != nil || token == "" {
+			c.HTML(http.StatusOK,"waterfall_landing.html",nil)
+			return 
+		}
+		c.Redirect(http.StatusFound,"/")
+	})
+
+	r.GET("/register",func(c *gin.Context) {
+		token,err := c.Cookie("token")
+		if err != nil || token == "" {
+			c.HTML(http.StatusOK,"register.html",nil)
+			return 
+		}
+		c.Redirect(http.StatusFound,"/")
 	})
 
 	r.GET("/login",func(c *gin.Context){

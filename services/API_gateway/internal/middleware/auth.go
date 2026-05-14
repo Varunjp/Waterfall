@@ -23,6 +23,8 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 		"/billing/checkout":true,
 		// "/billing/subscription":true,
 		"/":true,
+		"/home":true,
+		"/register":true,
 		"/login":true,
 		"/payment-success":true,
 		"/payment-cancel":true,
