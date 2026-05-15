@@ -19,6 +19,6 @@ COPY --from=builder /app/api-gateway .
 
 COPY --from=builder /app/web ./web 
 
-EXPOSE 8081 6060
+EXPOSE 8081
 
 CMD ["./api-gateway"]

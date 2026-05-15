@@ -362,7 +362,7 @@
       const jobs = data.jobs || [];
       totalJobs  = data.total || jobs.length;
 
-      renderStats(jobs);
+      renderStats(jobs,totalJobs);
       renderTable(jobs);
       renderPagination(page, totalJobs);
     } catch {
@@ -394,24 +394,24 @@
       const data = await res.json();
       const jobs = data.jobs || [];
       totalJobs  = data.total || jobs.length;
-      renderStats(jobs);
+      renderStats(jobs, totalJobs);
       renderTable(jobs);
       renderPagination(currentPage, totalJobs);
     } catch { /* silent — don't disrupt the user */ }
   }
 
-  function renderStats(jobs) {
-    const c = { COMPLETED: 0, FAILED: 0, CANCELED: 0, CANCELLED: 0, PENDING: 0, RUNNING: 0, SCHEDULED: 0, QUEUED: 0 };
+  function renderStats(jobs, totalJobs) {
+    const c = { COMPLETED: 0, FAILED: 0, CANCELED: 0, CANCELLED: 0, PENDING: 0, RUNNING: 0, SCHEDULED: 0, QUEUED: 0, DLQ: 0 };
     jobs.forEach(j => { if (c[j.status] !== undefined) c[j.status]++; });
 
     const succeeded = c.COMPLETED;
-    const failed    = c.FAILED + c.CANCELED + c.CANCELLED;
+    const failed    = c.FAILED + c.CANCELED + c.CANCELLED + c.DLQ;
     const active    = c.PENDING + c.RUNNING + c.SCHEDULED + c.QUEUED;
 
     document.getElementById('stats-row').innerHTML = `
       <div class="stat-card">
         <p class="stat-label">Total Shown</p>
-        <p class="stat-value">${jobs.length}</p>
+        <p class="stat-value">${totalJobs}</p>
       </div>
       <div class="stat-card">
         <p class="stat-label">Completed</p>

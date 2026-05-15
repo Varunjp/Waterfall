@@ -87,6 +87,8 @@ services:
     ports:
       - "8080:8080"
       - "50054:50054"
+    expose:
+      - "9101"
     depends_on:
       postgres:
         condition: service_healthy
@@ -121,7 +123,8 @@ services:
     container_name: scheduler_service
     ports:
       - "50052:50052"
-      - "9100:9100"
+    expose:
+      - "9100"
     depends_on:
       postgres:
         condition: service_healthy
@@ -167,6 +170,16 @@ services:
         condition: service_started
     env_file:
       - ./services/API_gateway/.env
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
 volumes:
   postgres_data:

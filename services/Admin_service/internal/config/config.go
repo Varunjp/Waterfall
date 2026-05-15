@@ -22,6 +22,7 @@ type Config struct {
 	SmtpUser      string
 	Smtppass      string
 	Stripe        stripeConfig
+	Metrics       MetricsConfig
 }
 
 type stripeConfig struct {
@@ -29,6 +30,11 @@ type stripeConfig struct {
 	SecretKey     string
 	SuccessURL    string
 	CancelURL     string
+}
+
+type MetricsConfig struct {
+	Enabled bool
+	Port    string
 }
 
 func Load() *Config {
@@ -56,7 +62,24 @@ func Load() *Config {
 			SuccessURL:    strings.TrimSpace(GetEnv("STRIPE_SUCCESS_URL", "")),
 			CancelURL:     strings.TrimSpace(GetEnv("STRIPE_CANCEL_URL", "")),
 		},
+		Metrics: MetricsConfig{
+			Enabled: getEnvBool("METRICS_ENABLED", true),
+			Port:    GetEnv("METRICS_PORT", "9101"),
+		},
 	}
+}
+
+func getEnvBool(key string, fallback bool) bool {
+	value := strings.TrimSpace(GetEnv(key, ""))
+	if value == "" {
+		return fallback
+	}
+
+	parsed, err := strconv.ParseBool(value)
+	if err != nil {
+		return fallback
+	}
+	return parsed
 }
 
 func BootstrapAdmin(db repo.AdminRepository) error {
