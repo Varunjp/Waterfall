@@ -4,12 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"scheduler_service/internal/domain"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
-
-	"scheduler_service/internal/domain"
 
 	"github.com/redis/go-redis/v9"
 )

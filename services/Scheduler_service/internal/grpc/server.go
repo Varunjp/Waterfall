@@ -2,7 +2,9 @@ package grpcserver
 
 import (
 	"context"
+	"errors"
 	"net"
+
 	"scheduler_service/internal/domain"
 	schedulerpb "scheduler_service/internal/grpc/schedulerpb"
 	"scheduler_service/internal/metrics"
@@ -26,6 +28,8 @@ type Server struct {
 	jobResultProcess domain.JobResultUsecase
 	log              *zap.Logger
 	runtime          *monitoring.Store
+
+	workerManger *WorkerManger
 }
 
 func NewServer(
@@ -35,6 +39,7 @@ func NewServer(
 	j domain.JobResultUsecase,
 	log *zap.Logger,
 	store *monitoring.Store,
+	w *WorkerManger,
 ) *Server {
 	return &Server{
 		redis:            redis,
@@ -43,168 +48,351 @@ func NewServer(
 		jobResultProcess: j,
 		log:              log,
 		runtime:          store,
+		workerManger: w,
 	}
 }
 
-func (s *Server) Heartbeat(ctx context.Context, req *schedulerpb.HeartbeatRequest) (*schedulerpb.Ack, error) {
-	now := requestTime(req.Timestamp)
-	key := "heartbeat:" + req.JobId
+func (s *Server) JobStream(stream schedulerpb.Scheduler_JobStreamServer) error {
 
-	err := s.redis.Set(
+	ctx,cancel := context.WithCancel(stream.Context())
+	defer cancel()
+
+	firstMsg,err := stream.Recv()
+	if err != nil {
+		return err 
+	}
+
+	register := firstMsg.GetRegister()
+	if register == nil {
+		return status.Error(codes.InvalidArgument,"first message must be register")
+	}
+
+	worker := &WorkerConnection{
+		AppID: register.AppId,
+		WorkerID: register.WorkerId,
+		JobTypes: register.JobTypes,
+		MaxConcurrency: register.MaxConcurrency,
+		Stream: stream,
+		SendQueue: make(chan *schedulerpb.SchedulerMessage,100),
+
+		Ctx: ctx,
+		Cancel: cancel,
+	}
+
+	go worker.WritePump()
+
+	s.workerManger.Register(worker)
+
+	s.log.Info("worker connected",zap.String("worker_id",worker.WorkerID))
+
+	defer func() {
+		s.workerManger.Remove(worker.WorkerID)
+		_ = s.runtime.MarkWorkerOffline(
+			ctx,
+			worker.AppID,
+			worker.WorkerID,
+			time.Now(),
+		)
+
+		s.log.Info("worker disconnected",zap.String("worker_id",worker.WorkerID))
+	}()
+
+	err = s.runtime.RecordWorkerRegistration(
+		ctx,
+		register.AppId,
+		register.WorkerId,
+		register.JobTypes,
+		int(register.MaxConcurrency),
+		time.Now(),
+	)
+
+	if err != nil {
+		return err 
+	}
+
+	for {
+
+		msg,err := stream.Recv()
+		if err != nil {
+			return err 
+		}
+
+		switch payload := msg.Payload.(type) {
+		case *schedulerpb.WorkerMessage_Heartbeat:
+			s.handleHeartbeat(
+				ctx,
+				worker,
+				payload.Heartbeat,
+			)
+		case *schedulerpb.WorkerMessage_Progress:
+			s.handleProgress(
+				ctx,
+				worker,
+				payload.Progress,
+			)
+		case *schedulerpb.WorkerMessage_Result:
+			s.handleResult(
+				ctx,
+				worker,
+				payload.Result,
+			)
+		}
+	}
+}
+
+func (s *Server) handleHeartbeat(ctx context.Context,worker *WorkerConnection, req *schedulerpb.WorkerHeartbeat) {
+
+	worker.activeJobs.Store(req.ActiveJobs)
+
+	err := s.runtime.RecordWorkerHeartbeat(
+		ctx,
+		worker.AppID,
+		worker.WorkerID,
+		worker.JobTypes,
+		int(worker.MaxConcurrency),
+		int(worker.ActiveJobs()),
+		requestTime(req.Timestamp),
+	)
+
+	if err != nil {
+		s.log.Warn("heartbeat failed",zap.Error(err))
+	}
+}
+
+func (s *Server) handleProgress(ctx context.Context,worker *WorkerConnection, req *schedulerpb.JobProgress) {
+
+	key := "heartbeat:"+ req.JobId
+	_ = s.redis.Set(
 		ctx,
 		key,
 		req.Timestamp,
 		30*time.Second,
-	).Err()
-
-	if err != nil {
-		s.log.Warn("heartbeat failed", zap.Error(err))
-	}
-
-	if s.runtime != nil {
-		if err := s.runtime.RecordWorkerSeen(ctx, req.AppId, req.WorkerId, now); err != nil {
-			s.log.Warn("failed to refresh worker activity",
-				zap.String("worker_id", req.WorkerId),
-				zap.String("app_id", req.AppId),
-				zap.Error(err),
-			)
-		}
-	}
-
-	if req.Progress == 0 {
-		event := map[string]any{
-			"job_id": req.JobId,
-			"app_id": req.AppId,
-			"status": "RUNNING",
-			"retry":  0,
-		}
-
-		if err := s.producer.Publish(ctx, event); err != nil {
-			s.log.Warn("failed to emit running update",
-				zap.String("job_id", req.JobId),
-				zap.Error(err),
-			)
-		}
-
-		if s.runtime != nil {
-			if err := s.runtime.RecordJobStarted(ctx, req.AppId, req.WorkerId, req.JobId, now); err != nil {
-				s.log.Warn("failed to record job start",
-					zap.String("job_id", req.JobId),
-					zap.String("worker_id", req.WorkerId),
-					zap.Error(err),
-				)
-			}
-		}
-	}
-
-	return &schedulerpb.Ack{Ok: err == nil}, nil
+	)
 }
 
-func (s *Server) ReportResult(ctx context.Context, req *schedulerpb.JobResultRequest) (*schedulerpb.Ack, error) {
+func (s *Server) handleResult(ctx context.Context,worker *WorkerConnection,req *schedulerpb.JobExecutionResult) {
+
 	jobID := req.JobId
-	appID := req.AppId
-	now := requestTime(req.Timestamp)
+	appID := worker.AppID
 
-	_ = s.redis.Del(ctx, "heartbeat:"+jobID)
-
-	_ = s.redis.Decr(ctx, "concurrency:"+appID)
+	_ = s.redis.Del(ctx,"heartbeat:"+jobID)
+	_ = s.redis.Decr(ctx,"concurrency:"+appID)
 
 	status := "COMPLETED"
+
 	if req.Status == schedulerpb.JobResultStatus_JOB_RESULT_FAILED {
-		s.metrics.JobsFailed.Inc()
 		status = "FAILED"
-	} else {
+		s.metrics.JobsFailed.Inc()
+	}else {
 		s.metrics.JobsSuccess.Inc()
 	}
+
 	s.metrics.RunningJobs.Dec()
 
-	if s.runtime != nil {
-		if err := s.runtime.RecordJobFinished(ctx, appID, req.WorkerId, jobID, now); err != nil {
-			s.log.Warn("failed to record job completion",
-				zap.String("job_id", jobID),
-				zap.String("worker_id", req.WorkerId),
-				zap.Error(err),
-			)
-		}
-	}
-
 	input := domain.JobResultInput{
-		JobID:        jobID,
-		AppID:        appID,
-		Status:       status,
-		Retry:        int(req.Retry),
+		JobID: jobID,
+		AppID: appID,
+		Status: status,
+		Retry: int(req.Retry),
 		ErrorMessage: req.ErrorMessage,
 	}
 
-	if err := s.jobResultProcess.ProcessJobResult(ctx, input); err != nil {
-		return &schedulerpb.Ack{Ok: false}, err
-	}
+	err := s.jobResultProcess.ProcessJobResult(ctx,input)
 
-	return &schedulerpb.Ack{Ok: true}, nil
+	if err != nil {
+		s.log.Error("job result failed",zap.Error(err))
+	}
 }
 
-func (s *Server) RegisterWorker(ctx context.Context, req *schedulerpb.RegisterWorkerRequest) (*schedulerpb.Ack, error) {
-	if req.AppId == "" || req.WorkerId == "" {
-		return &schedulerpb.Ack{Ok: false}, status.Error(codes.InvalidArgument, "app_id and worker_id are required")
+func (s *Server) DispatchJob(ctx context.Context,job domain.Job,worker *WorkerConnection) error {
+
+	if worker == nil {
+		return errors.New("no worker available")
 	}
 
-	if s.runtime == nil {
-		return &schedulerpb.Ack{Ok: false}, status.Error(codes.FailedPrecondition, "runtime store not configured")
+	err := worker.Stream.Send(
+		&schedulerpb.SchedulerMessage{
+			Payload: &schedulerpb.SchedulerMessage_Job{
+				Job: &schedulerpb.JobAssignment{
+					JobId: job.JobID,
+					AppId: job.AppID,
+					JobType: job.Type,
+					Payload: job.Payload,
+					RetryCount: int32(job.Retry),
+					MaxRetries: int32(job.MaxRetries),
+				},
+			},
+		},
+	)
+
+	if err != nil {
+		s.workerManger.Remove(worker.WorkerID)
+		return err 
 	}
 
-	if err := s.runtime.RecordWorkerRegistration(
-		ctx,
-		req.AppId,
-		req.WorkerId,
-		req.JobTypes,
-		int(req.MaxConcurrency),
-		requestTime(req.Timestamp),
-	); err != nil {
-		return &schedulerpb.Ack{Ok: false}, err
-	}
-
-	return &schedulerpb.Ack{Ok: true}, nil
+	worker.activeJobs.Add(1)
+	return nil 
 }
 
-func (s *Server) WorkerHeartbeat(ctx context.Context, req *schedulerpb.WorkerHeartbeatRequest) (*schedulerpb.Ack, error) {
-	if req.AppId == "" || req.WorkerId == "" {
-		return &schedulerpb.Ack{Ok: false}, status.Error(codes.InvalidArgument, "app_id and worker_id are required")
-	}
+// func (s *Server) Heartbeat(ctx context.Context, req *schedulerpb.HeartbeatRequest) (*schedulerpb.Ack, error) {
+// 	now := requestTime(req.Timestamp)
+// 	key := "heartbeat:" + req.JobId
 
-	if s.runtime == nil {
-		return &schedulerpb.Ack{Ok: false}, status.Error(codes.FailedPrecondition, "runtime store not configured")
-	}
+// 	err := s.redis.Set(
+// 		ctx,
+// 		key,
+// 		req.Timestamp,
+// 		30*time.Second,
+// 	).Err()
 
-	if err := s.runtime.RecordWorkerHeartbeat(
-		ctx,
-		req.AppId,
-		req.WorkerId,
-		req.JobTypes,
-		int(req.MaxConcurrency),
-		int(req.ActiveJobs),
-		requestTime(req.Timestamp),
-	); err != nil {
-		return &schedulerpb.Ack{Ok: false}, err
-	}
+// 	if err != nil {
+// 		s.log.Warn("heartbeat failed", zap.Error(err))
+// 	}
 
-	return &schedulerpb.Ack{Ok: true}, nil
-}
+// 	if s.runtime != nil {
+// 		if err := s.runtime.RecordWorkerSeen(ctx, req.AppId, req.WorkerId, now); err != nil {
+// 			s.log.Warn("failed to refresh worker activity",
+// 				zap.String("worker_id", req.WorkerId),
+// 				zap.String("app_id", req.AppId),
+// 				zap.Error(err),
+// 			)
+// 		}
+// 	}
 
-func (s *Server) UnregisterWorker(ctx context.Context, req *schedulerpb.UnregisterWorkerRequest) (*schedulerpb.Ack, error) {
-	if req.AppId == "" || req.WorkerId == "" {
-		return &schedulerpb.Ack{Ok: false}, status.Error(codes.InvalidArgument, "app_id and worker_id are required")
-	}
+// 	if req.Progress == 0 {
+// 		event := map[string]any{
+// 			"job_id": req.JobId,
+// 			"app_id": req.AppId,
+// 			"status": "RUNNING",
+// 			"retry":  0,
+// 		}
 
-	if s.runtime == nil {
-		return &schedulerpb.Ack{Ok: false}, status.Error(codes.FailedPrecondition, "runtime store not configured")
-	}
+// 		if err := s.producer.Publish(ctx, event); err != nil {
+// 			s.log.Warn("failed to emit running update",
+// 				zap.String("job_id", req.JobId),
+// 				zap.Error(err),
+// 			)
+// 		}
 
-	if err := s.runtime.MarkWorkerOffline(ctx, req.AppId, req.WorkerId, requestTime(req.Timestamp)); err != nil {
-		return &schedulerpb.Ack{Ok: false}, err
-	}
+// 		if s.runtime != nil {
+// 			if err := s.runtime.RecordJobStarted(ctx, req.AppId, req.WorkerId, req.JobId, now); err != nil {
+// 				s.log.Warn("failed to record job start",
+// 					zap.String("job_id", req.JobId),
+// 					zap.String("worker_id", req.WorkerId),
+// 					zap.Error(err),
+// 				)
+// 			}
+// 		}
+// 	}
 
-	return &schedulerpb.Ack{Ok: true}, nil
-}
+// 	return &schedulerpb.Ack{Ok: err == nil}, nil
+// }
+
+// func (s *Server) ReportResult(ctx context.Context, req *schedulerpb.JobResultRequest) (*schedulerpb.Ack, error) {
+// 	jobID := req.JobId
+// 	appID := req.AppId
+// 	now := requestTime(req.Timestamp)
+
+// 	_ = s.redis.Del(ctx, "heartbeat:"+jobID)
+
+// 	_ = s.redis.Decr(ctx, "concurrency:"+appID)
+
+// 	status := "COMPLETED"
+// 	if req.Status == schedulerpb.JobResultStatus_JOB_RESULT_FAILED {
+// 		s.metrics.JobsFailed.Inc()
+// 		status = "FAILED"
+// 	} else {
+// 		s.metrics.JobsSuccess.Inc()
+// 	}
+// 	s.metrics.RunningJobs.Dec()
+
+// 	if s.runtime != nil {
+// 		if err := s.runtime.RecordJobFinished(ctx, appID, req.WorkerId, jobID, now); err != nil {
+// 			s.log.Warn("failed to record job completion",
+// 				zap.String("job_id", jobID),
+// 				zap.String("worker_id", req.WorkerId),
+// 				zap.Error(err),
+// 			)
+// 		}
+// 	}
+
+// 	input := domain.JobResultInput{
+// 		JobID:        jobID,
+// 		AppID:        appID,
+// 		Status:       status,
+// 		Retry:        int(req.Retry),
+// 		ErrorMessage: req.ErrorMessage,
+// 	}
+
+// 	if err := s.jobResultProcess.ProcessJobResult(ctx, input); err != nil {
+// 		return &schedulerpb.Ack{Ok: false}, err
+// 	}
+
+// 	return &schedulerpb.Ack{Ok: true}, nil
+// }
+
+// func (s *Server) RegisterWorker(ctx context.Context, req *schedulerpb.RegisterWorkerRequest) (*schedulerpb.Ack, error) {
+// 	if req.AppId == "" || req.WorkerId == "" {
+// 		return &schedulerpb.Ack{Ok: false}, status.Error(codes.InvalidArgument, "app_id and worker_id are required")
+// 	}
+
+// 	if s.runtime == nil {
+// 		return &schedulerpb.Ack{Ok: false}, status.Error(codes.FailedPrecondition, "runtime store not configured")
+// 	}
+
+// 	if err := s.runtime.RecordWorkerRegistration(
+// 		ctx,
+// 		req.AppId,
+// 		req.WorkerId,
+// 		req.JobTypes,
+// 		int(req.MaxConcurrency),
+// 		requestTime(req.Timestamp),
+// 	); err != nil {
+// 		return &schedulerpb.Ack{Ok: false}, err
+// 	}
+
+// 	return &schedulerpb.Ack{Ok: true}, nil
+// }
+
+// func (s *Server) WorkerHeartbeat(ctx context.Context, req *schedulerpb.WorkerHeartbeatRequest) (*schedulerpb.Ack, error) {
+// 	if req.AppId == "" || req.WorkerId == "" {
+// 		return &schedulerpb.Ack{Ok: false}, status.Error(codes.InvalidArgument, "app_id and worker_id are required")
+// 	}
+
+// 	if s.runtime == nil {
+// 		return &schedulerpb.Ack{Ok: false}, status.Error(codes.FailedPrecondition, "runtime store not configured")
+// 	}
+
+// 	if err := s.runtime.RecordWorkerHeartbeat(
+// 		ctx,
+// 		req.AppId,
+// 		req.WorkerId,
+// 		req.JobTypes,
+// 		int(req.MaxConcurrency),
+// 		int(req.ActiveJobs),
+// 		requestTime(req.Timestamp),
+// 	); err != nil {
+// 		return &schedulerpb.Ack{Ok: false}, err
+// 	}
+
+// 	return &schedulerpb.Ack{Ok: true}, nil
+// }
+
+// func (s *Server) UnregisterWorker(ctx context.Context, req *schedulerpb.UnregisterWorkerRequest) (*schedulerpb.Ack, error) {
+// 	if req.AppId == "" || req.WorkerId == "" {
+// 		return &schedulerpb.Ack{Ok: false}, status.Error(codes.InvalidArgument, "app_id and worker_id are required")
+// 	}
+
+// 	if s.runtime == nil {
+// 		return &schedulerpb.Ack{Ok: false}, status.Error(codes.FailedPrecondition, "runtime store not configured")
+// 	}
+
+// 	if err := s.runtime.MarkWorkerOffline(ctx, req.AppId, req.WorkerId, requestTime(req.Timestamp)); err != nil {
+// 		return &schedulerpb.Ack{Ok: false}, err
+// 	}
+
+// 	return &schedulerpb.Ack{Ok: true}, nil
+// }
 
 func (s *Server) GetTenantRuntime(ctx context.Context, req *schedulerpb.GetTenantRuntimeRequest) (*schedulerpb.GetTenantRuntimeResponse, error) {
 	if s.runtime == nil {
@@ -266,6 +454,8 @@ func Run(
 	log *zap.Logger,
 	store *monitoring.Store,
 	jwtSecret string,
+	w *WorkerManger,
+	s *Server,
 ) error {
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -275,7 +465,7 @@ func Run(
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(middleware.APIKeyInterceptor(jwtSecret)),
 	)
-	schedulerpb.RegisterSchedulerServer(grpcServer, NewServer(redis, producer, m, j, log, store))
+	schedulerpb.RegisterSchedulerServer(grpcServer, s)
 
 	go func() {
 		<-ctx.Done()

@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type Worker struct {
 	WorkerID   string 
@@ -10,3 +13,6 @@ type Worker struct {
 	ActiveJobs  int 
 	LastSeen    time.Time 
 }
+
+var ErrWorkerDisconnected error = errors.New("Worker disconnected")
+var ErrWorkerQueueFull error = errors.New("worker queue full")
