@@ -154,6 +154,8 @@ services:
     restart: unless-stopped
     env_file:
       - ./services/Admin_service/.env
+    ports:
+      - "8080:8080"
     expose:
       - "50054"
       - "9101"
