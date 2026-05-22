@@ -106,7 +106,7 @@ func (s *AppService) Register(name,email string) (string,string,string,error) {
 	return appID,name,pass,nil 
 }
 
-func (s *AppService) List()([]*entities.App,error) {
+func (s *AppService) List()([]*entities.AppDetails,error) {
 	return s.repo.FindAll()
 }
 

@@ -60,7 +60,7 @@ func (s *Store) RecordWorkerRegistration(
 	return s.upsertWorker(ctx, appID, workerID, jobTypes, maxConcurrency, 0, ts, true)
 }
 
-func (s *Store) RecordWorkerHeartbeat(
+func (s *Store) WorkerStreamHeartbeat(
 	ctx context.Context,
 	appID string,
 	workerID string,
@@ -69,7 +69,29 @@ func (s *Store) RecordWorkerHeartbeat(
 	activeJobs int,
 	ts time.Time,
 ) error {
-	return s.upsertWorker(ctx, appID, workerID, jobTypes, maxConcurrency, activeJobs, ts, true)
+	key := s.workerKey(appID,workerID,)
+
+	fields :=map[string]any{
+		"last_seen":
+			ts.Unix(),
+
+		"active_jobs":
+			activeJobs,
+
+		"worker_state":
+			"active",
+	}
+
+	pipe := s.redis.TxPipeline()
+
+	pipe.HSet(ctx,key,fields)
+
+	pipe.Expire(ctx,key,stateTTL)
+
+	_, err :=
+		pipe.Exec(ctx)
+
+	return err
 }
 
 func (s *Store) RecordWorkerSeen(

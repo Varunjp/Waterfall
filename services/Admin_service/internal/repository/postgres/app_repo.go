@@ -113,26 +113,25 @@ func (r *AppRepo) Create(app *entities.App) (string, error) {
 	return appID, nil
 }
 
-func (r *AppRepo) FindAll() ([]*entities.App, error) {
+func (r *AppRepo) FindAll() ([]*entities.AppDetails, error) {
 	rows, err := r.db.Query(`
-		SELECT app_id,app_name,app_email,status,tier, created_at, updated_at FROM apps ORDER BY created_at DESC
+		SELECT a.app_id,a.app_name,a.app_email,a.status, p.name As PlanName, s.current_period_end FROM apps a JOIN subscriptions s ON a.app_id = s.app_id JOIN plans p ON p.plan_id = s.plan_id ORDER BY a.created_at DESC
 	`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var apps []*entities.App
+	var apps []*entities.AppDetails
 	for rows.Next() {
-		var a entities.App
+		var a entities.AppDetails
 		err := rows.Scan(
 			&a.AppID,
 			&a.AppName,
 			&a.AppEmail,
 			&a.Status,
-			&a.Tier,
-			&a.CreatedAt,
-			&a.UpdatedAt,
+			&a.PlanName,
+			&a.EndDate,
 		)
 		if err != nil {
 			return nil, err

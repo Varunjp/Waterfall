@@ -70,6 +70,7 @@ func (a *Assigner) Assign(ctx context.Context, job domain.Job) error {
 		jobRes := domain.JobResultInput {
 			JobID: job.JobID,
 			AppID: job.AppID,
+			Retry: job.Retry,
 			Status: "FAILED",
 			ErrorMessage: "No worker available",
 		}

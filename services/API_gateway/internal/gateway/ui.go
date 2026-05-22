@@ -65,7 +65,7 @@ func RegisterUIRoutes(r *gin.Engine) {
 	})
 
 	r.GET("/admin/dashboard",func(c *gin.Context) {
-		token,err := c.Cookie("token")
+		token,err := c.Cookie("admin_token")
 		if err != nil || token == "" {
 			c.Redirect(http.StatusFound,"/admin")
 			return 

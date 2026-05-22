@@ -103,7 +103,7 @@ func (s *Server) JobStream(stream schedulerpb.Scheduler_JobStreamServer) error {
 		register.WorkerId,
 		register.JobTypes,
 		int(register.MaxConcurrency),
-		time.Now(),
+		time.Now().UTC(),
 	)
 
 	if err != nil {
@@ -144,7 +144,7 @@ func (s *Server) handleHeartbeat(ctx context.Context,worker *WorkerConnection, r
 
 	worker.activeJobs.Store(req.ActiveJobs)
 
-	err := s.runtime.RecordWorkerHeartbeat(
+	err := s.runtime.WorkerStreamHeartbeat(
 		ctx,
 		worker.AppID,
 		worker.WorkerID,

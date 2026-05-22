@@ -58,7 +58,8 @@ message App {
   string app_name = 2;
   string app_email = 3;
   string status = 4;
-  string tier = 5;
+  string plan_name = 5;
+  string endDate = 6;
 }
 
 message BlockAppRequest {

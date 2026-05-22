@@ -210,7 +210,7 @@
       </div>`);
 
     try {
-      const res  = await fetch(`/api/v1/admin/apps?limit=${LIMIT}&offset=${page}`, { headers: authH });
+      const res  = await fetch(`/api/v1/apps?limit=${LIMIT}&offset=${page}`, { headers: authH });
       const data = await res.json();
       const apps = data.apps || data || [];
       const total = data.total || apps.length;
@@ -221,10 +221,10 @@
       const rows = apps.map(a => `<tr>
         <td><span class="cell-id" title="${esc(a.appId || a.id)}">${esc(a.appId || a.id)}</span></td>
         <td>${esc(a.name || a.appName || '—')}</td>
-        <td>${esc(a.email || '—')}</td>
+        <td>${esc(a.appEmail || '—')}</td>
         <td>${badge(a.status)}</td>
         <td>${esc(a.planName || '—')}</td>
-        <td>${fmtDate(a.planEndDate || a.currentPeriodEnd)}</td>
+        <td>${fmtDate(a.endDate || a.currentPeriodEnd)}</td>
         <td class="action-cell">
           ${a.status === 'active' || a.status === 'Active'
             ? `<button class="btn-action-sm btn-block" onclick="toggleApp('${esc(a.appId||a.id)}','block',this)">Block</button>`
@@ -250,7 +250,7 @@
     const orig = btn.textContent;
     btn.disabled = true; btn.textContent = '…';
     try {
-      const res = await fetch(`/api/v1/admin/apps/${appId}/${action}`, { method: 'POST', headers: authH });
+      const res = await fetch(`/api/v1/apps/${appId}/${action}`, { method: 'PATCH', headers: authH });
       if (!res.ok) throw new Error((await res.json().catch(()=>({}))).message || 'Failed');
       toast(`App ${action}ed successfully`);
       loadApps(state.apps.page);
@@ -266,7 +266,7 @@
     $('app-users-body').innerHTML = '<div class="state-loading">Loading</div>';
     $('app-users-overlay').classList.add('open');
     try {
-      const res  = await fetch(`/api/v1/admin/apps/${appId}/users`, { headers: authH });
+      const res  = await fetch(`/api/v1/apps/${appId}/users`, { headers: authH });
       const data = await res.json();
       const users = data.users || data || [];
       if (!users.length) { $('app-users-body').innerHTML = '<div class="state-empty">No users</div>'; return; }
@@ -428,7 +428,7 @@
 
     if (nameVal)   body.name          = nameVal;
     if (priceVal)  body.price         = Number(priceVal);
-    if (limitVal)  body.jobLimit      = Number(limitVal);
+    if (limitVal)  body.jobLimt      = Number(limitVal);
     if (stripeVal) body.stripePriceID = stripeVal;
 
     if (!Object.keys(body).length) { errEl.textContent = 'Enter at least one field to update.'; return; }

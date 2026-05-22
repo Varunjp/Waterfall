@@ -47,6 +47,9 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 
 		if authHeader == "" {
 			cookie, _ := c.Cookie("token")
+			if cookie == "" {
+				cookie,_ = c.Cookie("admin_token")
+			}
 			authHeader = "Bearer "+cookie
 		}
 
@@ -58,6 +61,7 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 
 		claims, err := utils.ValidateToken(token, secret)
+
 		if err != nil {
 			c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
 			return
