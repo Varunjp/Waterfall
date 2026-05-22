@@ -18,7 +18,7 @@ func NewJobRepo(db *pgxpool.Pool) JobRepository {
 	return &jobRepo{db: db}
 }
 
-func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit,offset int,startDate,endDate *time.Time)([]domain.Job,int,error) {
+func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]domain.Job, int, error) {
 
 	baseQuery := `FROM jobs WHERE app_id = $1`
 	args := []any{appID}
@@ -87,15 +87,15 @@ func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit,off
 	return jobs, total, nil
 }
 
-func (r *jobRepo) ListFailed(ctx context.Context,limit,offset int) ([]domain.Job,int,error) {
+func (r *jobRepo) ListFailed(ctx context.Context, limit, offset int) ([]domain.Job, int, error) {
 
 	totalQuery := `SELECT COUNT(*) FROM jobs WHERE status = 'FAILED' OR status = 'DQL';`
 
-	var total int 
-	err := r.db.QueryRow(ctx,totalQuery).Scan(&total)
+	var total int
+	err := r.db.QueryRow(ctx, totalQuery).Scan(&total)
 
 	if err != nil {
-		return nil,0,err 
+		return nil, 0, err
 	}
 
 	query := `
@@ -107,9 +107,9 @@ func (r *jobRepo) ListFailed(ctx context.Context,limit,offset int) ([]domain.Job
 	args := []any{}
 	args = append(args, limit, offset)
 
-	rows,err := r.db.Query(ctx,query,args...)
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
-		return nil,0,err 
+		return nil, 0, err
 	}
 	defer rows.Close()
 
@@ -117,36 +117,36 @@ func (r *jobRepo) ListFailed(ctx context.Context,limit,offset int) ([]domain.Job
 	for rows.Next() {
 		var j domain.Job
 		if err := rows.Scan(
-			&j.JobID,&j.AppID,&j.Type,&j.Payload,&j.Status,&j.Retry,&j.MaxRetry,&j.CreatedAt,&j.UpdatedAt,
+			&j.JobID, &j.AppID, &j.Type, &j.Payload, &j.Status, &j.Retry, &j.MaxRetry, &j.CreatedAt, &j.UpdatedAt,
 		); err != nil {
-			return nil,0,err 
+			return nil, 0, err
 		}
 		jobs = append(jobs, j)
 	}
 
-	return jobs,total,nil
+	return jobs, total, nil
 }
 
-func (r *jobRepo) GetByID(ctx context.Context,jobID string)(*domain.Job,error) {
+func (r *jobRepo) GetByID(ctx context.Context, jobID string) (*domain.Job, error) {
 	query := `
 	SELECT job_id,app_id, type, payload, status, retry, max_retry, created_at, updated_at,manual_retry
 	FROM jobs WHERE job_id=$1
 	`
 
 	var j domain.Job
-	err := r.db.QueryRow(ctx,query,jobID).Scan(
-		&j.JobID,&j.AppID,&j.Type,&j.Payload,&j.Status,&j.Retry,&j.MaxRetry,&j.CreatedAt,&j.UpdatedAt,&j.ManualRetry,
+	err := r.db.QueryRow(ctx, query, jobID).Scan(
+		&j.JobID, &j.AppID, &j.Type, &j.Payload, &j.Status, &j.Retry, &j.MaxRetry, &j.CreatedAt, &j.UpdatedAt, &j.ManualRetry,
 	)
 
 	if err != nil {
-		return nil,domain.ErrNotFound
+		return nil, domain.ErrNotFound
 	}
 
-	return &j,nil 
+	return &j, nil
 }
 
-func (r *jobRepo) GetJobStats(ctx context.Context, appID string)(*domain.JobStats,error) {
-	
+func (r *jobRepo) GetJobStats(ctx context.Context, appID string) (*domain.JobStats, error) {
+
 	query := `
 		SELECT
 			COUNT(*) AS total_jobs,
@@ -169,7 +169,9 @@ func (r *jobRepo) GetJobStats(ctx context.Context, appID string)(*domain.JobStat
 	return &stats, nil
 }
 
-func (r *jobRepo) GetJobMetrics(ctx context.Context,appID string,from, to time.Time,bucket string) ([]domain.MetricBucket, error) {
+func (r *jobRepo) GetJobMetrics(ctx context.Context, appID string, from, to time.Time, bucket string) ([]domain.MetricBucket, error) {
+	from = from.UTC()
+	to = to.UTC()
 
 	if bucket == "" {
 		bucket = "hour"
@@ -221,7 +223,7 @@ func (r *jobRepo) GetJobMetrics(ctx context.Context,appID string,from, to time.T
 			return nil, err
 		}
 
-		item.TS = ts.Format(time.RFC3339)
+		item.TS = ts.UTC().Format(time.RFC3339)
 		result = append(result, item)
 	}
 

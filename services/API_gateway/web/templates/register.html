@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — Waterfall</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,200;0,300;0,400;0,500;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:      #080808;
+      --surface:    #0e0e0e;
+      --surface-2:  #141414;
+      --surface-3:  #1c1c1c;
+      --white:      #f2f2ec;
+      --gray-light: #d8d8d2;
+      --gray-mid:   #6e6e68;
+      --gray-dim:   #333330;
+      --border:     rgba(242,242,236,0.07);
+      --border-hi:  rgba(242,242,236,0.16);
+      --accent:     #a8f0b8;
+      --accent-2:   #a8d4f0;
+      --accent-red: #f0a8a8;
+      --accent-warn: #f0e6a8;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Grid overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 72px 72px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      width: 420px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    /* Subtle vertical accent line */
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 1px; height: 100%;
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(242,242,236,0.15) 30%,
+        rgba(242,242,236,0.15) 70%,
+        transparent
+      );
+    }
+
+    .left-brand {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+
+    .left-brand-label {
+      font-size: 9px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--gray-mid);
+    }
+
+    .left-brand-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px; letter-spacing: 0.08em;
+      line-height: 1; color: var(--white);
+    }
+
+    .left-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 0;
+    }
+
+    .left-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 56px; letter-spacing: 0.04em;
+      line-height: 0.95;
+      color: var(--white);
+      margin-bottom: 20px;
+    }
+
+    .left-heading span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(242,242,236,0.22);
+    }
+
+    .left-sub {
+      font-size: 13px; line-height: 1.8;
+      color: var(--gray-mid); font-weight: 300;
+      max-width: 280px;
+      margin-bottom: 40px;
+    }
+
+    .left-features {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    .left-feature {
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+
+    .left-feature-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 0 5px var(--accent);
+    }
+
+    .left-feature-text {
+      font-size: 12px; line-height: 1.6;
+      color: var(--gray-mid); font-weight: 300;
+    }
+
+    .left-feature-text strong {
+      color: var(--gray-light);
+      font-weight: 400;
+    }
+
+    .left-footer {
+      font-size: 10px; letter-spacing: 0.08em;
+      color: var(--gray-dim);
+    }
+
+    /* Decorative waterfall SVG on left */
+    .left-deco {
+      position: absolute;
+      bottom: 80px; right: -20px;
+      opacity: 0.04;
+      pointer-events: none;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      padding: 48px;
+      overflow-y: auto;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    /* Top bar of the card */
+    .form-card-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-card-tag {
+      font-size: 9px; letter-spacing: 0.24em;
+      text-transform: uppercase; color: var(--gray-mid);
+    }
+
+    .form-card-step {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em;
+      color: var(--gray-dim);
+    }
+
+    .form-card-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 40px; letter-spacing: 0.06em;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .form-card-hint {
+      font-size: 12px; line-height: 1.6;
+      color: var(--gray-mid); font-weight: 300;
+      margin-bottom: 40px;
+    }
+
+    /* ── FIELDS ── */
+    .field-group {
+      margin-bottom: 22px;
+    }
+
+    .field-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 9px; letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gray-mid);
+      margin-bottom: 10px;
+    }
+
+    .field-label-tag {
+      font-size: 8px; letter-spacing: 0.1em;
+      padding: 2px 8px;
+      border: 1px solid var(--border-hi);
+      color: var(--gray-dim);
+      font-weight: 400;
+      text-transform: none;
+    }
+
+    .field-input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      padding: 13px 16px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      border-radius: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      letter-spacing: 0.02em;
+    }
+
+    .field-input:focus {
+      border-color: var(--border-hi);
+      background: var(--surface-3);
+    }
+
+    .field-input::placeholder {
+      color: rgba(242,242,236,0.15);
+      font-size: 13px;
+    }
+
+    .field-input.error {
+      border-color: rgba(240,168,168,0.5);
+    }
+
+    .field-hint {
+      margin-top: 7px;
+      font-size: 10px; letter-spacing: 0.04em;
+      color: var(--gray-dim);
+      line-height: 1.5;
+    }
+
+    /* ── INLINE VALIDATION ── */
+    .field-validation {
+      margin-top: 7px;
+      font-size: 11px; letter-spacing: 0.04em;
+      min-height: 16px;
+      line-height: 1.4;
+      display: flex; align-items: center; gap: 6px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .field-validation.visible { opacity: 1; }
+    .field-validation.ok  { color: var(--accent); }
+    .field-validation.err { color: var(--accent-red); }
+
+    .field-validation-icon {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; font-weight: 700;
+    }
+
+    .field-validation.ok  .field-validation-icon { background: rgba(168,240,184,0.2); color: var(--accent); }
+    .field-validation.err .field-validation-icon { background: rgba(240,168,168,0.2); color: var(--accent-red); }
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--white);
+      border: none;
+      color: var(--black);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px; letter-spacing: 0.22em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-submit:hover:not(:disabled) { opacity: 0.85; }
+
+    .btn-submit:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .btn-submit.loading {
+      pointer-events: none;
+    }
+
+    .btn-spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(0,0,0,0.3);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+
+    .btn-submit.loading .btn-spinner { display: block; }
+    .btn-submit.loading .btn-text { opacity: 0.6; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ERROR BANNER ── */
+    .error-banner {
+      display: none;
+      align-items: flex-start; gap: 12px;
+      padding: 14px 16px;
+      background: rgba(240,168,168,0.06);
+      border: 1px solid rgba(240,168,168,0.25);
+      margin-bottom: 20px;
+    }
+
+    .error-banner.visible { display: flex; }
+
+    .error-banner-icon {
+      font-size: 14px; flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    .error-banner-msg {
+      font-size: 12px; line-height: 1.6;
+      color: var(--accent-red);
+      font-weight: 300;
+    }
+
+    /* ── SUCCESS STATE ── */
+    .success-state {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .success-state.visible { display: flex; }
+
+    .success-top {
+      display: flex; align-items: center; gap: 16px;
+    }
+
+    .success-icon {
+      width: 40px; height: 40px; flex-shrink: 0;
+      border: 1px solid rgba(168,240,184,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--accent);
+    }
+
+    .success-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px; letter-spacing: 0.06em;
+      color: var(--accent); line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .success-sub {
+      font-size: 12px; color: var(--gray-mid); font-weight: 300;
+    }
+
+    /* Warning banner */
+    .save-warning {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 16px;
+      background: rgba(240,230,168,0.06);
+      border: 1px solid rgba(240,230,168,0.25);
+    }
+
+    .save-warning-icon {
+      font-size: 16px; color: var(--accent-warn);
+      flex-shrink: 0; line-height: 1.4;
+    }
+
+    .save-warning-title {
+      font-size: 12px; font-weight: 500;
+      color: var(--accent-warn);
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .save-warning-text {
+      font-size: 11px; line-height: 1.65;
+      color: rgba(240,230,168,0.55);
+      font-weight: 300;
+    }
+
+    /* Credential grid */
+    .cred-grid {
+      display: flex; flex-direction: column;
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .cred-row {
+      background: var(--surface-2);
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cred-row--highlight {
+      background: rgba(240,230,168,0.04);
+      border-left: 2px solid rgba(240,230,168,0.35);
+    }
+
+    .cred-key {
+      font-size: 9px; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gray-mid);
+      flex-shrink: 0; width: 80px;
+    }
+
+    .cred-val-wrap {
+      display: flex; align-items: center; gap: 10px;
+      flex: 1; min-width: 0;
+    }
+
+    .cred-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px; font-weight: 300;
+      color: var(--gray-light);
+      word-break: break-all; flex: 1;
+    }
+
+    .cred-val--password {
+      color: var(--accent-warn);
+      letter-spacing: 0.03em;
+    }
+
+    .btn-copy {
+      background: none;
+      border: 1px solid var(--border-hi);
+      color: var(--gray-mid);
+      width: 26px; height: 26px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .btn-copy:hover { border-color: var(--white); color: var(--white); }
+
+    .btn-copy.copied {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(168,240,184,0.08);
+    }
+
+    .btn-goto-login {
+      width: 100%;
+      padding: 14px;
+      background: var(--white);
+      border: none;
+      color: var(--black);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px; letter-spacing: 0.2em;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      transition: opacity 0.2s;
+    }
+
+    .btn-goto-login:hover { opacity: 0.85; }
+
+    /* ── FOOTER LINK ── */
+    .form-footer-link {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--gray-dim);
+    }
+
+    .form-footer-link a {
+      color: var(--gray-mid);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .form-footer-link a:hover { color: var(--white); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-card {
+      animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+      animation-delay: 0.1s;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gray-dim); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 780px) {
+      body { flex-direction: column; overflow: auto; }
+      .left-panel {
+        width: 100%; padding: 32px 24px;
+        border-right: none; border-bottom: 1px solid var(--border);
+      }
+      .left-content { display: none; }
+      .left-footer { display: none; }
+      .right-panel { padding: 40px 24px; align-items: flex-start; }
+      body { overflow: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── LEFT PANEL ── -->
+  <aside class="left-panel">
+    <div class="left-brand">
+      <p class="left-brand-label">Job Queue Infrastructure</p>
+      <p class="left-brand-name">WATERFALL</p>
+    </div>
+
+    <div class="left-content">
+      <h2 class="left-heading">
+        YOUR QUEUE
+        <span>STARTS HERE</span>
+      </h2>
+      <p class="left-sub">
+        Create a free Waterfall app to start scheduling,
+        retrying, and monitoring background jobs in minutes.
+      </p>
+
+      <div class="left-features">
+        <div class="left-feature">
+          <div class="left-feature-dot"></div>
+          <p class="left-feature-text"><strong>Free tier included</strong> — up to 10,000 jobs per month with no credit card required.</p>
+        </div>
+        <div class="left-feature">
+          <div class="left-feature-dot"></div>
+          <p class="left-feature-text"><strong>Live admin dashboard</strong> — monitor queues, workers, and job logs from day one.</p>
+        </div>
+        <div class="left-feature">
+          <div class="left-feature-dot"></div>
+          <p class="left-feature-text"><strong>Instant API access</strong> — your App ID and credentials are ready the moment you register.</p>
+        </div>
+        <div class="left-feature">
+          <div class="left-feature-dot"></div>
+          <p class="left-feature-text"><strong>Built-in retry engine</strong> — automatic retries with Dead Letter Queue on exhaustion.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="left-footer">© 2025 Waterfall. All rights reserved.</p>
+
+    <!-- decorative -->
+    <svg class="left-deco" width="200" height="200" viewBox="0 0 400 400" fill="none" aria-hidden="true">
+      <rect x="160" y="20" width="80" height="40" rx="2" stroke="white" stroke-width="1"/>
+      <rect x="100" y="100" width="80" height="40" rx="2" stroke="white" stroke-width="1"/>
+      <rect x="220" y="100" width="80" height="40" rx="2" stroke="white" stroke-width="1"/>
+      <rect x="40" y="180" width="80" height="40" rx="2" stroke="white" stroke-width="1"/>
+      <rect x="160" y="180" width="80" height="40" rx="2" stroke="white" stroke-width="1"/>
+      <rect x="280" y="180" width="80" height="40" rx="2" stroke="white" stroke-width="1"/>
+      <rect x="100" y="260" width="80" height="40" rx="2" stroke="white" stroke-width="1"/>
+      <rect x="220" y="260" width="80" height="40" rx="2" stroke="white" stroke-width="1"/>
+      <line x1="200" y1="60" x2="140" y2="100" stroke="white" stroke-width="0.5"/>
+      <line x1="200" y1="60" x2="260" y2="100" stroke="white" stroke-width="0.5"/>
+      <line x1="140" y1="140" x2="80" y2="180" stroke="white" stroke-width="0.5"/>
+      <line x1="140" y1="140" x2="200" y2="180" stroke="white" stroke-width="0.5"/>
+      <line x1="260" y1="140" x2="200" y2="180" stroke="white" stroke-width="0.5"/>
+      <line x1="260" y1="140" x2="320" y2="180" stroke="white" stroke-width="0.5"/>
+    </svg>
+  </aside>
+
+  <!-- ── RIGHT PANEL ── -->
+  <main class="right-panel">
+    <div class="form-card">
+
+      <div class="form-card-bar">
+        <span class="form-card-tag">Create Account</span>
+        <span class="form-card-step">POST /api/v1/apps</span>
+      </div>
+
+      <h1 class="form-card-heading">REGISTER</h1>
+      <p class="form-card-hint">Enter your app name and email to create a Waterfall account. Your App ID and API credentials will be generated automatically.</p>
+
+      <!-- Error banner -->
+      <div class="error-banner" id="error-banner" role="alert">
+        <span class="error-banner-icon">✕</span>
+        <p class="error-banner-msg" id="error-msg">Something went wrong.</p>
+      </div>
+
+      <!-- Form -->
+      <div id="register-form">
+
+        <!-- App Name -->
+        <div class="field-group">
+          <label class="field-label" for="app_name">
+            App Name
+            <span class="field-label-tag">app_name</span>
+          </label>
+          <input
+            type="text"
+            id="app_name"
+            class="field-input"
+            placeholder="myapp"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div class="field-validation" id="name-validation">
+            <div class="field-validation-icon">✓</div>
+            <span class="field-validation-text"></span>
+          </div>
+          <p class="field-hint">Lowercase letters, numbers, and hyphens only. Used as your queue namespace.</p>
+        </div>
+
+        <!-- Email -->
+        <div class="field-group">
+          <label class="field-label" for="app_email">
+            Email Address
+            <span class="field-label-tag">app_email</span>
+          </label>
+          <input
+            type="email"
+            id="app_email"
+            class="field-input"
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+          <div class="field-validation" id="email-validation">
+            <div class="field-validation-icon">✓</div>
+            <span class="field-validation-text"></span>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button class="btn-submit" id="btn-submit" disabled>
+          <div class="btn-spinner"></div>
+          <span class="btn-text">Create Account</span>
+        </button>
+
+        <p class="form-footer-link">
+          Already have an account? <a href="/login">Log in →</a>
+        </p>
+
+      </div>
+
+      <!-- Success state (shown after successful registration) -->
+      <div class="success-state" id="success-state">
+
+        <div class="success-top">
+          <div class="success-icon">✓</div>
+          <div>
+            <p class="success-heading">APP CREATED</p>
+            <p class="success-sub">Your Waterfall app is ready to use.</p>
+          </div>
+        </div>
+
+        <!-- Warning banner -->
+        <div class="save-warning">
+          <div class="save-warning-icon">⚠</div>
+          <div>
+            <p class="save-warning-title">Save your credentials now</p>
+            <p class="save-warning-text">Your password will not be shown again. Copy and store it somewhere safe before leaving this page.</p>
+          </div>
+        </div>
+
+        <!-- Credential rows -->
+        <div class="cred-grid">
+          <div class="cred-row">
+            <p class="cred-key">App ID</p>
+            <div class="cred-val-wrap">
+              <p class="cred-val" id="cred-app-id">—</p>
+              <button class="btn-copy" data-target="cred-app-id" title="Copy">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="5" y="5" width="9" height="9" rx="0.5"/><path d="M11 5V3a.5.5 0 0 0-.5-.5H2.5A.5.5 0 0 0 2 3v8a.5.5 0 0 0 .5.5H5"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="cred-row">
+            <p class="cred-key">App Name</p>
+            <div class="cred-val-wrap">
+              <p class="cred-val" id="cred-app-name">—</p>
+              <button class="btn-copy" data-target="cred-app-name" title="Copy">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="5" y="5" width="9" height="9" rx="0.5"/><path d="M11 5V3a.5.5 0 0 0-.5-.5H2.5A.5.5 0 0 0 2 3v8a.5.5 0 0 0 .5.5H5"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="cred-row cred-row--highlight">
+            <p class="cred-key">Password</p>
+            <div class="cred-val-wrap">
+              <p class="cred-val cred-val--password" id="cred-password">—</p>
+              <button class="btn-copy" data-target="cred-password" title="Copy">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="5" y="5" width="9" height="9" rx="0.5"/><path d="M11 5V3a.5.5 0 0 0-.5-.5H2.5A.5.5 0 0 0 2 3v8a.5.5 0 0 0 .5.5H5"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <a class="btn-goto-login" href="/login">Go to Login →</a>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const nameEl        = document.getElementById('app_name');
+    const emailEl       = document.getElementById('app_email');
+    const nameVal       = document.getElementById('name-validation');
+    const emailVal      = document.getElementById('email-validation');
+    const submitBtn     = document.getElementById('btn-submit');
+    const errorBanner   = document.getElementById('error-banner');
+    const errorMsg      = document.getElementById('error-msg');
+    const registerForm  = document.getElementById('register-form');
+    const successState  = document.getElementById('success-state');
+
+    /* ── Validation helpers ── */
+    const NAME_RE  = /^[a-z0-9][a-z0-9\-]{1,}[a-z0-9]$|^[a-z0-9]{2,}$/;
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    function showValidation(el, ok, msg) {
+      el.classList.remove('ok', 'err', 'visible');
+      el.classList.add(ok ? 'ok' : 'err', 'visible');
+      el.querySelector('.field-validation-icon').textContent = ok ? '✓' : '✕';
+      el.querySelector('.field-validation-text').textContent = msg;
+    }
+
+    function hideValidation(el) {
+      el.classList.remove('ok', 'err', 'visible');
+    }
+
+    function isNameValid()  { return NAME_RE.test(nameEl.value.trim()); }
+    function isEmailValid() { return EMAIL_RE.test(emailEl.value.trim()); }
+
+    function updateSubmitState() {
+      submitBtn.disabled = !(isNameValid() && isEmailValid());
+    }
+
+    /* ── Live preview ── */
+    nameEl.addEventListener('input', () => {
+      const v = nameEl.value.trim();
+      nameEl.classList.remove('error');
+
+      if (!v) { hideValidation(nameVal); }
+      else if (!NAME_RE.test(v)) {
+        showValidation(nameVal, false, 'Use lowercase letters, numbers, or hyphens (min 2 chars)');
+      } else {
+        showValidation(nameVal, true, 'Looks good');
+      }
+      updateSubmitState();
+    });
+
+    emailEl.addEventListener('input', () => {
+      const v = emailEl.value.trim();
+      emailEl.classList.remove('error');
+
+      if (!v) { hideValidation(emailVal); }
+      else if (!EMAIL_RE.test(v)) {
+        showValidation(emailVal, false, 'Enter a valid email address');
+      } else {
+        showValidation(emailVal, true, 'Valid email');
+      }
+      updateSubmitState();
+    });
+
+    /* ── Submit ── */
+    submitBtn.addEventListener('click', async () => {
+      // Final validation
+      if (!isNameValid()) {
+        nameEl.classList.add('error');
+        showValidation(nameVal, false, 'App name is required and must be valid');
+        return;
+      }
+      if (!isEmailValid()) {
+        emailEl.classList.add('error');
+        showValidation(emailVal, false, 'A valid email is required');
+        return;
+      }
+
+      // Hide previous error
+      errorBanner.classList.remove('visible');
+
+      // Loading state
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      const body = {
+        app_name:  nameEl.value.trim(),
+        app_email: emailEl.value.trim(),
+      };
+
+      try {
+        const res  = await fetch('/api/v1/apps', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(body),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          throw new Error(data.message || data.error || `Registration failed (${res.status})`);
+        }
+
+        // ── Success ──
+        document.getElementById('cred-app-id').textContent   = data.appId   || '—';
+        document.getElementById('cred-app-name').textContent = data.appName || '—';
+        document.getElementById('cred-password').textContent = data.appPassword || '—';
+
+        // Swap form → success
+        registerForm.style.display = 'none';
+        successState.classList.add('visible');
+
+      } catch (err) {
+        errorMsg.textContent = err.message || 'Something went wrong. Please try again.';
+        errorBanner.classList.add('visible');
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
+    });
+
+    /* ── Copy buttons ── */
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('.btn-copy');
+      if (!btn) return;
+      const target = document.getElementById(btn.dataset.target);
+      if (!target) return;
+      navigator.clipboard.writeText(target.textContent).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><polyline points="2 8 6 12 14 4"/></svg>';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="5" y="5" width="9" height="9" rx="0.5"/><path d="M11 5V3a.5.5 0 0 0-.5-.5H2.5A.5.5 0 0 0 2 3v8a.5.5 0 0 0 .5.5H5"/></svg>';
+        }, 1800);
+      });
+    });
+
+    /* Allow Enter key to submit */
+    [nameEl, emailEl].forEach(el => {
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !submitBtn.disabled) submitBtn.click();
+      });
+    });
+  </script>
+
+</body>
+</html>

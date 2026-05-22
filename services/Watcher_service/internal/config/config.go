@@ -8,18 +8,20 @@ import (
 )
 
 type Config struct {
-	DBURL         string
-	DBADMINURL	  string
-	KafkaBroker   []string
-	KafkaTopic    string
-	JobTopic      string
-	JobGroupID    string
-	JobRunTopic   string
-	JobStatusTopic string 
-	JobUsageTopic  string
+	DBURL         	string
+	DBADMINURL	  	string
+	KafkaBroker   	[]string
+	KafkaTopic    	string
+	JobTopic      	string
+	JobGroupID    	string
+	JobRunTopic   	string
+	JobStatusTopic 	string 
+	JobUsageTopic  	string
+	TestTopic   	string 
+	TestScheduler   string 
 	JobUsageGroupID string 
-	JobRunGroupID string
-	PollInterval  int
+	JobRunGroupID 	string
+	PollInterval  	int
 	RedisAddr 		string 
 	RedisPassword 	string 
 	RedisDB  		int
@@ -46,6 +48,8 @@ func Load() *Config {
 		JobUsageGroupID: os.Getenv("KAFKA_JOB_USAGE_TOPIC"),
 		JobRunTopic: os.Getenv("KAFKA_RUN_TOPIC"),
 		JobStatusTopic: os.Getenv("KAFKA_JOB_STATUS_TOPIC"),
+		TestTopic: os.Getenv("TEST_TOPIC"),
+		TestScheduler: os.Getenv("TEST_SCHEDULER_QUEUE"),
 		JobRunGroupID: firstNonEmpty(
 			os.Getenv("KAFKA_RUN_GROUP_ID"),
 			os.Getenv("KAFAK_RUN_GROUPID"),

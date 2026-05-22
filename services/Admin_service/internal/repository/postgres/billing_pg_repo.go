@@ -63,6 +63,8 @@ func (r *BillingPGRepo) CreateSubscription(
 	ON CONFLICT (app_id)
 	DO UPDATE SET
 		plan_id = EXCLUDED.plan_id,
+		stripe_subscription_id = EXCLUDED.stripe_subscription_id,
+		status = EXCLUDED.status,
 		current_period_start = EXCLUDED.current_period_start,
 		current_period_end = EXCLUDED.current_period_end,
 		updated_at = NOW();
@@ -234,6 +236,17 @@ func (r *BillingPGRepo) GetSubscription(ctx context.Context, appID string) (*ent
 		), 0)
 	`
 	err = r.db.QueryRowContext(ctx, mquery, s.AppID).Scan(&s.CurrentLimit)
+
+	if err != nil {
+		return nil, err
+	}
+
+	fquery := `
+		SELECT COALESCE(free_limit,0), COALESCE(free_usage,0)
+		FROM apps
+		WHERE app_id = $1
+	`
+	err = r.db.QueryRowContext(ctx, fquery, s.AppID).Scan(&s.FreeLimit, &s.FreeUsage)
 
 	if err != nil {
 		return nil, err

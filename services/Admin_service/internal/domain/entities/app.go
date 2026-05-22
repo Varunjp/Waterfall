@@ -12,3 +12,12 @@ type App struct {
 	CreatedAt   time.Time 
 	UpdatedAt 	time.Time 
 }
+
+type AppDetails struct {
+	AppID 		string 
+	AppName		string 
+	AppEmail	string 
+	Status 		string 
+	PlanName 	string 
+	EndDate		time.Time
+}

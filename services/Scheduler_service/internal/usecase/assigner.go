@@ -2,85 +2,110 @@ package usecase
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"scheduler_service/internal/domain"
+	grpcserver "scheduler_service/internal/grpc"
+	"scheduler_service/internal/grpc/schedulerpb"
 	"scheduler_service/internal/metrics"
 	"scheduler_service/internal/monitoring"
 	"scheduler_service/internal/producer"
 	redisClient "scheduler_service/internal/redis"
-	"scheduler_service/internal/repository"
 	"time"
 )
 
-var (
-	ErrNoJobAvailable = errors.New("no job available")
-	ErrQuotaExceeded  = errors.New("app quota exceeded")
-)
-
 type Assigner struct {
-	redis     *redisClient.Client
-	adminRepo *repository.AdminRepo
-	metrics   *metrics.SchedulerMetrics
-	producer  *producer.KafkaProducer
-	runtime   *monitoring.Store
+	redis    *redisClient.Client
+	metrics  *metrics.SchedulerMetrics
+	producer *producer.KafkaProducer
+	runtime  *monitoring.Store
+
+	workerMg *grpcserver.WorkerManger
+	dispatch grpcserver.GrpcDispatch
+	jobuse   *jobUsecase
 }
 
 func NewAssigner(
 	r *redisClient.Client,
-	a *repository.AdminRepo,
 	m *metrics.SchedulerMetrics,
 	p *producer.KafkaProducer,
 	store *monitoring.Store,
+	w *grpcserver.WorkerManger,
+	d grpcserver.GrpcDispatch,
+	jobu *jobUsecase,
 ) *Assigner {
 	return &Assigner{
-		redis:     r,
-		adminRepo: a,
-		metrics:   m,
-		producer:  p,
-		runtime:   store,
+		redis:    r,
+		metrics:  m,
+		producer: p,
+		runtime:  store,
+		workerMg: w,
+		dispatch: d,
+		jobuse: jobu,
 	}
 }
 
 func (a *Assigner) Assign(ctx context.Context, job domain.Job) error {
-	limit, err := a.adminRepo.Concurrency(ctx, job.AppID)
-	if err != nil {
-		return err
-	}
+	// stream := fmt.Sprintf("stream:jobs:%s:%s", job.AppID, job.Type)
+	// group := fmt.Sprintf("workers:%s:%s", job.AppID, job.Type)
 
-	if limit == 0 {
-		return ErrQuotaExceeded
-	}
+	// if err := redisClient.EnsureGroup(ctx, a.redis.Client, stream, group); err != nil {
+	// 	return err
+	// }
 
-	stream := fmt.Sprintf("stream:jobs:%s:%s", job.AppID, job.Type)
-	group := fmt.Sprintf("workers:%s:%s", job.AppID, job.Type)
+	// key := fmt.Sprintf("concurrency:%s", job.AppID)
+	
 
-	if err := redisClient.EnsureGroup(ctx, a.redis.Client, stream, group); err != nil {
-		return err
-	}
+	// _, err := a.redis.EvalSha(
+	// 	ctx,
+	// 	a.redis.AssignSHA,
+	// 	[]string{key, stream},
+	// 	job.JobID,
+	// 	job.Payload,
+	// 	job.Retry,
+	// 	job.ManualRetry,
+	// ).Result()
 
-	key := fmt.Sprintf("concurrency:%s", job.AppID)
+	worker := a.workerMg.FindAvailableWorker(job.AppID,job.Type)
 
-	_, err = a.redis.EvalSha(
-		ctx,
-		a.redis.AssignSHA,
-		[]string{key, stream},
-		limit,
-		job.JobID,
-		job.Payload,
-		job.Retry,
-		job.ManualRetry,
-	).Result()
-
-	if err != nil {
+	if worker == nil  {
+		jobRes := domain.JobResultInput {
+			JobID: job.JobID,
+			AppID: job.AppID,
+			Retry: job.Retry,
+			Status: "FAILED",
+			ErrorMessage: "No worker available",
+		}
 		a.metrics.JobsFailed.Inc()
-		return err
-	}
+		return a.jobuse.ProcessJobResult(ctx,jobRes)
+	}else {
 
-	a.metrics.RunningJobs.Inc()
-	a.metrics.JobsAssigned.Inc()
-	if a.runtime != nil {
-		_ = a.runtime.RecordQueuedJob(ctx, job, time.Now().UTC())
+		msg := &schedulerpb.SchedulerMessage{
+			Payload: &schedulerpb.SchedulerMessage_Job{
+				Job: &schedulerpb.JobAssignment{
+					JobId: job.JobID,
+					AppId: job.AppID,
+					JobType: job.Type,
+					Payload: job.Payload,
+					RetryCount: int32(job.Retry),
+					MaxRetries: int32(job.MaxRetries),
+				},
+			},
+		}
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-worker.Ctx.Done():
+			return domain.ErrWorkerDisconnected
+		case worker.SendQueue <- msg :
+			worker.IncrementJobs()
+			a.metrics.RunningJobs.Inc()
+			a.metrics.JobsAssigned.Inc()
+			if a.runtime != nil {
+				_ = a.runtime.RecordQueuedJob(ctx, job, time.Now().UTC())
+			}
+			return nil 
+		case <- time.After(3 * time.Second):
+			return domain.ErrWorkerQueueFull
+		}
 	}
-	return nil
 }

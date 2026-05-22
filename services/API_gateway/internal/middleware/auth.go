@@ -12,6 +12,7 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 	publicPaths := map[string]bool{
 		"/health": true,
 		"/api/v1/jobs": true,
+		"/api/v1/jobs-test":true,
 		"/api/v1/admin/login": true,
 		"/api/v1/users/login":true,
 		"/api/v1/users/password/reset/request": true,
@@ -22,6 +23,8 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 		"/billing/checkout":true,
 		// "/billing/subscription":true,
 		"/":true,
+		"/home":true,
+		"/register":true,
 		"/login":true,
 		"/payment-success":true,
 		"/payment-cancel":true,
@@ -44,6 +47,9 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 
 		if authHeader == "" {
 			cookie, _ := c.Cookie("token")
+			if cookie == "" {
+				cookie,_ = c.Cookie("admin_token")
+			}
 			authHeader = "Bearer "+cookie
 		}
 
@@ -55,6 +61,7 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 
 		claims, err := utils.ValidateToken(token, secret)
+
 		if err != nil {
 			c.AbortWithStatusJSON(401, gin.H{"error": "invalid token"})
 			return

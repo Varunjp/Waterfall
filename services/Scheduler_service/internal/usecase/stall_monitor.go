@@ -86,60 +86,66 @@ func (s *StallMonitor) scan(ctx context.Context, raw []byte) {
 }
 
 func (s *StallMonitor) handlestall(ctx context.Context, jobID string, stjob domain.Job) {
-	if s.runtime != nil {
-		_ = s.runtime.ReleaseJob(ctx, jobID, time.Now().UTC())
-	}
-
-	metaKey := "running:" + jobID
-
-	raw, err := s.redis.Get(ctx, metaKey).Result()
-
-	if err == redis.Nil {
-		stjob.Retry++
-		if stjob.Retry > stjob.MaxRetries {
-			s.producer.Publish(ctx, map[string]any{
-				"job_id":  stjob.JobID,
-				"app_id":  stjob.AppID,
-				"Status":  "DLQ",
-				"retries": stjob.Retry,
-			})
-			return
-		}
-
-		s.producer.Publish(ctx, map[string]any{
-			"job_id": stjob.JobID,
-			"app_id": stjob.AppID,
-			"status": "JOB_RETRY",
-			"retry":  stjob.Retry,
-		})
-	}
-
+	job, err := s.stalledJob(ctx, jobID, stjob)
 	if err != nil {
 		return
 	}
 
-	var job domain.Job
-	json.Unmarshal([]byte(raw), &job)
+	if s.runtime != nil {
+		_ = s.runtime.ReleaseJob(ctx, jobID, time.Now().UTC())
+	}
+
+	if job.AppID != "" {
+		_ = s.redis.Decr(ctx, "concurrency:"+job.AppID)
+	}
+
+	_, _ = s.redis.Del(ctx, "heartbeat:"+jobID, "running:"+jobID).Result()
 
 	job.Retry++
+	s.publishStallOutcome(ctx, job)
+}
 
-	if job.Retry > job.MaxRetries {
-
-		s.producer.Publish(ctx, map[string]any{
-			"job_id":  job.JobID,
-			"app_id":  job.AppID,
-			"Status":  "DLQ",
-			"retries": job.Retry,
-		})
-
-		return
+func (s *StallMonitor) stalledJob(ctx context.Context, jobID string, fallback domain.Job) (domain.Job, error) {
+	raw, err := s.redis.Get(ctx, "running:"+jobID).Result()
+	if err == redis.Nil {
+		return fallback, nil
 	}
-	s.producer.Publish(ctx, map[string]any{
+
+	if err != nil {
+		return domain.Job{}, err
+	}
+
+	var job domain.Job
+	if err := json.Unmarshal([]byte(raw), &job); err != nil {
+		return domain.Job{}, err
+	}
+
+	if job.JobID == "" {
+		job.JobID = fallback.JobID
+	}
+	if job.AppID == "" {
+		job.AppID = fallback.AppID
+	}
+	if job.MaxRetries == 0 && fallback.MaxRetries > 0 {
+		job.MaxRetries = fallback.MaxRetries
+	}
+
+	return job, nil
+}
+
+func (s *StallMonitor) publishStallOutcome(ctx context.Context, job domain.Job) {
+	event := map[string]any{
 		"job_id": job.JobID,
 		"app_id": job.AppID,
-		"status": "JOB_RETRY",
 		"retry":  job.Retry,
-	})
+	}
 
-	s.redis.LPush(ctx, "job:ingress", raw)
+	if job.Retry > job.MaxRetries {
+		event["status"] = "DLQ"
+		_ = s.producer.Publish(ctx, event)
+		return
+	}
+
+	event["status"] = domain.JobRetry
+	_ = s.producer.Publish(ctx, event)
 }

@@ -22,14 +22,14 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  function fmt(d) {
+  function fmtLegacy(d) {
     if (!d) return '—';
     const dt = new Date(d);
     if (isNaN(dt)) return d;
     return dt.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false });
   }
 
-  function fmtDate(d) {
+  function fmtDateLegacy(d) {
     if (!d) return '—';
     const dt = new Date(d);
     return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
@@ -37,6 +37,66 @@
 
   function fmtMoney(cents) {
     return (cents).toLocaleString('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:2 });
+  }
+
+  function parseDate(dateStr) {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  function timeZoneLabel(date) {
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZoneName: 'short',
+      }).formatToParts(date);
+      const tzPart = parts.find(part => part.type === 'timeZoneName');
+      return tzPart ? tzPart.value : '';
+    } catch {
+      return '';
+    }
+  }
+
+  function fmt(d) {
+    const dt = parseDate(d);
+    if (!dt) return d || 'â€”';
+    const text = dt.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:false });
+    const tz = timeZoneLabel(dt);
+    return tz ? `${text} ${tz}` : text;
+  }
+
+  function fmtUTC(d) {
+    const dt = parseDate(d);
+    if (!dt) return d || 'Ã¢â‚¬â€';
+    const text = dt.toLocaleString('en-GB', {
+      day:'2-digit',
+      month:'short',
+      year:'numeric',
+      hour:'2-digit',
+      minute:'2-digit',
+      hour12:false,
+      timeZone:'UTC',
+    });
+    return `${text} UTC`;
+  }
+
+  function fmtDate(d) {
+    const dt = parseDate(d);
+    if (!dt) return d || 'â€”';
+    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  }
+
+  function toLocalInputValue(dateStr) {
+    const d = parseDate(dateStr);
+    if (!d) return '';
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 10);
+  }
+
+  function toUTCDateBoundary(dateStr, endOfDay = false) {
+    if (!dateStr) return null;
+    const local = new Date(`${dateStr}${endOfDay ? 'T23:59:59.999' : 'T00:00:00.000'}`);
+    return Number.isNaN(local.getTime()) ? null : local.toISOString();
   }
 
   function badge(status) {
@@ -150,7 +210,7 @@
       </div>`);
 
     try {
-      const res  = await fetch(`/api/v1/admin/apps?limit=${LIMIT}&offset=${page}`, { headers: authH });
+      const res  = await fetch(`/api/v1/apps?limit=${LIMIT}&offset=${page}`, { headers: authH });
       const data = await res.json();
       const apps = data.apps || data || [];
       const total = data.total || apps.length;
@@ -161,10 +221,10 @@
       const rows = apps.map(a => `<tr>
         <td><span class="cell-id" title="${esc(a.appId || a.id)}">${esc(a.appId || a.id)}</span></td>
         <td>${esc(a.name || a.appName || '—')}</td>
-        <td>${esc(a.email || '—')}</td>
+        <td>${esc(a.appEmail || '—')}</td>
         <td>${badge(a.status)}</td>
         <td>${esc(a.planName || '—')}</td>
-        <td>${fmtDate(a.planEndDate || a.currentPeriodEnd)}</td>
+        <td>${fmtDate(a.endDate || a.currentPeriodEnd)}</td>
         <td class="action-cell">
           ${a.status === 'active' || a.status === 'Active'
             ? `<button class="btn-action-sm btn-block" onclick="toggleApp('${esc(a.appId||a.id)}','block',this)">Block</button>`
@@ -190,7 +250,7 @@
     const orig = btn.textContent;
     btn.disabled = true; btn.textContent = '…';
     try {
-      const res = await fetch(`/api/v1/admin/apps/${appId}/${action}`, { method: 'POST', headers: authH });
+      const res = await fetch(`/api/v1/apps/${appId}/${action}`, { method: 'PATCH', headers: authH });
       if (!res.ok) throw new Error((await res.json().catch(()=>({}))).message || 'Failed');
       toast(`App ${action}ed successfully`);
       loadApps(state.apps.page);
@@ -206,7 +266,7 @@
     $('app-users-body').innerHTML = '<div class="state-loading">Loading</div>';
     $('app-users-overlay').classList.add('open');
     try {
-      const res  = await fetch(`/api/v1/admin/apps/${appId}/users`, { headers: authH });
+      const res  = await fetch(`/api/v1/apps/${appId}/users`, { headers: authH });
       const data = await res.json();
       const users = data.users || data || [];
       if (!users.length) { $('app-users-body').innerHTML = '<div class="state-empty">No users</div>'; return; }
@@ -244,9 +304,9 @@
             </select>
             <span class="toolbar-divider"></span>
             <span class="toolbar-label">From</span>
-            <input type="date" class="filter-date" id="j-start" max="${today}" value="${start?start.substring(0,10):''}" />
+            <input type="date" class="filter-date" id="j-start" max="${today}" value="${start ? toLocalInputValue(start) : ''}" />
             <span class="toolbar-label">To</span>
-            <input type="date" class="filter-date" id="j-end"   max="${today}" value="${end?end.substring(0,10):''}" />
+            <input type="date" class="filter-date" id="j-end"   max="${today}" value="${end ? toLocalInputValue(end) : ''}" />
             <button class="btn-filter" id="j-apply">Apply</button>
             <button class="btn-filter-outline" id="j-clear">Clear</button>
           </div>
@@ -261,7 +321,7 @@
 
     $('j-apply').addEventListener('click', () => {
       const s = startEl.value, e = endEl.value;
-      loadJobs(0, $('j-status').value, s ? `${s}T00:00:00Z` : null, e ? `${e}T23:59:59Z` : null);
+      loadJobs(0, $('j-status').value, toUTCDateBoundary(s), toUTCDateBoundary(e, true));
     });
     $('j-clear').addEventListener('click', () => { startEl.value=''; endEl.value=''; loadJobs(0, $('j-status').value, null, null); });
     $('j-status').addEventListener('change', e => loadJobs(0, e.target.value, state.jobs.start, state.jobs.end));
@@ -285,8 +345,8 @@
         <td>${esc(j.type||'—')}</td>
         <td>${badge(j.status)}</td>
         <td>${j.retry??0} / ${j.maxRetry??0}</td>
-        <td>${fmt(j.scheduleAt)}</td>
-        <td>${fmt(j.createdAt)}</td>
+        <td>${fmtUTC(j.scheduleAt)}</td>
+        <td>${fmtUTC(j.createdAt)}</td>
       </tr>`).join('');
 
       $('jobs-body').innerHTML = `<table>
@@ -368,7 +428,7 @@
 
     if (nameVal)   body.name          = nameVal;
     if (priceVal)  body.price         = Number(priceVal);
-    if (limitVal)  body.jobLimit      = Number(limitVal);
+    if (limitVal)  body.jobLimt      = Number(limitVal);
     if (stripeVal) body.stripePriceID = stripeVal;
 
     if (!Object.keys(body).length) { errEl.textContent = 'Enter at least one field to update.'; return; }
@@ -405,9 +465,9 @@
             <input type="text" class="filter-select" id="pay-app" placeholder="App ID or name" style="width:160px" value="${esc(appId)}" />
             <span class="toolbar-divider"></span>
             <span class="toolbar-label">From</span>
-            <input type="date" class="filter-date" id="pay-start" max="${today}" value="${start?start.substring(0,10):''}" />
+            <input type="date" class="filter-date" id="pay-start" max="${today}" value="${start ? toLocalInputValue(start) : ''}" />
             <span class="toolbar-label">To</span>
-            <input type="date" class="filter-date" id="pay-end"   max="${today}" value="${end?end.substring(0,10):''}" />
+            <input type="date" class="filter-date" id="pay-end"   max="${today}" value="${end ? toLocalInputValue(end) : ''}" />
             <button class="btn-filter" id="pay-apply">Apply</button>
             <button class="btn-filter-outline" id="pay-clear">Clear</button>
           </div>
@@ -422,7 +482,7 @@
 
     $('pay-apply').addEventListener('click', () => {
       const s = startEl.value, e = endEl.value;
-      loadPayments(0, $('pay-app').value.trim(), s?`${s}T00:00:00Z`:null, e?`${e}T23:59:59Z`:null);
+      loadPayments(0, $('pay-app').value.trim(), toUTCDateBoundary(s), toUTCDateBoundary(e, true));
     });
     $('pay-clear').addEventListener('click', () => { $('pay-app').value=''; startEl.value=''; endEl.value=''; loadPayments(0,'',null,null); });
 

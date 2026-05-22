@@ -362,7 +362,7 @@
       const jobs = data.jobs || [];
       totalJobs  = data.total || jobs.length;
 
-      renderStats(jobs);
+      renderStats(jobs,totalJobs);
       renderTable(jobs);
       renderPagination(page, totalJobs);
     } catch {
@@ -394,24 +394,24 @@
       const data = await res.json();
       const jobs = data.jobs || [];
       totalJobs  = data.total || jobs.length;
-      renderStats(jobs);
+      renderStats(jobs, totalJobs);
       renderTable(jobs);
       renderPagination(currentPage, totalJobs);
     } catch { /* silent — don't disrupt the user */ }
   }
 
-  function renderStats(jobs) {
-    const c = { COMPLETED: 0, FAILED: 0, CANCELED: 0, CANCELLED: 0, PENDING: 0, RUNNING: 0, SCHEDULED: 0, QUEUED: 0 };
+  function renderStats(jobs, totalJobs) {
+    const c = { COMPLETED: 0, FAILED: 0, CANCELED: 0, CANCELLED: 0, PENDING: 0, RUNNING: 0, SCHEDULED: 0, QUEUED: 0, DLQ: 0 };
     jobs.forEach(j => { if (c[j.status] !== undefined) c[j.status]++; });
 
     const succeeded = c.COMPLETED;
-    const failed    = c.FAILED + c.CANCELED + c.CANCELLED;
+    const failed    = c.FAILED + c.CANCELED + c.CANCELLED + c.DLQ;
     const active    = c.PENDING + c.RUNNING + c.SCHEDULED + c.QUEUED;
 
     document.getElementById('stats-row').innerHTML = `
       <div class="stat-card">
         <p class="stat-label">Total Shown</p>
-        <p class="stat-value">${jobs.length}</p>
+        <p class="stat-value">${totalJobs}</p>
       </div>
       <div class="stat-card">
         <p class="stat-label">Completed</p>
@@ -925,24 +925,62 @@
   }
 
   function renderSubscription(d) {
-    const used    = d.CurrentLimit  ?? 0;
-    const limit   = d.PlanLimit     ?? 1;
-    const pct     = Math.min(100, Math.round((used / limit) * 100));
+    const isFree     = (d.PlanName || '').toUpperCase() === 'FREE';
 
-    // Colour ramp: green → amber → red
-    let usageColor, usageBg;
-    if (pct < 60) {
-      usageColor = 'var(--status-completed)';
-      usageBg    = 'rgba(168,240,184,0.12)';
-    } else if (pct < 85) {
-      usageColor = 'var(--status-pending)';
-      usageBg    = 'rgba(240,230,168,0.12)';
-    } else {
-      usageColor = 'var(--status-failed)';
-      usageBg    = 'rgba(240,168,168,0.12)';
+    // Free quota values (always shown)
+    const freeUsed   = d.FreeUsage  ?? 0;
+    const freeLimit  = d.FreeLimit  ?? 0;
+    const freePct    = freeLimit > 0 ? Math.min(100, Math.round((freeUsed / freeLimit) * 100)) : 0;
+
+    // Paid quota values (only for non-free plans)
+    const paidUsed   = d.CurrentLimit ?? 0;
+    const paidLimit  = d.PlanLimit    ?? 1;
+    const paidPct    = paidLimit > 0 ? Math.min(100, Math.round((paidUsed / paidLimit) * 100)) : 0;
+
+    function usageColors(pct) {
+      if (pct < 60) return { color: 'var(--status-completed)', bg: 'rgba(168,240,184,0.12)' };
+      if (pct < 85) return { color: 'var(--status-pending)',   bg: 'rgba(240,230,168,0.12)' };
+      return           { color: 'var(--status-failed)',        bg: 'rgba(240,168,168,0.12)' };
+    }
+
+    function usageBarHtml({ label, used, limit, pct }) {
+      const { color, bg } = usageColors(pct);
+      const remaining = limit - used;
+      return `
+        <div class="sub-card sub-usage-card">
+          <div class="sub-usage-header">
+            <div>
+              <p class="sub-card-label">${escHtml(label)}</p>
+              <p class="sub-usage-numbers">
+                <span class="sub-usage-used" style="color:${color}">${used.toLocaleString()}</span>
+                <span class="sub-usage-sep">/</span>
+                <span class="sub-usage-limit">${limit.toLocaleString()} jobs</span>
+              </p>
+            </div>
+            <div class="sub-pct-badge" style="color:${color};background:${bg}">${pct}%</div>
+          </div>
+          <div class="sub-bar-track">
+            <div class="sub-bar-fill" style="width:${pct}%;background:${color}"></div>
+          </div>
+          <p class="sub-bar-caption" style="color:${color}">
+            ${remaining > 0
+              ? `${remaining.toLocaleString()} jobs remaining this period`
+              : 'Limit reached'}
+          </p>
+        </div>`;
     }
 
     const statusCls = d.Status === 'active' ? 'badge-COMPLETED' : 'badge-FAILED';
+
+    // For FREE plan: one bar (free quota). For paid: free quota bar + paid quota bar.
+    const usageBarsHtml = isFree
+      ? usageBarHtml({ label: 'Free Quota Usage', used: freeUsed, limit: freeLimit, pct: freePct })
+      : usageBarHtml({ label: 'Free Quota Usage', used: freeUsed, limit: freeLimit, pct: freePct })
+        + usageBarHtml({ label: 'Monthly Paid Usage', used: paidUsed, limit: paidLimit, pct: paidPct });
+
+    // Meta grid: show plan limit based on plan type
+    const metaLimitLabel = isFree ? 'Free Limit' : 'Plan Limit';
+    const metaLimitVal   = isFree ? freeLimit : paidLimit;
 
     document.getElementById('sub-body').innerHTML = `
       <div class="sub-layout">
@@ -960,40 +998,18 @@
           </div>
         </div>
 
-        <!-- ── Usage bar card ── -->
-        <div class="sub-card sub-usage-card">
-          <div class="sub-usage-header">
-            <div>
-              <p class="sub-card-label">Monthly Usage</p>
-              <p class="sub-usage-numbers">
-                <span class="sub-usage-used" style="color:${usageColor}">${used.toLocaleString()}</span>
-                <span class="sub-usage-sep">/</span>
-                <span class="sub-usage-limit">${limit.toLocaleString()} jobs</span>
-              </p>
-            </div>
-            <div class="sub-pct-badge" style="color:${usageColor};background:${usageBg}">
-              ${pct}%
-            </div>
-          </div>
-          <div class="sub-bar-track">
-            <div class="sub-bar-fill" style="width:${pct}%;background:${usageColor}"></div>
-          </div>
-          <p class="sub-bar-caption" style="color:${usageColor}">
-            ${limit - used > 0
-              ? `${(limit - used).toLocaleString()} jobs remaining this period`
-              : 'Monthly limit reached'}
-          </p>
-        </div>
+        <!-- ── Usage bar(s) ── -->
+        ${usageBarsHtml}
 
         <!-- ── Meta grid ── -->
         <div class="sub-meta-grid">
           <div class="sub-meta-cell">
-            <p class="sub-card-label">Plan Limit</p>
-            <p class="sub-meta-val">${limit.toLocaleString()} <span>jobs / mo</span></p>
+            <p class="sub-card-label">${metaLimitLabel}</p>
+            <p class="sub-meta-val">${metaLimitVal.toLocaleString()} <span>jobs / mo</span></p>
           </div>
           <div class="sub-meta-cell">
-            <p class="sub-card-label">Jobs Used</p>
-            <p class="sub-meta-val" style="color:${usageColor}">${used.toLocaleString()}</p>
+            <p class="sub-card-label">Free used</p>
+            <p class="sub-meta-val" style="color:${usageColors(freePct).color}">${freeUsed.toLocaleString()}</p>
           </div>
           <div class="sub-meta-cell">
             <p class="sub-card-label">Period Start</p>
@@ -1015,10 +1031,11 @@
 
       </div>`;
 
-    // Animate bar in after render
+    // Animate bars in after render
     requestAnimationFrame(() => {
-      const fill = document.querySelector('.sub-bar-fill');
-      if (fill) { fill.style.transition = 'width 0.9s cubic-bezier(0.16,1,0.3,1)'; }
+      document.querySelectorAll('.sub-bar-fill').forEach(fill => {
+        fill.style.transition = 'width 0.9s cubic-bezier(0.16,1,0.3,1)';
+      });
     });
   }
 
@@ -1924,7 +1941,7 @@
           };
           if (appId) body.app_id = appId;
 
-          const res = await fetch('/api/v1/jobs', {
+          const res = await fetch('/api/v1/jobs-test', {
             method:  'POST',
             headers: { ...authHeader, 'Content-Type': 'application/json' },
             body:    JSON.stringify(body),

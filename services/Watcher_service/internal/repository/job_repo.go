@@ -17,4 +17,7 @@ type JobRepository interface {
 	RunningJobs(ctx context.Context)([]domain.Job,error)
 	JobManualRetry(ctx context.Context,jobID string, status domain.JobStatus) error 
 	CancelJob(ctx context.Context,jobID string) (bool,error)
+	InsertTest(ctx context.Context,job domain.Job) error 
+	FetchDueTestJobs(ctx context.Context,now time.Time)([]domain.Job,error)
+	MarkTestQueued(ctx context.Context,jobID string)error 
 }

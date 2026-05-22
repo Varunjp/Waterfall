@@ -18,6 +18,6 @@ WORKDIR /root/
 COPY --from=builder /app/admin-service .
 COPY --from=builder /app/.env .
 
-EXPOSE 8080 50054
+EXPOSE 8080 50054 9101
 
 CMD ["./admin-service"]

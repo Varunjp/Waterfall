@@ -51,7 +51,8 @@ func main() {
 	adrepo := repository.NewAdminRepo(adDb)
 	queueProducer := producer.NewKafkaProducer(cfg.KafkaBroker, cfg.KafkaTopic)
 	jobStatusProducer := producer.NewKafkaProducer(cfg.KafkaBroker,cfg.JobStatusTopic)
-	watchUC := usecase.NewWatchJobsUsecase(repo, queueProducer,jobStatusProducer, logg)
+	testProducer := producer.NewKafkaProducer(cfg.KafkaBroker,cfg.TestScheduler)
+	watchUC := usecase.NewWatchJobsUsecase(repo, queueProducer,jobStatusProducer, testProducer, logg)
 	rd,err:= redisClient.NewRedisClient(cfg.RedisAddr,cfg.RedisPassword,cfg.RedisDB)
 
 	if err != nil {
@@ -110,6 +111,10 @@ func main() {
 			case <-ticker.C:
 				if err := watchUC.Run(ctx); err != nil {
 					logg.Error("watcher tick failed", zap.Error(err))
+				}
+
+				if err := watchUC.RunTest(ctx); err != nil {
+					logg.Error("watcher tick failed",zap.Error(err))
 				}
 			}
 		}

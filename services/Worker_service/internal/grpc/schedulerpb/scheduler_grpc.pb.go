@@ -19,11 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Scheduler_Heartbeat_FullMethodName        = "/scheduler.Scheduler/Heartbeat"
-	Scheduler_ReportResult_FullMethodName     = "/scheduler.Scheduler/ReportResult"
-	Scheduler_RegisterWorker_FullMethodName   = "/scheduler.Scheduler/RegisterWorker"
-	Scheduler_WorkerHeartbeat_FullMethodName  = "/scheduler.Scheduler/WorkerHeartbeat"
-	Scheduler_UnregisterWorker_FullMethodName = "/scheduler.Scheduler/UnregisterWorker"
+	Scheduler_JobStream_FullMethodName        = "/scheduler.Scheduler/JobStream"
 	Scheduler_GetTenantRuntime_FullMethodName = "/scheduler.Scheduler/GetTenantRuntime"
 )
 
@@ -31,11 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SchedulerClient interface {
-	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*Ack, error)
-	ReportResult(ctx context.Context, in *JobResultRequest, opts ...grpc.CallOption) (*Ack, error)
-	RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*Ack, error)
-	WorkerHeartbeat(ctx context.Context, in *WorkerHeartbeatRequest, opts ...grpc.CallOption) (*Ack, error)
-	UnregisterWorker(ctx context.Context, in *UnregisterWorkerRequest, opts ...grpc.CallOption) (*Ack, error)
+	JobStream(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[WorkerMessage, SchedulerMessage], error)
 	GetTenantRuntime(ctx context.Context, in *GetTenantRuntimeRequest, opts ...grpc.CallOption) (*GetTenantRuntimeResponse, error)
 }
 
@@ -47,55 +39,18 @@ func NewSchedulerClient(cc grpc.ClientConnInterface) SchedulerClient {
 	return &schedulerClient{cc}
 }
 
-func (c *schedulerClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*Ack, error) {
+func (c *schedulerClient) JobStream(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[WorkerMessage, SchedulerMessage], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Ack)
-	err := c.cc.Invoke(ctx, Scheduler_Heartbeat_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &Scheduler_ServiceDesc.Streams[0], Scheduler_JobStream_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[WorkerMessage, SchedulerMessage]{ClientStream: stream}
+	return x, nil
 }
 
-func (c *schedulerClient) ReportResult(ctx context.Context, in *JobResultRequest, opts ...grpc.CallOption) (*Ack, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Ack)
-	err := c.cc.Invoke(ctx, Scheduler_ReportResult_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *schedulerClient) RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*Ack, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Ack)
-	err := c.cc.Invoke(ctx, Scheduler_RegisterWorker_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *schedulerClient) WorkerHeartbeat(ctx context.Context, in *WorkerHeartbeatRequest, opts ...grpc.CallOption) (*Ack, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Ack)
-	err := c.cc.Invoke(ctx, Scheduler_WorkerHeartbeat_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *schedulerClient) UnregisterWorker(ctx context.Context, in *UnregisterWorkerRequest, opts ...grpc.CallOption) (*Ack, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Ack)
-	err := c.cc.Invoke(ctx, Scheduler_UnregisterWorker_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Scheduler_JobStreamClient = grpc.BidiStreamingClient[WorkerMessage, SchedulerMessage]
 
 func (c *schedulerClient) GetTenantRuntime(ctx context.Context, in *GetTenantRuntimeRequest, opts ...grpc.CallOption) (*GetTenantRuntimeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -111,11 +66,7 @@ func (c *schedulerClient) GetTenantRuntime(ctx context.Context, in *GetTenantRun
 // All implementations must embed UnimplementedSchedulerServer
 // for forward compatibility.
 type SchedulerServer interface {
-	Heartbeat(context.Context, *HeartbeatRequest) (*Ack, error)
-	ReportResult(context.Context, *JobResultRequest) (*Ack, error)
-	RegisterWorker(context.Context, *RegisterWorkerRequest) (*Ack, error)
-	WorkerHeartbeat(context.Context, *WorkerHeartbeatRequest) (*Ack, error)
-	UnregisterWorker(context.Context, *UnregisterWorkerRequest) (*Ack, error)
+	JobStream(grpc.BidiStreamingServer[WorkerMessage, SchedulerMessage]) error
 	GetTenantRuntime(context.Context, *GetTenantRuntimeRequest) (*GetTenantRuntimeResponse, error)
 	mustEmbedUnimplementedSchedulerServer()
 }
@@ -127,20 +78,8 @@ type SchedulerServer interface {
 // pointer dereference when methods are called.
 type UnimplementedSchedulerServer struct{}
 
-func (UnimplementedSchedulerServer) Heartbeat(context.Context, *HeartbeatRequest) (*Ack, error) {
-	return nil, status.Error(codes.Unimplemented, "method Heartbeat not implemented")
-}
-func (UnimplementedSchedulerServer) ReportResult(context.Context, *JobResultRequest) (*Ack, error) {
-	return nil, status.Error(codes.Unimplemented, "method ReportResult not implemented")
-}
-func (UnimplementedSchedulerServer) RegisterWorker(context.Context, *RegisterWorkerRequest) (*Ack, error) {
-	return nil, status.Error(codes.Unimplemented, "method RegisterWorker not implemented")
-}
-func (UnimplementedSchedulerServer) WorkerHeartbeat(context.Context, *WorkerHeartbeatRequest) (*Ack, error) {
-	return nil, status.Error(codes.Unimplemented, "method WorkerHeartbeat not implemented")
-}
-func (UnimplementedSchedulerServer) UnregisterWorker(context.Context, *UnregisterWorkerRequest) (*Ack, error) {
-	return nil, status.Error(codes.Unimplemented, "method UnregisterWorker not implemented")
+func (UnimplementedSchedulerServer) JobStream(grpc.BidiStreamingServer[WorkerMessage, SchedulerMessage]) error {
+	return status.Error(codes.Unimplemented, "method JobStream not implemented")
 }
 func (UnimplementedSchedulerServer) GetTenantRuntime(context.Context, *GetTenantRuntimeRequest) (*GetTenantRuntimeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTenantRuntime not implemented")
@@ -166,95 +105,12 @@ func RegisterSchedulerServer(s grpc.ServiceRegistrar, srv SchedulerServer) {
 	s.RegisterService(&Scheduler_ServiceDesc, srv)
 }
 
-func _Scheduler_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HeartbeatRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SchedulerServer).Heartbeat(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Scheduler_Heartbeat_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServer).Heartbeat(ctx, req.(*HeartbeatRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+func _Scheduler_JobStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SchedulerServer).JobStream(&grpc.GenericServerStream[WorkerMessage, SchedulerMessage]{ServerStream: stream})
 }
 
-func _Scheduler_ReportResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JobResultRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SchedulerServer).ReportResult(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Scheduler_ReportResult_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServer).ReportResult(ctx, req.(*JobResultRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Scheduler_RegisterWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterWorkerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SchedulerServer).RegisterWorker(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Scheduler_RegisterWorker_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServer).RegisterWorker(ctx, req.(*RegisterWorkerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Scheduler_WorkerHeartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WorkerHeartbeatRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SchedulerServer).WorkerHeartbeat(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Scheduler_WorkerHeartbeat_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServer).WorkerHeartbeat(ctx, req.(*WorkerHeartbeatRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Scheduler_UnregisterWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UnregisterWorkerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SchedulerServer).UnregisterWorker(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Scheduler_UnregisterWorker_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SchedulerServer).UnregisterWorker(ctx, req.(*UnregisterWorkerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Scheduler_JobStreamServer = grpc.BidiStreamingServer[WorkerMessage, SchedulerMessage]
 
 func _Scheduler_GetTenantRuntime_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetTenantRuntimeRequest)
@@ -282,30 +138,17 @@ var Scheduler_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*SchedulerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Heartbeat",
-			Handler:    _Scheduler_Heartbeat_Handler,
-		},
-		{
-			MethodName: "ReportResult",
-			Handler:    _Scheduler_ReportResult_Handler,
-		},
-		{
-			MethodName: "RegisterWorker",
-			Handler:    _Scheduler_RegisterWorker_Handler,
-		},
-		{
-			MethodName: "WorkerHeartbeat",
-			Handler:    _Scheduler_WorkerHeartbeat_Handler,
-		},
-		{
-			MethodName: "UnregisterWorker",
-			Handler:    _Scheduler_UnregisterWorker_Handler,
-		},
-		{
 			MethodName: "GetTenantRuntime",
 			Handler:    _Scheduler_GetTenantRuntime_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "JobStream",
+			Handler:       _Scheduler_JobStream_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "proto/scheduler.proto",
 }

@@ -5,6 +5,7 @@ import (
 	domainerr "admin_service/internal/domain/errors"
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/lib/pq"
@@ -18,7 +19,44 @@ func NewAppRepo(db *sql.DB) *AppRepo {
 	return &AppRepo{db}
 }
 
+func (r *AppRepo) getPlanByID(planID string) (*entities.Plan, error) {
+	if planID == "" {
+		return nil, domainerr.ErrPlanIDRequired
+	}
+
+	var plan entities.Plan
+
+	err := r.db.QueryRow(`
+		SELECT plan_id, name, monthly_job_limit, price, stripe_price_id
+		FROM plans
+		WHERE plan_id = $1
+	`, planID).Scan(
+		&plan.PlanID,
+		&plan.Name,
+		&plan.MonthlyJobLimit,
+		&plan.Price,
+		&plan.StripeID,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domainerr.ErrPlanNotFound
+		}
+
+		return nil, err
+	}
+
+	return &plan, nil
+}
+
 func (r *AppRepo) Create(app *entities.App) (string, error) {
+	plan, err := r.getPlanByID(app.PlanID)
+	if err != nil {
+		return "", err
+	}
+
+	app.Tier = strings.ToLower(plan.Name)
+
 	tx, err := r.db.Begin()
 	if err != nil {
 		return "", err
@@ -27,8 +65,8 @@ func (r *AppRepo) Create(app *entities.App) (string, error) {
 	var appID string
 
 	err = tx.QueryRow(`
-		INSERT INTO apps (app_name, app_email, status, tier, plan_id)
-		VALUES ($1, $2, $3, $4,$5)
+		INSERT INTO apps (app_name, app_email, status, tier, plan_id, free_limit, free_usage)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING app_id
 	`,
 		app.AppName,
@@ -36,6 +74,8 @@ func (r *AppRepo) Create(app *entities.App) (string, error) {
 		app.Status,
 		app.Tier,
 		app.PlanID,
+		plan.MonthlyJobLimit,
+		0,
 	).Scan(&appID)
 
 	if err != nil {
@@ -73,26 +113,25 @@ func (r *AppRepo) Create(app *entities.App) (string, error) {
 	return appID, nil
 }
 
-func (r *AppRepo) FindAll() ([]*entities.App, error) {
+func (r *AppRepo) FindAll() ([]*entities.AppDetails, error) {
 	rows, err := r.db.Query(`
-		SELECT app_id,app_name,app_email,status,tier, created_at, updated_at FROM apps ORDER BY created_at DESC
+		SELECT a.app_id,a.app_name,a.app_email,a.status, p.name As PlanName, s.current_period_end FROM apps a JOIN subscriptions s ON a.app_id = s.app_id JOIN plans p ON p.plan_id = s.plan_id ORDER BY a.created_at DESC
 	`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var apps []*entities.App
+	var apps []*entities.AppDetails
 	for rows.Next() {
-		var a entities.App
+		var a entities.AppDetails
 		err := rows.Scan(
 			&a.AppID,
 			&a.AppName,
 			&a.AppEmail,
 			&a.Status,
-			&a.Tier,
-			&a.CreatedAt,
-			&a.UpdatedAt,
+			&a.PlanName,
+			&a.EndDate,
 		)
 		if err != nil {
 			return nil, err

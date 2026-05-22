@@ -78,6 +78,8 @@ func (x *RegisterAppRequest) GetAppEmail() string {
 type RegisterAppResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AppId         string                 `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	AppName       string                 `protobuf:"bytes,2,opt,name=app_name,json=appName,proto3" json:"app_name,omitempty"`
+	AppPassword   string                 `protobuf:"bytes,3,opt,name=app_password,json=appPassword,proto3" json:"app_password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -115,6 +117,20 @@ func (*RegisterAppResponse) Descriptor() ([]byte, []int) {
 func (x *RegisterAppResponse) GetAppId() string {
 	if x != nil {
 		return x.AppId
+	}
+	return ""
+}
+
+func (x *RegisterAppResponse) GetAppName() string {
+	if x != nil {
+		return x.AppName
+	}
+	return ""
+}
+
+func (x *RegisterAppResponse) GetAppPassword() string {
+	if x != nil {
+		return x.AppPassword
 	}
 	return ""
 }
@@ -205,7 +221,8 @@ type App struct {
 	AppName       string                 `protobuf:"bytes,2,opt,name=app_name,json=appName,proto3" json:"app_name,omitempty"`
 	AppEmail      string                 `protobuf:"bytes,3,opt,name=app_email,json=appEmail,proto3" json:"app_email,omitempty"`
 	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
-	Tier          string                 `protobuf:"bytes,5,opt,name=tier,proto3" json:"tier,omitempty"`
+	PlanName      string                 `protobuf:"bytes,5,opt,name=plan_name,json=planName,proto3" json:"plan_name,omitempty"`
+	EndDate       string                 `protobuf:"bytes,6,opt,name=endDate,proto3" json:"endDate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -268,9 +285,16 @@ func (x *App) GetStatus() string {
 	return ""
 }
 
-func (x *App) GetTier() string {
+func (x *App) GetPlanName() string {
 	if x != nil {
-		return x.Tier
+		return x.PlanName
+	}
+	return ""
+}
+
+func (x *App) GetEndDate() string {
+	if x != nil {
+		return x.EndDate
 	}
 	return ""
 }
@@ -326,19 +350,22 @@ const file_internal_proto_admin_app_proto_rawDesc = "" +
 	"\x1einternal/proto/admin/app.proto\x12\x05admin\x1a'googleapis/google/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"L\n" +
 	"\x12RegisterAppRequest\x12\x19\n" +
 	"\bapp_name\x18\x01 \x01(\tR\aappName\x12\x1b\n" +
-	"\tapp_email\x18\x02 \x01(\tR\bappEmail\",\n" +
+	"\tapp_email\x18\x02 \x01(\tR\bappEmail\"j\n" +
 	"\x13RegisterAppResponse\x12\x15\n" +
-	"\x06app_id\x18\x01 \x01(\tR\x05appId\"\x11\n" +
+	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x19\n" +
+	"\bapp_name\x18\x02 \x01(\tR\aappName\x12!\n" +
+	"\fapp_password\x18\x03 \x01(\tR\vappPassword\"\x11\n" +
 	"\x0fListAppsRequest\"2\n" +
 	"\x10ListAppsResponse\x12\x1e\n" +
 	"\x04apps\x18\x01 \x03(\v2\n" +
-	".admin.AppR\x04apps\"\x80\x01\n" +
+	".admin.AppR\x04apps\"\xa3\x01\n" +
 	"\x03App\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x19\n" +
 	"\bapp_name\x18\x02 \x01(\tR\aappName\x12\x1b\n" +
 	"\tapp_email\x18\x03 \x01(\tR\bappEmail\x12\x16\n" +
-	"\x06status\x18\x04 \x01(\tR\x06status\x12\x12\n" +
-	"\x04tier\x18\x05 \x01(\tR\x04tier\"(\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12\x1b\n" +
+	"\tplan_name\x18\x05 \x01(\tR\bplanName\x12\x18\n" +
+	"\aendDate\x18\x06 \x01(\tR\aendDate\"(\n" +
 	"\x0fBlockAppRequest\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\tR\x05appId2\x8a\x03\n" +
 	"\n" +

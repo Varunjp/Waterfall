@@ -4,6 +4,8 @@ CREATE TABLE apps (
     app_email VARCHAR(255) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active',
     tier VARCHAR(20) NOT NULL DEFAULT 'free',
+    free_limit INT,
+    free_usage INT,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );

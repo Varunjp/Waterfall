@@ -21,15 +21,20 @@ func NewAppUserHandler(u interfaces.AppUserUsecase) *AppUserHandler {
 }
 
 func (h *AppUserHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*emptypb.Empty, error) {
+	appID, err := utils.GetAppIDFromContext(ctx)
+	if err != nil {
+		return nil, errors.ErrUnauthenticated
+	}
+
 	return &emptypb.Empty{}, h.usecase.Create(
-		req.AppId,req.Email, req.Password, req.Role,
+		appID, req.Email, req.Password, req.Role,
 	)
 }
 
 func (h *AppUserHandler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.ListUsersResponse, error) {
 
-	appID,err := utils.GetAppIDFromContext(ctx)
-	
+	appID, err := utils.GetAppIDFromContext(ctx)
+
 	if err != nil {
 		return nil, errors.ErrUnauthenticated
 	}
@@ -52,78 +57,78 @@ func (h *AppUserHandler) ListUsers(ctx context.Context, req *pb.ListUsersRequest
 	return &pb.ListUsersResponse{Users: res}, nil
 }
 
-func (h *AppUserHandler) AppLogin(ctx context.Context, req *pb.AppLoginRequest) (*pb.AppLoginResponse,error) {
-	token,err := h.usecase.AppLogin(req.Email,req.Password)
+func (h *AppUserHandler) AppLogin(ctx context.Context, req *pb.AppLoginRequest) (*pb.AppLoginResponse, error) {
+	token, err := h.usecase.AppLogin(req.Email, req.Password)
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
-	return &pb.AppLoginResponse{AccessToken: token},nil 
+	return &pb.AppLoginResponse{AccessToken: token}, nil
 }
 
-func (h *AppUserHandler) RequestPasswordReset(ctx context.Context, req *pb.RequestResetPasswordRequest)(*pb.RequestResetPasswordResponse,error) {
-	err := h.usecase.RequestPasswordReset(ctx,req.Email)
+func (h *AppUserHandler) RequestPasswordReset(ctx context.Context, req *pb.RequestResetPasswordRequest) (*pb.RequestResetPasswordResponse, error) {
+	err := h.usecase.RequestPasswordReset(ctx, req.Email)
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
 	return &pb.RequestResetPasswordResponse{
 		Message: "OTP sent to email",
-	},nil 
+	}, nil
 }
 
-func (h *AppUserHandler) VerifyPasswordResetOtp(ctx context.Context,req *pb.VerifyPasswordResetOtpRequest)(*pb.VerifyPasswordResetOtpResponse,error) {
+func (h *AppUserHandler) VerifyPasswordResetOtp(ctx context.Context, req *pb.VerifyPasswordResetOtpRequest) (*pb.VerifyPasswordResetOtpResponse, error) {
 
-	token,err := h.usecase.VerifyOtp(ctx,req.Email,req.Otp)
+	token, err := h.usecase.VerifyOtp(ctx, req.Email, req.Otp)
 	if err != nil {
-		return nil ,err 
+		return nil, err
 	}
 
 	return &pb.VerifyPasswordResetOtpResponse{
 		ResetToken: token,
-	},nil 
+	}, nil
 }
 
-func (h *AppUserHandler) ResetPassword(ctx context.Context,req *pb.ResetPasswordRequest) (*pb.ResetPasswordResponse,error) {
-	err := h.usecase.ResetPassword(ctx,req.ResetToken,req.NewPassword)
+func (h *AppUserHandler) ResetPassword(ctx context.Context, req *pb.ResetPasswordRequest) (*pb.ResetPasswordResponse, error) {
+	err := h.usecase.ResetPassword(ctx, req.ResetToken, req.NewPassword)
 
 	if err != nil {
-		return  nil,err 
+		return nil, err
 	}
 
 	return &pb.ResetPasswordResponse{
 		Message: "password updated",
-	},nil 
+	}, nil
 }
 
-func (h *AppUserHandler) ListPlans(ctx context.Context, req *pb.ListPlansRequest)(*pb.ListPlansResponse,error) {
+func (h *AppUserHandler) ListPlans(ctx context.Context, req *pb.ListPlansRequest) (*pb.ListPlansResponse, error) {
 
-	plan,err := h.usecase.ListPlans(ctx)
+	plan, err := h.usecase.ListPlans(ctx)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	return mapUPlans(plan),nil
+	return mapUPlans(plan), nil
 }
 
-func (h *AppUserHandler) UpdateUserStatus(ctx context.Context,req *pb.UpdateUserStatusRequest)(*emptypb.Empty,error) {
+func (h *AppUserHandler) UpdateUserStatus(ctx context.Context, req *pb.UpdateUserStatusRequest) (*emptypb.Empty, error) {
 
-	err := h.usecase.BlockUser(ctx,req.UserId,req.Status)
+	err := h.usecase.BlockUser(ctx, req.UserId, req.Status)
 	if err != nil {
-		return &emptypb.Empty{},err 
+		return &emptypb.Empty{}, err
 	}
-	return &emptypb.Empty{},nil 
+	return &emptypb.Empty{}, nil
 }
 
 func mapUPlans(plans []*entities.Plan) *pb.ListPlansResponse {
 	resp := &pb.ListPlansResponse{}
-	for _,p := range plans {
+	for _, p := range plans {
 		resp.Plans = append(resp.Plans, &pb.UserPlan{
-			PlanId: p.PlanID,
-			PlanName: p.Name,
+			PlanId:       p.PlanID,
+			PlanName:     p.Name,
 			MonthlyLimit: int32(p.MonthlyJobLimit),
-			Planprice: p.Price,
+			Planprice:    p.Price,
 		})
 	}
-	return resp 
+	return resp
 }

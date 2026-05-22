@@ -4,6 +4,7 @@ import (
 	"admin_service/internal/domain/entities"
 	pb "admin_service/internal/proto/admin"
 	"context"
+	"time"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -11,16 +12,16 @@ import (
 type AppHandler struct {
 	pb.UnimplementedAppServiceServer 
 	usecase interface {
-		Register(string,string)(string,error) 
-		List()([]*entities.App,error)
+		Register(string,string)(string,string,string,error) 
+		List()([]*entities.AppDetails,error)
 		Block(string)error 
 		Unblock(string)error 
 	}
 }
 
 func NewAppHandler(u interface{
-	Register(string,string)(string,error) 
-	List() ([]*entities.App, error)
+	Register(string,string)(string,string,string,error) 
+	List() ([]*entities.AppDetails, error)
 	Block(string) error
 	Unblock(string) error
 }) *AppHandler {
@@ -28,8 +29,8 @@ func NewAppHandler(u interface{
 }
 
 func (h *AppHandler) RegisterApp(ctx context.Context, req *pb.RegisterAppRequest) (*pb.RegisterAppResponse,error) {
-	app_id,err := h.usecase.Register(req.AppName,req.AppEmail)
-	return &pb.RegisterAppResponse{AppId: app_id},err 
+	app_id,app_name,app_pass,err := h.usecase.Register(req.AppName,req.AppEmail)
+	return &pb.RegisterAppResponse{AppId: app_id,AppName: app_name,AppPassword: app_pass},err 
 }
 
 func (h *AppHandler) ListApps(ctx context.Context,_ *pb.ListAppsRequest)(*pb.ListAppsResponse,error) {
@@ -45,7 +46,8 @@ func (h *AppHandler) ListApps(ctx context.Context,_ *pb.ListAppsRequest)(*pb.Lis
 			AppName: a.AppName,
 			AppEmail: a.AppEmail,
 			Status: a.Status,
-			Tier: a.Tier,
+			PlanName: a.PlanName,
+			EndDate: formatUTC(a.EndDate),
 		})
 	}
 
@@ -58,4 +60,12 @@ func (h *AppHandler) BlockApp(ctx context.Context, req *pb.BlockAppRequest) (*em
 
 func (h *AppHandler) UnblockApp(ctx context.Context, req *pb.BlockAppRequest) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, h.usecase.Unblock(req.AppId)
+}
+
+func formatUTC(ts time.Time) string {
+	if ts.IsZero() {
+		return ""
+	}
+
+	return ts.UTC().Format(time.RFC3339)
 }

@@ -67,6 +67,53 @@ func (r *jobRepo) FetchDueJobs(ctx context.Context, now, until time.Time) ([]dom
 	return jobs, nil
 }
 
+func (r *jobRepo) FetchDueTestJobs(ctx context.Context, now time.Time) ([]domain.Job, error) {
+	query := `
+		SELECT job_id, app_id, type, payload, schedule_at,retry,max_retry
+		FROM jobs_test
+		WHERE 
+			(
+				status = 'SCHEDULED' 
+				AND schedule_at <= NOW()
+			)
+			OR 
+			(
+				status = 'MANUAL_RETRY'
+			)
+			OR
+			(	
+				status = 'PENDING'
+				AND schedule_at <= NOW()
+			)
+		ORDER BY schedule_at ASC
+		FOR UPDATE SKIP LOCKED; 
+	`
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var jobs []domain.Job
+	for rows.Next() {
+		var j domain.Job
+		if err := rows.Scan(
+			&j.JobID,
+			&j.AppID,
+			&j.Type,
+			&j.Payload,
+			&j.ScheduleAt,
+			&j.Retry,
+			&j.MaxRetries,
+		); err != nil {
+			return nil, err
+		}
+		jobs = append(jobs, j)
+	}
+
+	return jobs, nil
+}
+
 func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
 	now := time.Now()
 	startOfDay := time.Date(
@@ -135,9 +182,42 @@ func (r *jobRepo) MarkQueued(ctx context.Context, jobID string) error {
 	return err
 }
 
+func (r *jobRepo) MarkTestQueued(ctx context.Context, jobID string) error {
+
+	_, err := r.db.ExecContext(
+		ctx,
+		`UPDATE jobs_test SET status='QUEUED' WHERE job_id=$1`,
+		jobID,
+	)
+	return err
+}
+
 func (r *jobRepo) Insert(ctx context.Context, job domain.Job) error {
 	query := `
 		INSERT INTO jobs(job_id, app_id, type, payload, status, created_at, updated_at, schedule_at)
+		VALUES($1,$2,$3,$4,$5,$6,$7,$8)
+		ON CONFLICT (job_id) DO NOTHING;
+	`
+	_, err := r.db.ExecContext(
+		ctx,
+		query,
+		job.JobID,
+		job.AppID,
+		job.Type,
+		job.Payload,
+		job.Status,
+		job.CreatedAt,
+		job.UpdatedAt,
+		job.ScheduleAt,
+	)
+
+	return err
+}
+
+func (r *jobRepo) InsertTest(ctx context.Context,job domain.Job) error {
+
+	query := `
+		INSERT INTO jobs_test(job_id, app_id, type, payload, status, created_at, updated_at, schedule_at)
 		VALUES($1,$2,$3,$4,$5,$6,$7,$8)
 		ON CONFLICT (job_id) DO NOTHING;
 	`
