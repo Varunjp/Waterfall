@@ -9,11 +9,13 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o watcher-service ./cmd/worker
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o watcher-service ./cmd/worker
 
 FROM alpine:latest 
 
-WORKDIR /root/
+WORKDIR /app 
+
+RUN apk add --no-cache ca-certificates
 
 COPY --from=builder /app/watcher-service .
 
