@@ -2,6 +2,7 @@ package worker
 
 import (
 	"context"
+	"log"
 	"sync"
 	pb "worker_service/internal/grpc/schedulerpb"
 
@@ -63,7 +64,7 @@ func (r *Runner) Start(ctx context.Context) {
 
 func (r *Runner) worker(ctx context.Context,id int) {
 	defer r.wg.Done()
-
+	log.Println("Worker ID :",id+1," ready and waiting for jobs...")
 	for {
 		select {
 		case <-ctx.Done():

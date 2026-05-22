@@ -7,11 +7,8 @@ option go_package = "internal/proto/schedulerpb";
 import "googleapis/google/api/annotations.proto";
 
 service Scheduler {
-  rpc Heartbeat(HeartbeatRequest) returns (Ack);
-  rpc ReportResult(JobResultRequest) returns (Ack);
-  rpc RegisterWorker(RegisterWorkerRequest) returns (Ack);
-  rpc WorkerHeartbeat(WorkerHeartbeatRequest) returns (Ack);
-  rpc UnregisterWorker(UnregisterWorkerRequest) returns (Ack);
+  rpc JobStream(stream WorkerMessage) returns (stream SchedulerMessage);
+
   rpc GetTenantRuntime(GetTenantRuntimeRequest) returns (GetTenantRuntimeResponse) {
     option (google.api.http) = {
       get: "/api/v1/runtime/overview"
@@ -19,47 +16,60 @@ service Scheduler {
   }
 }
 
-message HeartbeatRequest {
-  string job_id = 1;
-  string app_id = 2;
-  string worker_id = 3;
-  int64 progress = 4;
-  int64 timestamp = 5;
+message WorkerMessage {
+  oneof payload {
+    WorkerRegister register = 1;
+    WorkerHeartbeat heartbeat = 2;
+    JobProgress progress = 3;
+    JobExecutionResult result = 4;
+  }
 }
 
-message JobResultRequest {
-  string job_id = 1;
-  string app_id = 2;
-  string worker_id = 3;
-  JobResultStatus status = 4;
-  string error_message = 5;
-  string stacktrace = 6;
-  int64 timestamp = 7;
-  int32 retry = 8;
-  int32 manual_retry = 9;
-}
-
-message RegisterWorkerRequest {
+message WorkerRegister {
   string app_id = 1;
   string worker_id = 2;
   repeated string job_types = 3;
   int32 max_concurrency = 4;
-  int64 timestamp = 5;
 }
 
-message WorkerHeartbeatRequest {
-  string app_id = 1;
-  string worker_id = 2;
-  repeated string job_types = 3;
-  int32 active_jobs = 4;
-  int32 max_concurrency = 5;
-  int64 timestamp = 6;
+message WorkerHeartbeat {
+  int32 active_jobs = 1;
+  int64 timestamp = 2;
 }
 
-message UnregisterWorkerRequest {
-  string app_id = 1;
-  string worker_id = 2;
+message JobProgress {
+  string job_id = 1;
+  int64 progress = 2;
   int64 timestamp = 3;
+}
+
+message JobExecutionResult {
+  string job_id = 1;
+  JobResultStatus status = 2;
+  string error_message = 3;
+  string stacktrace = 4;
+  int32 retry = 5;
+}
+
+message SchedulerMessage {
+  oneof payload {
+    JobAssignment job = 1;
+    StreamAck ack = 2;
+  }
+}
+
+message JobAssignment {
+  string job_id = 1;
+  string app_id = 2;
+  string job_type = 3;
+  string payload = 4;
+  int32 retry_count = 5;
+  int32 max_retries = 6;
+}
+
+message StreamAck {
+  bool ok = 1;
+  string message = 2;
 }
 
 message GetTenantRuntimeRequest {
@@ -99,7 +109,7 @@ message WorkerRuntime {
 enum JobResultStatus {
   JOB_RESULT_UNKNOWN = 0;
   JOB_RESULT_SUCCESS = 1;
-  JOB_RESULT_FAILED = 2;
+  JOB_RESULT_FAILED  = 2;
 }
 
 enum WorkerStatus {
