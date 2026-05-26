@@ -24,15 +24,11 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/joho/godotenv"
 	"github.com/stripe/stripe-go/v78"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("failed to env")
-	}
 	cfg := config.Load()
 	stripe.Key = cfg.Stripe.SecretKey
 

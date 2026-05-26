@@ -12,6 +12,7 @@
 **/img
 
 **/*.dev
+create-topics.ps1
 
 dev.bat
 dev.sh

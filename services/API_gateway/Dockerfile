@@ -9,11 +9,13 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o api-gateway ./cmd/main.go 
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o api-gateway ./cmd/main.go 
 
 FROM alpine:latest 
 
-WORKDIR /root/
+WORKDIR /app
+
+RUN apk add --no-cache ca-certificates
 
 COPY --from=builder /app/api-gateway . 
 
