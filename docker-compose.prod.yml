@@ -1,0 +1,247 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: jobs_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - waterfall-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - waterfall-network
+
+  redpanda:
+    image: redpandadata/redpanda:v23.3.10
+    container_name: redpanda
+    restart: unless-stopped
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp=1
+      - --memory=1G
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -q Healthy"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - waterfall-network
+
+  redpanda-init:
+    image: redpandadata/redpanda:v23.3.10
+    container_name: redpanda-init
+    restart: "no"
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      until rpk cluster info --brokers redpanda:9092 >/dev/null 2>&1
+      do
+        sleep 2
+      done
+
+      rpk topic create job_requests --partitions 3 --replicas 1 --brokers redpanda:9092 || true
+      rpk topic create scheduler_queue --partitions 3 --replicas 1 --brokers redpanda:9092 || true
+      rpk topic create retry_queue --partitions 3 --replicas 1 --brokers redpanda:9092 || true
+      rpk topic create worker_jobs --partitions 1 --replicas 1 --brokers redpanda:9092 || true
+      rpk topic create job_status --partitions 1 --replicas 1 --brokers redpanda:9092 || true
+      rpk topic create job_usage --partitions 1 --replicas 1 --brokers redpanda:9092 || true
+
+    networks:
+      - waterfall-network
+
+  migrate_jobs:
+    image: migrate/migrate
+    container_name: migrate_jobs
+    profiles: ["migration"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/Job_Service/migrations:/migrations
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/jobs_db?sslmode=disable",
+        "up",
+      ]
+    networks:
+      - waterfall-network
+
+  migrate_admin:
+    image: migrate/migrate
+    container_name: migrate_admin
+    profiles: ["migration"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/Admin_service/migrations:/migrations
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/waterfall_admins?sslmode=disable",
+        "up",
+      ]
+    networks:
+      - waterfall-network
+
+  admin_service:
+    image: ghcr.io/varunjp/admin_service:latest
+    container_name: admin_service
+    restart: unless-stopped
+    env_file:
+      - ./env/admin.env
+    ports:
+      - "8080:8080"
+    expose:
+      - "50054"
+      - "9101"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - waterfall-network
+
+  job_service:
+    image: ghcr.io/varunjp/job_service:latest
+    container_name: job_service
+    restart: unless-stopped
+    env_file:
+      - ./env/job.env
+    expose:
+      - "50051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    networks:
+      - waterfall-network
+
+  scheduler_service:
+    image: ghcr.io/varunjp/scheduler_service:latest
+    container_name: scheduler_service
+    restart: unless-stopped
+    ports:
+      - "50052:50052"
+    expose:
+      - "50052"
+      - "9100"
+    env_file:
+      - ./env/scheduler.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    networks:
+      - waterfall-network
+
+  watcher_service:
+    image: ghcr.io/varunjp/watcher_service:latest
+    container_name: watcher_service
+    restart: unless-stopped
+    env_file:
+      - ./env/watcher.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    networks:
+      - waterfall-network
+
+  api_gateway:
+    image: ghcr.io/varunjp/api_gateway:latest
+    container_name: api_gateway
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./env/gateway.env
+    depends_on:
+      admin_service:
+        condition: service_started
+      job_service:
+        condition: service_started
+      scheduler_service:
+        condition: service_started
+    networks:
+      - waterfall-network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - waterfall-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - waterfall-network
+
+networks:
+  waterfall-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  redpanda_data:
+  prometheus_data:
+  grafana_data:
