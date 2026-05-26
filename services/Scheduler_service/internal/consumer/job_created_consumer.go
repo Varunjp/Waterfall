@@ -10,7 +10,6 @@ type JobCreatedConsumer struct {
 	reader *kafka.Reader
 }
 
-
 func NewJobCreatedConsumer(brokers,topic,groupID string) *JobCreatedConsumer {
 	return &JobCreatedConsumer{
 		reader: kafka.NewReader(kafka.ReaderConfig{
