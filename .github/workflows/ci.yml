@@ -1,0 +1,58 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-build:
+    name: Test & Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - Admin_service
+          - Job_Service
+          - Scheduler_service
+          - Watcher_service
+          - API_gateway
+
+    defaults:
+      run:
+        working-directory: services/${{ matrix.service }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Cache Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: >
+            ${{ runner.os }}-go-
+            ${{ matrix.service }}-
+            ${{ hashFiles(format('services/{0}/go.sum', matrix.service)) }}
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Verify Formatting
+        run: |
+          test -z "$(gofmt -l .)"
+
+      - name: Run Tests
+        run: go test ./... -v
+
+      - name: Build Check
+        run: go build ./...

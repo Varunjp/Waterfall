@@ -1,0 +1,162 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: ${{ secrets.GHCR_USERNAME }}
+
+jobs:
+  build-and-push:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: Admin_service
+            image: admin_service
+
+          - service: Job_Service
+            image: job_service
+
+          - service: Scheduler_service
+            image: scheduler_service
+
+          - service: Watcher_service
+            image: watcher_service
+
+          - service: API_gateway
+            image: api_gateway
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ secrets.GHCR_USERNAME }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./services/${{ matrix.service }}
+          file: ./services/${{ matrix.service }}/Dockerfile
+          push: true
+          provenance: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+    deploy:
+    name: Deploy to EC2
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy using SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            set -e
+
+            echo "Moving to project"
+
+            cd ~/waterfall
+
+            echo "Login to GHCR"
+
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io \
+              -u "${{ secrets.GHCR_USERNAME }}" \
+              --password-stdin
+
+            echo "Pull latest images"
+
+            docker compose -f docker-compose.prod.yml pull
+
+            echo "Starting infrastructure"
+
+            docker compose -f docker-compose.prod.yml up -d \
+              postgres \
+              redis \
+              redpanda
+
+            echo "Waiting for postgres"
+
+            until docker exec postgres pg_isready -U $(docker exec postgres printenv POSTGRES_USER)
+            do
+              sleep 2
+            done
+
+            echo "Waiting for redpanda"
+
+            until docker exec redpanda rpk cluster health | grep Healthy
+            do
+              sleep 3
+            done
+
+            echo "Running redpanda topic init"
+
+            docker compose \
+              -f docker-compose.prod.yml \
+              up redpanda-init
+
+            echo "Running Job DB migration"
+
+            docker compose \
+              -f docker-compose.prod.yml \
+              --profile migration \
+              run --rm migrate_jobs
+
+            echo "Running Admin DB migration"
+
+            docker compose \
+              -f docker-compose.prod.yml \
+              --profile migration \
+              run --rm migrate_admin
+
+            echo "Starting application services"
+
+            docker compose \
+              -f docker-compose.prod.yml \
+              up -d \
+              admin_service \
+              job_service \
+              scheduler_service \
+              watcher_service \
+              api_gateway \
+              prometheus \
+              grafana
+
+            echo "Cleaning old images"
+
+            docker image prune -af
+
+            echo "Deployment successful"
