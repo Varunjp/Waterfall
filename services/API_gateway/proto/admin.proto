@@ -48,6 +48,7 @@ message CreatePlanRequest {
     string name = 1;
     int32  joblimit = 2;
     double price = 3;
+    string stripePriceID = 4;
 }
 
 message CreatePlanResponse {

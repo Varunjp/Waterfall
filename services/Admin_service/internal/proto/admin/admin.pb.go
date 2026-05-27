@@ -123,6 +123,7 @@ type CreatePlanRequest struct {
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Joblimit      int32                  `protobuf:"varint,2,opt,name=joblimit,proto3" json:"joblimit,omitempty"`
 	Price         float64                `protobuf:"fixed64,3,opt,name=price,proto3" json:"price,omitempty"`
+	StripePriceID string                 `protobuf:"bytes,4,opt,name=stripePriceID,proto3" json:"stripePriceID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -176,6 +177,13 @@ func (x *CreatePlanRequest) GetPrice() float64 {
 		return x.Price
 	}
 	return 0
+}
+
+func (x *CreatePlanRequest) GetStripePriceID() string {
+	if x != nil {
+		return x.StripePriceID
+	}
+	return ""
 }
 
 type CreatePlanResponse struct {
@@ -507,11 +515,12 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"2\n" +
 	"\rLoginResponse\x12!\n" +
-	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\"Y\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\"\x7f\n" +
 	"\x11CreatePlanRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
 	"\bjoblimit\x18\x02 \x01(\x05R\bjoblimit\x12\x14\n" +
-	"\x05price\x18\x03 \x01(\x01R\x05price\".\n" +
+	"\x05price\x18\x03 \x01(\x01R\x05price\x12$\n" +
+	"\rstripePriceID\x18\x04 \x01(\tR\rstripePriceID\".\n" +
 	"\x12CreatePlanResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"\x11\n" +
 	"\x0fListPlanRequest\"\x8a\x01\n" +

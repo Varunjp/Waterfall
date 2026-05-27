@@ -30,7 +30,7 @@ func (h *AdminHandler) Login(ctx context.Context,req *pb.LoginRequest)(*pb.Login
 }
 
 func (h *AdminHandler) CreatePlan(ctx context.Context,req *pb.CreatePlanRequest)(*pb.CreatePlanResponse,error) {
-	err := h.plan.CreatePlan(req.Name,int(req.Joblimit),req.Price)
+	err := h.plan.CreatePlan(req.Name,int(req.Joblimit),req.Price,req.StripePriceID)
 	if err != nil {
 		return nil,err 
 	}
