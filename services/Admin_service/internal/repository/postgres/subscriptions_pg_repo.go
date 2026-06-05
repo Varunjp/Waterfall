@@ -13,14 +13,14 @@ func NewSubscriptionsRepo(db *sql.DB) *SubscriptionsPGRepo {
 	return &SubscriptionsPGRepo{db: db}
 }
 
-func (s *SubscriptionsPGRepo) ListPlans() ([]*entities.Plan,error) {
-	rows,err := s.db.Query(`
+func (s *SubscriptionsPGRepo) ListPlans() ([]*entities.Plan, error) {
+	rows, err := s.db.Query(`
 		SELECT plan_id,name,monthly_job_limit,price,created_at
 		FROM plans
 		WHERE name != 'FREE'`,
 	)
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -35,9 +35,9 @@ func (s *SubscriptionsPGRepo) ListPlans() ([]*entities.Plan,error) {
 			&p.CreatedAt,
 		)
 		if err != nil {
-			return nil,err 
+			return nil, err
 		}
 		plans = append(plans, &p)
 	}
-	return plans,nil 
+	return plans, nil
 }

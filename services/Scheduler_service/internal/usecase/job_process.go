@@ -15,48 +15,48 @@ import (
 
 type jobUsecase struct {
 	adminRepo *repository.AdminRepo
-	metrics *metrics.SchedulerMetrics
-	producer *producer.KafkaProducer
-	log *zap.Logger
-	maxRetry int 
-	redis *redisClient.Client
+	metrics   *metrics.SchedulerMetrics
+	producer  *producer.KafkaProducer
+	log       *zap.Logger
+	maxRetry  int
+	redis     *redisClient.Client
 }
 
-func NewJobResultProcess(a *repository.AdminRepo, m *metrics.SchedulerMetrics, p  *producer.KafkaProducer,l *zap.Logger,maxRetry int,r *redisClient.Client) *jobUsecase {
+func NewJobResultProcess(a *repository.AdminRepo, m *metrics.SchedulerMetrics, p *producer.KafkaProducer, l *zap.Logger, maxRetry int, r *redisClient.Client) *jobUsecase {
 	return &jobUsecase{
 		adminRepo: a,
-		metrics: m,
-		producer: p,
-		log: l,
-		maxRetry: maxRetry,
-		redis: r,
+		metrics:   m,
+		producer:  p,
+		log:       l,
+		maxRetry:  maxRetry,
+		redis:     r,
 	}
 }
 
-func (u *jobUsecase) ProcessJobResult(ctx context.Context,input domain.JobResultInput) error {
+func (u *jobUsecase) ProcessJobResult(ctx context.Context, input domain.JobResultInput) error {
 
 	if input.Status == "FAILED" {
 		if input.Retry < u.maxRetry {
-			delay := u.calculateBackoff(input.Retry+1)
+			delay := u.calculateBackoff(input.Retry + 1)
 			nextrun := time.Now().Add(delay)
 			event := map[string]any{
-				"job_id": input.JobID,
-				"app_id": input.AppID,
-				"status": domain.JobRetry,
-				"retry": input.Retry+1,
-				"next_run":nextrun,
-				"error": input.ErrorMessage,
+				"job_id":   input.JobID,
+				"app_id":   input.AppID,
+				"status":   domain.JobRetry,
+				"retry":    input.Retry + 1,
+				"next_run": nextrun,
+				"error":    input.ErrorMessage,
 			}
-			if err := u.producer.Publish(ctx,event); err != nil {
-				return err 
+			if err := u.producer.Publish(ctx, event); err != nil {
+				return err
 			}
 
 			u.log.Info("job scheduled for retry",
-				zap.String("job_id",input.JobID),
-				zap.Int("retry",input.Retry+1),
+				zap.String("job_id", input.JobID),
+				zap.Int("retry", input.Retry+1),
 			)
 
-			return nil 
+			return nil
 		}
 	}
 
@@ -64,20 +64,20 @@ func (u *jobUsecase) ProcessJobResult(ctx context.Context,input domain.JobResult
 		"job_id": input.JobID,
 		"app_id": input.AppID,
 		"status": input.Status,
-		"retry": input.Retry,
-		"error": input.ErrorMessage,
+		"retry":  input.Retry,
+		"error":  input.ErrorMessage,
 	}
 
-	if err := u.producer.Publish(ctx,event); err != nil {
-		return err 
+	if err := u.producer.Publish(ctx, event); err != nil {
+		return err
 	}
 
 	u.log.Info("job result processed",
-		zap.String("job_id",input.JobID),
-		zap.String("status",input.Status),
+		zap.String("job_id", input.JobID),
+		zap.String("status", input.Status),
 	)
 
-	return nil 
+	return nil
 }
 
 func (u *jobUsecase) calculateBackoff(retryCount int) time.Duration {

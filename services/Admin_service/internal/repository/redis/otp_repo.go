@@ -17,59 +17,59 @@ func NewOTPRepo(rdb *redis.Client) *OTPRepo {
 	}
 }
 
-func (r *OTPRepo) StoreOTP(email,otp string) error {
+func (r *OTPRepo) StoreOTP(email, otp string) error {
 
-	key := "otp:reset:"+email 
+	key := "otp:reset:" + email
 
-	data := map[string]interface{} {
-		"otp": otp,
-		"attempts":0,
+	data := map[string]interface{}{
+		"otp":      otp,
+		"attempts": 0,
 	}
 
-	jsonData,_ := json.Marshal(data)
+	jsonData, _ := json.Marshal(data)
 
-	return r.redis.Set(key,jsonData,5*time.Minute).Err()
+	return r.redis.Set(key, jsonData, 5*time.Minute).Err()
 }
 
-func (r *OTPRepo) GetOTP(email string)(string,int,error) {
+func (r *OTPRepo) GetOTP(email string) (string, int, error) {
 
-	key := "otp:reset:"+email 
+	key := "otp:reset:" + email
 
-	val,err := r.redis.Get(key).Result()
+	val, err := r.redis.Get(key).Result()
 	if err != nil {
-		return "",0,err 
+		return "", 0, err
 	}
 
 	var data struct {
-		Otp  string `json:"otp"`
-		Attemps int `json:"attempts"`
+		Otp     string `json:"otp"`
+		Attemps int    `json:"attempts"`
 	}
 
-	json.Unmarshal([]byte(val),&data)
-	return data.Otp,data.Attemps,nil 
+	json.Unmarshal([]byte(val), &data)
+	return data.Otp, data.Attemps, nil
 }
 
 func (r *OTPRepo) IncrementAttempt(email string) error {
 
-	key := "otp:reset:"+email 
+	key := "otp:reset:" + email
 
-	val,err := r.redis.Get(key).Result()
+	val, err := r.redis.Get(key).Result()
 	if err != nil {
-		return err 
+		return err
 	}
 
 	var data struct {
-		Otp   string `json:"otp"`
-		Attempts int `json:"attempts"`
+		Otp      string `json:"otp"`
+		Attempts int    `json:"attempts"`
 	}
 
-	json.Unmarshal([]byte(val),&data)
+	json.Unmarshal([]byte(val), &data)
 
 	data.Attempts++
 
-	newVal,_ := json.Marshal(data)
+	newVal, _ := json.Marshal(data)
 
-	return r.redis.Set(key,newVal,5*time.Minute).Err()
+	return r.redis.Set(key, newVal, 5*time.Minute).Err()
 }
 
 func (r *OTPRepo) CanResend(email string) bool {

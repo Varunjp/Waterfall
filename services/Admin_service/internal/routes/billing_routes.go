@@ -7,18 +7,18 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func RgisterBillingRoutes(r chi.Router,billingController *controller.BillingController) {
+func RgisterBillingRoutes(r chi.Router, billingController *controller.BillingController) {
 
-	r.Route("/billing",func(r chi.Router){
+	r.Route("/billing", func(r chi.Router) {
 
-		r.Post("/webhook",billingController.StripeWebhook)
+		r.Post("/webhook", billingController.StripeWebhook)
 
-		r.Group(func(r chi.Router){
+		r.Group(func(r chi.Router) {
 			r.Use(middleware.AuthMiddleware)
 
-			r.Post("/checkout",billingController.CreateCheckout)
-			r.Post("/cancel",billingController.CancelSubscription)
-			r.Get("/subscription",billingController.GetSubscription)
+			r.Post("/checkout", billingController.CreateCheckout)
+			r.Post("/cancel", billingController.CancelSubscription)
+			r.Get("/subscription", billingController.GetSubscription)
 		})
 	})
 }

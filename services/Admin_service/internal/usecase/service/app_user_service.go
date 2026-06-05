@@ -16,17 +16,17 @@ import (
 )
 
 type AppUserService struct {
-	repo repo.AppUserRepository
+	repo    repo.AppUserRepository
 	otpRepo *redisclient.OTPRepo
-	mailer *utils.Mailer
-	secret string 
+	mailer  *utils.Mailer
+	secret  string
 }
 
-func NewAppUserService(r repo.AppUserRepository,rd *redisclient.OTPRepo,m *utils.Mailer,secret string) *AppUserService {
-	return &AppUserService{repo: r,otpRepo: rd,mailer: m,secret: secret}
+func NewAppUserService(r repo.AppUserRepository, rd *redisclient.OTPRepo, m *utils.Mailer, secret string) *AppUserService {
+	return &AppUserService{repo: r, otpRepo: rd, mailer: m, secret: secret}
 }
 
-func (s *AppUserService) Create(app_id,email, password, role string) error {
+func (s *AppUserService) Create(app_id, email, password, role string) error {
 	if role != enums.RoleSuperAdmin &&
 		role != enums.RoleAdmin &&
 		role != enums.RoleViewer {
@@ -39,7 +39,7 @@ func (s *AppUserService) Create(app_id,email, password, role string) error {
 	}
 
 	user := &entities.AppUser{
-		AppID: app_id,
+		AppID:        app_id,
 		Email:        email,
 		PasswordHash: hash,
 		Role:         role,
@@ -48,30 +48,30 @@ func (s *AppUserService) Create(app_id,email, password, role string) error {
 	return s.repo.Create(user)
 }
 
-func (s *AppUserService) List(appID string) ([]*entities.AppUser, error) {	
+func (s *AppUserService) List(appID string) ([]*entities.AppUser, error) {
 	return s.repo.FindByApp(appID)
 }
 
-func (s *AppUserService) AppLogin(email,password string)(string,error) {
-	
+func (s *AppUserService) AppLogin(email, password string) (string, error) {
+
 	if !validation.IsVaildEmail(email) {
-		return "",domainErr.ErrInvalidCredentials
+		return "", domainErr.ErrInvalidCredentials
 	}
-	appUser,err := s.repo.FindByEmail(email)
+	appUser, err := s.repo.FindByEmail(email)
 	if err != nil {
-		return "",domainErr.ErrInvalidCredentials
+		return "", domainErr.ErrInvalidCredentials
 	}
-	if err := security.Compare(appUser.PasswordHash,password); err != nil {
-		return "",domainErr.ErrInvalidCredentials
+	if err := security.Compare(appUser.PasswordHash, password); err != nil {
+		return "", domainErr.ErrInvalidCredentials
 	}
 	if appUser.Status != "active" {
 		return "", domainErr.ErrUserBlocked
 	}
-	return security.GenerateJWT(s.secret,appUser.ID,appUser.Role,appUser.AppID)
+	return security.GenerateJWT(s.secret, appUser.ID, appUser.Role, appUser.AppID)
 }
 
-func (s *AppUserService) RequestPasswordReset(ctx context.Context,email string) error {
-	_,err := s.repo.FindByEmail(email)
+func (s *AppUserService) RequestPasswordReset(ctx context.Context, email string) error {
+	_, err := s.repo.FindByEmail(email)
 	if err != nil {
 		return errors.New("user not found")
 	}
@@ -80,75 +80,75 @@ func (s *AppUserService) RequestPasswordReset(ctx context.Context,email string) 
 		return errors.New("please wait before requesting another OTP")
 	}
 
-	otp,err := utils.GenerateOTP()
+	otp, err := utils.GenerateOTP()
 	if err != nil {
 		return err
 	}
 
-	err = s.otpRepo.StoreOTP(email,otp)
+	err = s.otpRepo.StoreOTP(email, otp)
 
 	if err != nil {
-		return err 
+		return err
 	}
 
 	s.otpRepo.SetCooldown(email)
 
-	return s.mailer.SendOtp(email,otp)
+	return s.mailer.SendOtp(email, otp)
 }
 
-func (s *AppUserService) VerifyOtp(ctx context.Context,email,otp string)(string,error) {
+func (s *AppUserService) VerifyOtp(ctx context.Context, email, otp string) (string, error) {
 
-	storedotp,attempts,err := s.otpRepo.GetOTP(email)
+	storedotp, attempts, err := s.otpRepo.GetOTP(email)
 	if err != nil {
-		return "",errors.New("otp expired")
+		return "", errors.New("otp expired")
 	}
 
 	if attempts >= 5 {
-		return "",errors.New("too many attempts")
+		return "", errors.New("too many attempts")
 	}
 
 	if storedotp != otp {
 		s.otpRepo.IncrementAttempt(email)
-		return "",errors.New("invalid otp")
+		return "", errors.New("invalid otp")
 	}
 
 	return utils.GenerateResetToken(email)
 }
 
-func (s *AppUserService) ResetPassword(ctx context.Context,token,password string) error {
+func (s *AppUserService) ResetPassword(ctx context.Context, token, password string) error {
 
-	email,err := utils.ParseResetToken(token)
+	email, err := utils.ParseResetToken(token)
 	if err != nil {
-		return err 
+		return err
 	}
 
-	hash,err := bcrypt.GenerateFromPassword([]byte(password),bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
-		return err 
+		return err
 	}
 
-	return s.repo.UpdatePassword(ctx,email,string(hash))
+	return s.repo.UpdatePassword(ctx, email, string(hash))
 }
 
-func (s *AppUserService) ListPlans(ctx context.Context) ([]*entities.Plan,error) {
+func (s *AppUserService) ListPlans(ctx context.Context) ([]*entities.Plan, error) {
 
-	plans,err := s.repo.ListPlans()
+	plans, err := s.repo.ListPlans()
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	return plans,nil 
+	return plans, nil
 }
 
-func (s *AppUserService) BlockUser(ctx context.Context,userId,status string)error {
+func (s *AppUserService) BlockUser(ctx context.Context, userId, status string) error {
 
-	err := s.repo.BlockUser(userId,status)
-	
+	err := s.repo.BlockUser(userId, status)
+
 	if err != nil {
-		return err 
+		return err
 	}
 
-	return nil 
+	return nil
 }

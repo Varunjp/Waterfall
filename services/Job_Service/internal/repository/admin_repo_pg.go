@@ -43,15 +43,15 @@ func (a *adminrepo) GetPlanDetails(ctx context.Context, planID string) (string, 
 	pquery := `SELECT name,monthly_job_limit FROM plans WHERE plan_id = $1`
 
 	var totalLimit int
-	var name string 
+	var name string
 
-	err := a.db.QueryRow(ctx, pquery, planID).Scan(&name,&totalLimit)
+	err := a.db.QueryRow(ctx, pquery, planID).Scan(&name, &totalLimit)
 
 	if err != nil {
-		return "",-1, err
+		return "", -1, err
 	}
 
-	return name,totalLimit, nil
+	return name, totalLimit, nil
 }
 
 func (a *adminrepo) GetMonthlyUsage(ctx context.Context, appID string) (int, error) {

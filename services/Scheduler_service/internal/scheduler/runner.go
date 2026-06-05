@@ -18,20 +18,20 @@ var (
 )
 
 type Runner struct {
-	kafak *consumer.JobCreatedConsumer
+	kafak    *consumer.JobCreatedConsumer
 	assigner *usecase.Assigner
 	producer *producer.KafkaProducer
-	redis *redis.Client
-	log  *zap.Logger
+	redis    *redis.Client
+	log      *zap.Logger
 }
 
-func NewRunner(c *consumer.JobCreatedConsumer,a *usecase.Assigner,p *producer.KafkaProducer,r *redis.Client,l *zap.Logger) *Runner {
+func NewRunner(c *consumer.JobCreatedConsumer, a *usecase.Assigner, p *producer.KafkaProducer, r *redis.Client, l *zap.Logger) *Runner {
 	return &Runner{
-		kafak: c,
+		kafak:    c,
 		assigner: a,
 		producer: p,
-		redis: r,
-		log: l,
+		redis:    r,
+		log:      l,
 	}
 }
 
@@ -41,56 +41,56 @@ func (r *Runner) Run(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			r.log.Info("scheduler loop stopped")
-			return 
+			return
 		default:
-			msg,err := r.kafak.Read(ctx)
+			msg, err := r.kafak.Read(ctx)
 			if err != nil {
 				if ctx.Err() != nil {
-					return 
+					return
 				}
-				r.log.Error("kafka read failed",zap.Error(err))
+				r.log.Error("kafka read failed", zap.Error(err))
 				continue
 			}
-			r.handleMessage(ctx,msg)
+			r.handleMessage(ctx, msg)
 		}
 	}
 }
 
-func (r *Runner) handleMessage(ctx context.Context,raw []byte) {
+func (r *Runner) handleMessage(ctx context.Context, raw []byte) {
 	var job domain.Job
-	if err := json.Unmarshal(raw,&job); err != nil {
-		r.log.Warn("invalid job payload",zap.Error(err))
+	if err := json.Unmarshal(raw, &job); err != nil {
+		r.log.Warn("invalid job payload", zap.Error(err))
 		return
 	}
 
-	err := r.assigner.Assign(ctx,job)
-	
+	err := r.assigner.Assign(ctx, job)
+
 	if err != nil {
-		r.handleAssignFailure(ctx,job,err)
-		return 
+		r.handleAssignFailure(ctx, job, err)
+		return
 	}
 
-	r.presistRunningJob(ctx,job)
+	r.presistRunningJob(ctx, job)
 
 	//r.emitJobUpdate(ctx,job,"RUNNING","")
 }
 
-func (r *Runner) handleAssignFailure(ctx context.Context,job domain.Job,err error) {
+func (r *Runner) handleAssignFailure(ctx context.Context, job domain.Job, err error) {
 
-	if errors.Is(err,ErrConcurrencyLimit) {
+	if errors.Is(err, ErrConcurrencyLimit) {
 		r.log.Debug("concurrency limit hit",
-			zap.String("job_id",job.JobID),
-			zap.String("app_id",job.AppID),
+			zap.String("job_id", job.JobID),
+			zap.String("app_id", job.AppID),
 		)
-		return 
+		return
 	}
 
-	r.log.Error("job assignment failed", 
-		zap.String("job_id",job.JobID),
+	r.log.Error("job assignment failed",
+		zap.String("job_id", job.JobID),
 		zap.Error(err),
 	)
 
-	r.emitJobUpdate(ctx,job,"FAILED",err.Error())
+	r.emitJobUpdate(ctx, job, "FAILED", err.Error())
 }
 
 func (r *Runner) presistRunningJob(ctx context.Context, job domain.Job) {
@@ -105,7 +105,7 @@ func (r *Runner) presistRunningJob(ctx context.Context, job domain.Job) {
 
 	if err != nil {
 		r.log.Warn("failed to persist running job",
-			zap.String("job_id",job.JobID),
+			zap.String("job_id", job.JobID),
 			zap.Error(err),
 		)
 	}
@@ -118,17 +118,17 @@ func (r *Runner) emitJobUpdate(
 	errMsg string,
 ) {
 	event := map[string]any{
-		"job_id": job.JobID,
-		"app_id": job.AppID,
-		"status": status,
+		"job_id":  job.JobID,
+		"app_id":  job.AppID,
+		"status":  status,
 		"retries": job.Retry,
-		"error": errMsg,
+		"error":   errMsg,
 	}
 
-	if err := r.producer.Publish(ctx,event); err != nil {
-		r.log.Warn("failed to emit job update", 
-			zap.String("job_id",job.JobID),
-			zap.String("status",status),
+	if err := r.producer.Publish(ctx, event); err != nil {
+		r.log.Warn("failed to emit job update",
+			zap.String("job_id", job.JobID),
+			zap.String("status", status),
 			zap.Error(err),
 		)
 	}

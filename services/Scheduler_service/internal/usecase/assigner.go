@@ -39,7 +39,7 @@ func NewAssigner(
 		runtime:  store,
 		workerMg: w,
 		dispatch: d,
-		jobuse: jobu,
+		jobuse:   jobu,
 	}
 }
 
@@ -52,7 +52,6 @@ func (a *Assigner) Assign(ctx context.Context, job domain.Job) error {
 	// }
 
 	// key := fmt.Sprintf("concurrency:%s", job.AppID)
-	
 
 	// _, err := a.redis.EvalSha(
 	// 	ctx,
@@ -64,27 +63,27 @@ func (a *Assigner) Assign(ctx context.Context, job domain.Job) error {
 	// 	job.ManualRetry,
 	// ).Result()
 
-	worker := a.workerMg.FindAvailableWorker(job.AppID,job.Type)
+	worker := a.workerMg.FindAvailableWorker(job.AppID, job.Type)
 
-	if worker == nil  {
-		jobRes := domain.JobResultInput {
-			JobID: job.JobID,
-			AppID: job.AppID,
-			Retry: job.Retry,
-			Status: "FAILED",
+	if worker == nil {
+		jobRes := domain.JobResultInput{
+			JobID:        job.JobID,
+			AppID:        job.AppID,
+			Retry:        job.Retry,
+			Status:       "FAILED",
 			ErrorMessage: "No worker available",
 		}
 		a.metrics.JobsFailed.Inc()
-		return a.jobuse.ProcessJobResult(ctx,jobRes)
-	}else {
+		return a.jobuse.ProcessJobResult(ctx, jobRes)
+	} else {
 
 		msg := &schedulerpb.SchedulerMessage{
 			Payload: &schedulerpb.SchedulerMessage_Job{
 				Job: &schedulerpb.JobAssignment{
-					JobId: job.JobID,
-					AppId: job.AppID,
-					JobType: job.Type,
-					Payload: job.Payload,
+					JobId:      job.JobID,
+					AppId:      job.AppID,
+					JobType:    job.Type,
+					Payload:    job.Payload,
 					RetryCount: int32(job.Retry),
 					MaxRetries: int32(job.MaxRetries),
 				},
@@ -96,15 +95,15 @@ func (a *Assigner) Assign(ctx context.Context, job domain.Job) error {
 			return ctx.Err()
 		case <-worker.Ctx.Done():
 			return domain.ErrWorkerDisconnected
-		case worker.SendQueue <- msg :
+		case worker.SendQueue <- msg:
 			worker.IncrementJobs()
 			a.metrics.RunningJobs.Inc()
 			a.metrics.JobsAssigned.Inc()
 			if a.runtime != nil {
 				_ = a.runtime.RecordQueuedJob(ctx, job, time.Now().UTC())
 			}
-			return nil 
-		case <- time.After(3 * time.Second):
+			return nil
+		case <-time.After(3 * time.Second):
 			return domain.ErrWorkerQueueFull
 		}
 	}

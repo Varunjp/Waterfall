@@ -54,45 +54,45 @@ func (r *AppUserRepo) FindByApp(appID string) ([]*entities.AppUser, error) {
 	return users, nil
 }
 
-func (r *AppUserRepo) FindByEmail(email string) (*entities.AppUser,error) {
+func (r *AppUserRepo) FindByEmail(email string) (*entities.AppUser, error) {
 	row := r.db.QueryRow(
 		`SELECT id,app_id,email,password_hash,role,status,created_at
-		FROM app_users WHERE email = $1`,email,
+		FROM app_users WHERE email = $1`, email,
 	)
 
 	var appUser entities.AppUser
-	err := row.Scan(&appUser.ID,&appUser.AppID,&appUser.Email,&appUser.PasswordHash,&appUser.Role,&appUser.Status,&appUser.CreatedAt)
+	err := row.Scan(&appUser.ID, &appUser.AppID, &appUser.Email, &appUser.PasswordHash, &appUser.Role, &appUser.Status, &appUser.CreatedAt)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil,err 
+			return nil, err
 		}
-		return nil,err 
+		return nil, err
 	}
-	return &appUser,nil 
+	return &appUser, nil
 }
 
-func (r *AppUserRepo) UpdatePassword(ctx context.Context,email,passhash string) error {
+func (r *AppUserRepo) UpdatePassword(ctx context.Context, email, passhash string) error {
 
 	query := `UPDATE app_users SET password_hash = $1 WHERE email = $2`
-	args := []any{passhash,email}
+	args := []any{passhash, email}
 
-	_,err := r.db.QueryContext(ctx,query,args...)
+	_, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
-		return err 
+		return err
 	}
 
-	return nil 
+	return nil
 }
 
-func (r *AppUserRepo) ListPlans() ([]*entities.Plan,error) {
-	rows,err := r.db.Query(`
+func (r *AppUserRepo) ListPlans() ([]*entities.Plan, error) {
+	rows, err := r.db.Query(`
 		SELECT plan_id,name,monthly_job_limit,price,created_at
 		FROM plans
 		WHERE name != 'FREE'`,
 	)
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -107,14 +107,14 @@ func (r *AppUserRepo) ListPlans() ([]*entities.Plan,error) {
 			&p.CreatedAt,
 		)
 		if err != nil {
-			return nil,err 
+			return nil, err
 		}
 		plans = append(plans, &p)
 	}
-	return plans,nil 
+	return plans, nil
 }
 
-func (r *AppUserRepo)BlockUser(userID,status string) error {
+func (r *AppUserRepo) BlockUser(userID, status string) error {
 
 	err := r.db.QueryRow(
 		`UPDATE app_users SET status = $1 WHERE id = $2`,
@@ -122,5 +122,5 @@ func (r *AppUserRepo)BlockUser(userID,status string) error {
 		userID,
 	).Err()
 
-	return err 
+	return err
 }

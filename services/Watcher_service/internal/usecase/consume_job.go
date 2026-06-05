@@ -59,23 +59,23 @@ func (uc *ConsumeJobUsecase) Handle(ctx context.Context, event domain.JobEvent) 
 		}
 		return nil
 	case domain.JobTestCreated:
-		
+
 		now := time.Now().UTC()
-		job := domain.Job {
-			JobID: event.JobID,
-			AppID: event.AppID,
-			Type: event.Type,
-			Payload: event.Payload,
-			Status: domain.StatusScheduled,
-			CreatedAt: now,
-			UpdatedAt: now,
+		job := domain.Job{
+			JobID:      event.JobID,
+			AppID:      event.AppID,
+			Type:       event.Type,
+			Payload:    event.Payload,
+			Status:     domain.StatusScheduled,
+			CreatedAt:  now,
+			UpdatedAt:  now,
 			ScheduleAt: now,
 		}
 
-		err := uc.repo.InsertTest(ctx,job)
-		
+		err := uc.repo.InsertTest(ctx, job)
+
 		if err != nil {
-			return err 
+			return err
 		}
 
 		return nil

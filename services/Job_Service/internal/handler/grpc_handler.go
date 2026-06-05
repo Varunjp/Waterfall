@@ -28,16 +28,15 @@ func (h *JobHandler) CreateJob(ctx context.Context, r *jobpb.CreateJobRequest) (
 	return &jobpb.JobResponse{JobId: jobID, Status: "CREATED"}, nil
 }
 
-func (h *JobHandler) CreateTestJob(ctx context.Context,r *jobpb.CreateTestJobRequest)(*jobpb.JobResponse,error) {
+func (h *JobHandler) CreateTestJob(ctx context.Context, r *jobpb.CreateTestJobRequest) (*jobpb.JobResponse, error) {
 
-	jobID,err := h.uc.CreateTest(ctx,r.AppId,r.Type,r.Payload)
+	jobID, err := h.uc.CreateTest(ctx, r.AppId, r.Type, r.Payload)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
-	return &jobpb.JobResponse{JobId: jobID,Status: "CREATED_TEST"},nil 
-}	
-
+	return &jobpb.JobResponse{JobId: jobID, Status: "CREATED_TEST"}, nil
+}
 
 func (h *JobHandler) UpdateJob(ctx context.Context, r *jobpb.UpdateJobRequest) (*jobpb.JobResponse, error) {
 

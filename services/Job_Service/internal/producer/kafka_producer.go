@@ -19,46 +19,46 @@ type testkafkaProducer struct {
 	writer *kafka.Writer
 }
 
-func NewKafkaProducer(brokers []string,topic string) Producer {
-	return &kafkaProducer {
+func NewKafkaProducer(brokers []string, topic string) Producer {
+	return &kafkaProducer{
 		writer: &kafka.Writer{
-			Addr: kafka.TCP(brokers...),
-			Topic: topic,
+			Addr:     kafka.TCP(brokers...),
+			Topic:    topic,
 			Balancer: &kafka.LeastBytes{},
 		},
 	}
 }
 
-func NewTestKafkaProducer(brokers []string,topic string) Producer {
+func NewTestKafkaProducer(brokers []string, topic string) Producer {
 	return &testkafkaProducer{
 		writer: &kafka.Writer{
-			Addr: kafka.TCP(brokers...),
-			Topic: topic,
+			Addr:     kafka.TCP(brokers...),
+			Topic:    topic,
 			Balancer: &kafka.LeastBytes{},
 		},
 	}
 }
 
-func (k *kafkaProducer) Publish(ctx context.Context,key string,value any)error {
+func (k *kafkaProducer) Publish(ctx context.Context, key string, value any) error {
 	bytes, err := json.Marshal(value)
 	if err != nil {
-		return err 
+		return err
 	}
 
 	return k.writer.WriteMessages(ctx, kafka.Message{
-		Key: []byte(key),
+		Key:   []byte(key),
 		Value: bytes,
 	})
 }
 
-func (k *testkafkaProducer) Publish(ctx context.Context,key string,value any) error {
-	bytes,err := json.Marshal(value)
+func (k *testkafkaProducer) Publish(ctx context.Context, key string, value any) error {
+	bytes, err := json.Marshal(value)
 	if err != nil {
-		return err 
+		return err
 	}
 
 	return k.writer.WriteMessages(ctx, kafka.Message{
-		Key: []byte(key),
+		Key:   []byte(key),
 		Value: bytes,
 	})
 }

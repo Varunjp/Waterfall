@@ -16,7 +16,7 @@ func NewMetrics() *SchedulerMetrics {
 	m := &SchedulerMetrics{
 		JobsAssigned: prometheus.NewCounter(
 			prometheus.CounterOpts{
-				Name:"scheduler_jobs_assigned_total",
+				Name: "scheduler_jobs_assigned_total",
 				Help: "Total jobs assigned to workers",
 			},
 		),
@@ -27,7 +27,7 @@ func NewMetrics() *SchedulerMetrics {
 		),
 		JobsSuccess: prometheus.NewCounter(
 			prometheus.CounterOpts{
-				Name:"scheduler_jobs_success_total",
+				Name: "scheduler_jobs_success_total",
 			},
 		),
 		PendingJobs: prometheus.NewGaugeVec(
@@ -38,7 +38,7 @@ func NewMetrics() *SchedulerMetrics {
 		),
 		RunningJobs: prometheus.NewGauge(
 			prometheus.GaugeOpts{
-				Name:"scheduler_running_jobs",
+				Name: "scheduler_running_jobs",
 			},
 		),
 	}
@@ -51,5 +51,5 @@ func NewMetrics() *SchedulerMetrics {
 		m.RunningJobs,
 	)
 
-	return m 
+	return m
 }

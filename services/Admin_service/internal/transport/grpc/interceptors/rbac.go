@@ -15,31 +15,31 @@ func RBACInterceptor() grpc.UnaryServerInterceptor {
 		req interface{},
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
-	 )(interface{},error) {
+	) (interface{}, error) {
 
 		if publicMethods[info.FullMethod] {
-			return handler(ctx,req)
+			return handler(ctx, req)
 		}
 
-		claims,ok := ctx.Value(ClaimsKey).(jwt.MapClaims)
+		claims, ok := ctx.Value(ClaimsKey).(jwt.MapClaims)
 		if !ok {
-			return nil, status.Error(codes.Unauthenticated,"claims missing")
+			return nil, status.Error(codes.Unauthenticated, "claims missing")
 		}
 
-		role,ok := claims["role"].(string)
+		role, ok := claims["role"].(string)
 		if !ok {
-			return nil,status.Error(codes.PermissionDenied,"role missing")
+			return nil, status.Error(codes.PermissionDenied, "role missing")
 		}
 
-		allowedRoles,exists := MethodPermissions[info.FullMethod]
+		allowedRoles, exists := MethodPermissions[info.FullMethod]
 		if !exists {
-			return nil, status.Error(codes.PermissionDenied,"method not allowed")
+			return nil, status.Error(codes.PermissionDenied, "method not allowed")
 		}
-		for _,r := range allowedRoles {
+		for _, r := range allowedRoles {
 			if r == role {
-				return handler(ctx,req)
+				return handler(ctx, req)
 			}
 		}
-		return nil,status.Error(codes.PermissionDenied,"access denied")
-	 }
+		return nil, status.Error(codes.PermissionDenied, "access denied")
+	}
 }

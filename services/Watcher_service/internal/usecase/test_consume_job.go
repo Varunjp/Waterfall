@@ -16,7 +16,7 @@ type ConsumeTestJobUsecase struct {
 	logger    *zap.Logger
 }
 
-func NewConsumetestJobUsecase(r repository.JobRepository, adrepo repository.AdminRepository, l *zap.Logger) *ConsumeTestJobUsecase{
+func NewConsumetestJobUsecase(r repository.JobRepository, adrepo repository.AdminRepository, l *zap.Logger) *ConsumeTestJobUsecase {
 	return &ConsumeTestJobUsecase{repo: r, adminRepo: adrepo, logger: l}
 }
 
@@ -25,21 +25,21 @@ func (uc *ConsumeTestJobUsecase) Handle(ctx context.Context, event domain.JobEve
 	switch event.EventType {
 	case domain.JobTestCreated:
 		now := time.Now().UTC()
-		job := domain.Job {
-			JobID: event.JobID,
-			AppID: event.AppID,
-			Type: event.Type,
-			Payload: event.Payload,
-			Status: domain.StatusScheduled,
-			CreatedAt: now,
-			UpdatedAt: now,
+		job := domain.Job{
+			JobID:      event.JobID,
+			AppID:      event.AppID,
+			Type:       event.Type,
+			Payload:    event.Payload,
+			Status:     domain.StatusScheduled,
+			CreatedAt:  now,
+			UpdatedAt:  now,
 			ScheduleAt: now,
 		}
 
-		err := uc.repo.InsertTest(ctx,job)
-		
+		err := uc.repo.InsertTest(ctx, job)
+
 		if err != nil {
-			return err 
+			return err
 		}
 
 		return nil

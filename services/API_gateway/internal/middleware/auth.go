@@ -10,26 +10,26 @@ import (
 func AuthMiddleware(secret string) gin.HandlerFunc {
 
 	publicPaths := map[string]bool{
-		"/health": true,
-		"/api/v1/jobs": true,
-		"/api/v1/jobs-test":true,
-		"/api/v1/admin/login": true,
-		"/api/v1/users/login":true,
+		"/health":                              true,
+		"/api/v1/jobs":                         true,
+		"/api/v1/jobs-test":                    true,
+		"/api/v1/admin/login":                  true,
+		"/api/v1/users/login":                  true,
 		"/api/v1/users/password/reset/request": true,
-		"/api/v1/users/password/reset/verify": true,
-		"/api/v1/users/password/reset": true,
-		"/api/v1/apps": true,
-		"/billing/webhook":true,
-		"/billing/checkout":true,
+		"/api/v1/users/password/reset/verify":  true,
+		"/api/v1/users/password/reset":         true,
+		"/api/v1/apps":                         true,
+		"/billing/webhook":                     true,
+		"/billing/checkout":                    true,
 		// "/billing/subscription":true,
-		"/":true,
-		"/home":true,
-		"/register":true,
-		"/login":true,
-		"/payment-success":true,
-		"/payment-cancel":true,
-		"/forgot-password":true,
-		"/admin":true,
+		"/":                true,
+		"/home":            true,
+		"/register":        true,
+		"/login":           true,
+		"/payment-success": true,
+		"/payment-cancel":  true,
+		"/forgot-password": true,
+		"/admin":           true,
 	}
 
 	return func(c *gin.Context) {
@@ -48,9 +48,9 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 		if authHeader == "" {
 			cookie, _ := c.Cookie("token")
 			if cookie == "" {
-				cookie,_ = c.Cookie("admin_token")
+				cookie, _ = c.Cookie("admin_token")
 			}
-			authHeader = "Bearer "+cookie
+			authHeader = "Bearer " + cookie
 		}
 
 		if authHeader == "" {

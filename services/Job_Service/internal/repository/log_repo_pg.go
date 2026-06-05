@@ -15,7 +15,7 @@ func NewLogRepo(db *pgxpool.Pool) JobLogRepository {
 	return &logRepo{db: db}
 }
 
-func (r *logRepo) GetByJobID(ctx context.Context,jobID, appID string)([]domain.JobLog,error) {
+func (r *logRepo) GetByJobID(ctx context.Context, jobID, appID string) ([]domain.JobLog, error) {
 
 	query := `
 	SELECT l.created_at,l.status,l.error
@@ -24,25 +24,25 @@ func (r *logRepo) GetByJobID(ctx context.Context,jobID, appID string)([]domain.J
 	WHERE l.job_id=$1 AND j.app_id=$2
 	ORDER BY l.created_at ASC
 	`
-	args := []any{jobID,appID}
+	args := []any{jobID, appID}
 
-	rows,err := r.db.Query(ctx,query,args...)
+	rows, err := r.db.Query(ctx, query, args...)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 	defer rows.Close()
 
 	var logs []domain.JobLog
 	for rows.Next() {
 		var l domain.JobLog
-		rows.Scan(&l.Timestamp,&l.Status,&l.ErrorMessage)
+		rows.Scan(&l.Timestamp, &l.Status, &l.ErrorMessage)
 		logs = append(logs, l)
 	}
-	return logs,nil 
+	return logs, nil
 }
 
-func (r *logRepo) GetByJobIdAdmin(ctx context.Context,jobID string)([]domain.JobLog,error) {
+func (r *logRepo) GetByJobIdAdmin(ctx context.Context, jobID string) ([]domain.JobLog, error) {
 	query := `
 	SELECT l.created_at,l.status,l.error
 	FROM job_logs l
@@ -51,17 +51,17 @@ func (r *logRepo) GetByJobIdAdmin(ctx context.Context,jobID string)([]domain.Job
 	`
 	args := []any{jobID}
 
-	rows,err := r.db.Query(ctx,query,args...)
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 	defer rows.Close()
 
 	var logs []domain.JobLog
 	for rows.Next() {
 		var l domain.JobLog
-		rows.Scan(&l.Timestamp,&l.Status,&l.ErrorMessage)
+		rows.Scan(&l.Timestamp, &l.Status, &l.ErrorMessage)
 		logs = append(logs, l)
 	}
-	return logs,nil 
+	return logs, nil
 }

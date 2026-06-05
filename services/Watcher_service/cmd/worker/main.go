@@ -29,9 +29,9 @@ func main() {
 	cfg := config.Load()
 	validateConfig(cfg)
 
-	logg,err := logger.Newlogger("watcher-service")
-	defer logg.Sync() 
-	
+	logg, err := logger.Newlogger("watcher-service")
+	defer logg.Sync()
+
 	if err != nil {
 		panic(err)
 	}
@@ -50,16 +50,16 @@ func main() {
 	adDb := dbClient.NewPostgres(cfg.DBADMINURL)
 	adrepo := repository.NewAdminRepo(adDb)
 	queueProducer := producer.NewKafkaProducer(cfg.KafkaBroker, cfg.KafkaTopic)
-	jobStatusProducer := producer.NewKafkaProducer(cfg.KafkaBroker,cfg.JobStatusTopic)
-	testProducer := producer.NewKafkaProducer(cfg.KafkaBroker,cfg.TestScheduler)
-	watchUC := usecase.NewWatchJobsUsecase(repo, queueProducer,jobStatusProducer, testProducer, logg)
-	rd,err:= redisClient.NewRedisClient(cfg.RedisAddr,cfg.RedisPassword,cfg.RedisDB)
+	jobStatusProducer := producer.NewKafkaProducer(cfg.KafkaBroker, cfg.JobStatusTopic)
+	testProducer := producer.NewKafkaProducer(cfg.KafkaBroker, cfg.TestScheduler)
+	watchUC := usecase.NewWatchJobsUsecase(repo, queueProducer, jobStatusProducer, testProducer, logg)
+	rd, err := redisClient.NewRedisClient(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	jobEventUC := usecase.NewConsumeJobUsecase(repo,adrepo, logg,rd)
+	jobEventUC := usecase.NewConsumeJobUsecase(repo, adrepo, logg, rd)
 	jobEventConsumer := consumer.NewKafkaConsumer(
 		cfg.KafkaBroker,
 		cfg.JobTopic,
@@ -114,7 +114,7 @@ func main() {
 				}
 
 				if err := watchUC.RunTest(ctx); err != nil {
-					logg.Error("watcher tick failed",zap.Error(err))
+					logg.Error("watcher tick failed", zap.Error(err))
 				}
 			}
 		}

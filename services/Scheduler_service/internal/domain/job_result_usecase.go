@@ -7,10 +7,10 @@ type JobResultInput struct {
 	AppID        string
 	Status       string
 	Retry        int
-	ManualRetry  int 
+	ManualRetry  int
 	ErrorMessage string
 }
 
 type JobResultUsecase interface {
-	ProcessJobResult(ctx context.Context,input JobResultInput) error 
+	ProcessJobResult(ctx context.Context, input JobResultInput) error
 }

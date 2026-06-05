@@ -25,5 +25,5 @@ func EnsureGroup(
 		return err
 	}
 
-	return nil 
+	return nil
 }

@@ -13,7 +13,7 @@ import (
 
 type JobUseCase interface {
 	Create(ctx context.Context, appID, jobType, payload string, scheduleAt *time.Time) (string, error)
-	CreateTest(ctx context.Context, appID,jobType,payload string) (string,error)
+	CreateTest(ctx context.Context, appID, jobType, payload string) (string, error)
 	Update(ctx context.Context, jobID, payload string, scheduled_at time.Time, schduleModified bool) error
 	Cancel(ctx context.Context, jobID string) error
 }
@@ -25,8 +25,8 @@ type jobUsecase struct {
 	redis    *redisRepo.RedisRepo
 }
 
-func NewJobUsecase(p producer.Producer,t producer.Producer, l *zap.Logger, r *redisRepo.RedisRepo) JobUseCase {
-	return &jobUsecase{producer: p, test: t,logger: l, redis: r}
+func NewJobUsecase(p producer.Producer, t producer.Producer, l *zap.Logger, r *redisRepo.RedisRepo) JobUseCase {
+	return &jobUsecase{producer: p, test: t, logger: l, redis: r}
 }
 
 func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string, scheduleAt *time.Time) (string, error) {
@@ -73,7 +73,7 @@ func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string,
 	return jobID, nil
 }
 
-func (u *jobUsecase) CreateTest(ctx context.Context, appID,jobType,payload string) (string,error) {
+func (u *jobUsecase) CreateTest(ctx context.Context, appID, jobType, payload string) (string, error) {
 
 	jobID := uuid.NewString()
 
@@ -85,12 +85,12 @@ func (u *jobUsecase) CreateTest(ctx context.Context, appID,jobType,payload strin
 		EventType: domain.JobTestCreated,
 	}
 
-	err := u.test.Publish(ctx,jobID,event)
+	err := u.test.Publish(ctx, jobID, event)
 	if err != nil {
-		return "",err 
+		return "", err
 	}
 
-	return jobID,nil 
+	return jobID, nil
 }
 
 func (u *jobUsecase) Update(ctx context.Context, jobID, payload string, scheduled_at time.Time, schduleModified bool) error {
@@ -112,6 +112,6 @@ func (u *jobUsecase) Cancel(ctx context.Context, jobID string) error {
 		EventType: domain.JobCanceled,
 		Timestamp: time.Now().UTC(),
 	}
-	
+
 	return u.producer.Publish(ctx, jobID, event)
 }

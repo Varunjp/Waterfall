@@ -48,34 +48,34 @@ func NewServer(
 		jobResultProcess: j,
 		log:              log,
 		runtime:          store,
-		workerManger: w,
+		workerManger:     w,
 	}
 }
 
 func (s *Server) JobStream(stream schedulerpb.Scheduler_JobStreamServer) error {
 
-	ctx,cancel := context.WithCancel(stream.Context())
+	ctx, cancel := context.WithCancel(stream.Context())
 	defer cancel()
 
-	firstMsg,err := stream.Recv()
+	firstMsg, err := stream.Recv()
 	if err != nil {
-		return err 
+		return err
 	}
 
 	register := firstMsg.GetRegister()
 	if register == nil {
-		return status.Error(codes.InvalidArgument,"first message must be register")
+		return status.Error(codes.InvalidArgument, "first message must be register")
 	}
 
 	worker := &WorkerConnection{
-		AppID: register.AppId,
-		WorkerID: register.WorkerId,
-		JobTypes: register.JobTypes,
+		AppID:          register.AppId,
+		WorkerID:       register.WorkerId,
+		JobTypes:       register.JobTypes,
 		MaxConcurrency: register.MaxConcurrency,
-		Stream: stream,
-		SendQueue: make(chan *schedulerpb.SchedulerMessage,100),
+		Stream:         stream,
+		SendQueue:      make(chan *schedulerpb.SchedulerMessage, 100),
 
-		Ctx: ctx,
+		Ctx:    ctx,
 		Cancel: cancel,
 	}
 
@@ -83,7 +83,7 @@ func (s *Server) JobStream(stream schedulerpb.Scheduler_JobStreamServer) error {
 
 	s.workerManger.Register(worker)
 
-	s.log.Info("worker connected",zap.String("worker_id",worker.WorkerID))
+	s.log.Info("worker connected", zap.String("worker_id", worker.WorkerID))
 
 	defer func() {
 		s.workerManger.Remove(worker.WorkerID)
@@ -94,7 +94,7 @@ func (s *Server) JobStream(stream schedulerpb.Scheduler_JobStreamServer) error {
 			time.Now(),
 		)
 
-		s.log.Info("worker disconnected",zap.String("worker_id",worker.WorkerID))
+		s.log.Info("worker disconnected", zap.String("worker_id", worker.WorkerID))
 	}()
 
 	err = s.runtime.RecordWorkerRegistration(
@@ -107,14 +107,14 @@ func (s *Server) JobStream(stream schedulerpb.Scheduler_JobStreamServer) error {
 	)
 
 	if err != nil {
-		return err 
+		return err
 	}
 
 	for {
 
-		msg,err := stream.Recv()
+		msg, err := stream.Recv()
 		if err != nil {
-			return err 
+			return err
 		}
 
 		switch payload := msg.Payload.(type) {
@@ -140,7 +140,7 @@ func (s *Server) JobStream(stream schedulerpb.Scheduler_JobStreamServer) error {
 	}
 }
 
-func (s *Server) handleHeartbeat(ctx context.Context,worker *WorkerConnection, req *schedulerpb.WorkerHeartbeat) {
+func (s *Server) handleHeartbeat(ctx context.Context, worker *WorkerConnection, req *schedulerpb.WorkerHeartbeat) {
 
 	worker.activeJobs.Store(req.ActiveJobs)
 
@@ -155,13 +155,13 @@ func (s *Server) handleHeartbeat(ctx context.Context,worker *WorkerConnection, r
 	)
 
 	if err != nil {
-		s.log.Warn("heartbeat failed",zap.Error(err))
+		s.log.Warn("heartbeat failed", zap.Error(err))
 	}
 }
 
-func (s *Server) handleProgress(ctx context.Context,worker *WorkerConnection, req *schedulerpb.JobProgress) {
+func (s *Server) handleProgress(ctx context.Context, worker *WorkerConnection, req *schedulerpb.JobProgress) {
 
-	key := "heartbeat:"+ req.JobId
+	key := "heartbeat:" + req.JobId
 	_ = s.redis.Set(
 		ctx,
 		key,
@@ -170,41 +170,41 @@ func (s *Server) handleProgress(ctx context.Context,worker *WorkerConnection, re
 	)
 }
 
-func (s *Server) handleResult(ctx context.Context,worker *WorkerConnection,req *schedulerpb.JobExecutionResult) {
+func (s *Server) handleResult(ctx context.Context, worker *WorkerConnection, req *schedulerpb.JobExecutionResult) {
 
 	jobID := req.JobId
 	appID := worker.AppID
 
-	_ = s.redis.Del(ctx,"heartbeat:"+jobID)
-	_ = s.redis.Decr(ctx,"concurrency:"+appID)
+	_ = s.redis.Del(ctx, "heartbeat:"+jobID)
+	_ = s.redis.Decr(ctx, "concurrency:"+appID)
 
 	status := "COMPLETED"
 
 	if req.Status == schedulerpb.JobResultStatus_JOB_RESULT_FAILED {
 		status = "FAILED"
 		s.metrics.JobsFailed.Inc()
-	}else {
+	} else {
 		s.metrics.JobsSuccess.Inc()
 	}
 
 	s.metrics.RunningJobs.Dec()
 
 	input := domain.JobResultInput{
-		JobID: jobID,
-		AppID: appID,
-		Status: status,
-		Retry: int(req.Retry),
+		JobID:        jobID,
+		AppID:        appID,
+		Status:       status,
+		Retry:        int(req.Retry),
 		ErrorMessage: req.ErrorMessage,
 	}
 
-	err := s.jobResultProcess.ProcessJobResult(ctx,input)
+	err := s.jobResultProcess.ProcessJobResult(ctx, input)
 
 	if err != nil {
-		s.log.Error("job result failed",zap.Error(err))
+		s.log.Error("job result failed", zap.Error(err))
 	}
 }
 
-func (s *Server) DispatchJob(ctx context.Context,job domain.Job,worker *WorkerConnection) error {
+func (s *Server) DispatchJob(ctx context.Context, job domain.Job, worker *WorkerConnection) error {
 
 	if worker == nil {
 		return errors.New("no worker available")
@@ -214,10 +214,10 @@ func (s *Server) DispatchJob(ctx context.Context,job domain.Job,worker *WorkerCo
 		&schedulerpb.SchedulerMessage{
 			Payload: &schedulerpb.SchedulerMessage_Job{
 				Job: &schedulerpb.JobAssignment{
-					JobId: job.JobID,
-					AppId: job.AppID,
-					JobType: job.Type,
-					Payload: job.Payload,
+					JobId:      job.JobID,
+					AppId:      job.AppID,
+					JobType:    job.Type,
+					Payload:    job.Payload,
 					RetryCount: int32(job.Retry),
 					MaxRetries: int32(job.MaxRetries),
 				},
@@ -227,11 +227,11 @@ func (s *Server) DispatchJob(ctx context.Context,job domain.Job,worker *WorkerCo
 
 	if err != nil {
 		s.workerManger.Remove(worker.WorkerID)
-		return err 
+		return err
 	}
 
 	worker.activeJobs.Add(1)
-	return nil 
+	return nil
 }
 
 // func (s *Server) Heartbeat(ctx context.Context, req *schedulerpb.HeartbeatRequest) (*schedulerpb.Ack, error) {

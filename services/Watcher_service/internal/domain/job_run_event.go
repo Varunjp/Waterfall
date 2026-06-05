@@ -4,7 +4,7 @@ import "time"
 
 type JobRunEvent struct {
 	JobID      string     `json:"job_id"`
-	AppID   	string  `json:"app_id"`
+	AppID      string     `json:"app_id"`
 	Status     string     `json:"status"`
 	Retry      int        `json:"retry"`
 	Error      *string    `json:"error,omitempty"`

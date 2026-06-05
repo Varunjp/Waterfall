@@ -8,13 +8,13 @@ import (
 
 func IsVaildEmail(email string) bool {
 	_, err := mail.ParseAddress(email)
-	return err == nil 
+	return err == nil
 }
 
 func IsValidName(name string) bool {
 	name = strings.TrimSpace(name)
 	if name == "" {
-		return false 
+		return false
 	}
 
 	firstRune := []rune(name)[0]

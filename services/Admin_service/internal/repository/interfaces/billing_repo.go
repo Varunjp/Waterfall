@@ -14,5 +14,5 @@ type BillingRepository interface {
 	UpdateSubscriptionPeriod(ctx context.Context, stripeSubID string, start time.Time, end time.Time) error
 	ResetMonthlyUsage(ctx context.Context, stripeSubID string) error
 	BlockAppBilling(ctx context.Context, stripeSubID string) error
-	GetSubscription(ctx context.Context,appID string)(*entities.Subscription,error)
+	GetSubscription(ctx context.Context, appID string) (*entities.Subscription, error)
 }

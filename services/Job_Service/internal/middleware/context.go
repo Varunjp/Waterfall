@@ -39,14 +39,14 @@ func RoleFromContext(ctx context.Context) (string, error) {
 }
 
 var publicMethods = map[string]bool{
-	"/job.JobService/CreateJob":  true,
-	"/job.JobService/UpdateJob":  true,
-	"/job.JobService/CancelJob":  true,
+	"/job.JobService/CreateJob":     true,
+	"/job.JobService/UpdateJob":     true,
+	"/job.JobService/CancelJob":     true,
 	"/job.JobService/CreateTestJob": true,
 }
 
-var appAdmin = map[string]bool {
-	"/job.JobService/ListFailedJobs":true,
+var appAdmin = map[string]bool{
+	"/job.JobService/ListFailedJobs": true,
 }
 
 var appAdminRole string = "platform_admin"

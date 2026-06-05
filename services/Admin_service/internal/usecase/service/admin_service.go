@@ -8,26 +8,26 @@ import (
 )
 
 type AdminService struct {
-	repo repo.AdminRepository
-	secret string 
+	repo   repo.AdminRepository
+	secret string
 }
 
-func NewAdminService(r repo.AdminRepository,secret string) *AdminService {
-	return &AdminService{r,secret}
+func NewAdminService(r repo.AdminRepository, secret string) *AdminService {
+	return &AdminService{r, secret}
 }
 
-func (s *AdminService) Login(email,password string)(string,error) {
+func (s *AdminService) Login(email, password string) (string, error) {
 
 	if !validation.IsVaildEmail(email) {
-		return "",domainErr.ErrInvalidCredentials
+		return "", domainErr.ErrInvalidCredentials
 	}
 
-	admin,err := s.repo.FindByEmail(email)
+	admin, err := s.repo.FindByEmail(email)
 	if err != nil {
-		return "",err 
+		return "", err
 	}
-	if err := security.Compare(admin.PasswordHash,password); err != nil {
-		return "",err 
+	if err := security.Compare(admin.PasswordHash, password); err != nil {
+		return "", err
 	}
-	return security.GenerateJWT(s.secret,admin.ID,"platform_admin","")
+	return security.GenerateJWT(s.secret, admin.ID, "platform_admin", "")
 }

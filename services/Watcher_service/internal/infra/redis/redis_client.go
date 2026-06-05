@@ -22,5 +22,5 @@ func NewRedisClient(addr, password string, db int) (*redis.Client, error) {
 		return nil, err
 	}
 
-	return rdb,nil 
+	return rdb, nil
 }

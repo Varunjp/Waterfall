@@ -5,5 +5,5 @@ import (
 )
 
 type SubscriptionsRepo interface {
-	ListPlans() ([]*entities.Plan,error)
+	ListPlans() ([]*entities.Plan, error)
 }

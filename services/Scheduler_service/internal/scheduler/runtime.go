@@ -8,28 +8,28 @@ import (
 )
 
 type Runtime struct {
-	wg sync.WaitGroup
+	wg     sync.WaitGroup
 	cancel context.CancelFunc
-	log *zap.Logger
+	log    *zap.Logger
 }
 
 func NewRuntime(log *zap.Logger) *Runtime {
 	return &Runtime{log: log}
 }
 
-func (r *Runtime) Start(parent context.Context,components ...func(context.Context)) context.Context {
-	ctx,cancel := context.WithCancel(parent)
+func (r *Runtime) Start(parent context.Context, components ...func(context.Context)) context.Context {
+	ctx, cancel := context.WithCancel(parent)
 	r.cancel = cancel
 
-	for _,c := range components {
+	for _, c := range components {
 		r.wg.Add(1)
-		go func(fn func(context.Context)){
+		go func(fn func(context.Context)) {
 			defer r.wg.Done()
 			fn(ctx)
 		}(c)
 	}
 
-	return ctx 
+	return ctx
 }
 
 func (r *Runtime) Stop() {

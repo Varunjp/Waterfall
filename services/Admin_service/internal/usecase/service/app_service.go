@@ -15,105 +15,105 @@ import (
 
 var (
 	ErrInvalidEmail = errors.New("Invalid email provided")
-	ErrInvaildName = errors.New("Invalid name provided")
+	ErrInvaildName  = errors.New("Invalid name provided")
 )
 
 type AppService struct {
-	repo repo.AppRepository
+	repo   repo.AppRepository
 	toplan repo.AddToPlanRepo
 }
 
-func NewAppService(r repo.AppRepository,tp repo.AddToPlanRepo) *AppService {
-	return &AppService{repo: r,toplan: tp}
+func NewAppService(r repo.AppRepository, tp repo.AddToPlanRepo) *AppService {
+	return &AppService{repo: r, toplan: tp}
 }
 
-func (s *AppService) Register(name,email string) (string,string,string,error) {
-	
+func (s *AppService) Register(name, email string) (string, string, string, error) {
+
 	if !validation.IsVaildEmail(email) {
-		return "","","",ErrInvalidEmail
+		return "", "", "", ErrInvalidEmail
 	}
 
 	if !validation.IsValidName(name) {
-		return "","","",ErrInvaildName
+		return "", "", "", ErrInvaildName
 	}
 
 	planID := os.Getenv("FREE_PLAN_ID")
 
 	app := &entities.App{
-		AppName: name,
+		AppName:  name,
 		AppEmail: email,
-		Status: "active",
-		Tier: "free",
-		PlanID: planID,
+		Status:   "active",
+		Tier:     "free",
+		PlanID:   planID,
 	}
 
-	appID,err := s.repo.Create(app);
+	appID, err := s.repo.Create(app)
 
-	if  err != nil {
+	if err != nil {
 		if errors.Is(err, domainErr.ErrAppEmailAlreadyExists) {
-			return "","","",domainErr.ErrAppEmailAlreadyExists
+			return "", "", "", domainErr.ErrAppEmailAlreadyExists
 		}
-		return "","","",err 
+		return "", "", "", err
 	}
 
 	start := time.Now()
 	end := time.Now().AddDate(0, 1, 0)
 
 	subscription := &entities.Subscription{
-		AppID: appID,
-		PlanID: planID,
-		PlanName: "FREE",
-		Status: "active",
+		AppID:              appID,
+		PlanID:             planID,
+		PlanName:           "FREE",
+		Status:             "active",
 		CurrentPeriodStart: start,
-		CurrentPeriodEnd: end,
+		CurrentPeriodEnd:   end,
 	}
 
 	err = s.repo.CreateFreePlan(subscription)
 
 	if err != nil {
-		return "","","",err 
+		return "", "", "", err
 	}
 
 	// Logic: need to implement super user here
 	layout := "02/01/2006"
-	pass := name+time.Now().Format(layout)
-	hash,err := security.Hash(pass)
+	pass := name + time.Now().Format(layout)
+	hash, err := security.Hash(pass)
 
 	if err != nil {
 		log.Println(err.Error())
 	}
 
 	appUser := &entities.AppUser{
-		AppID: appID,
-		Email: email,
+		AppID:        appID,
+		Email:        email,
 		PasswordHash: hash,
-		Role: "super_admin",
-		Status: "active",
+		Role:         "super_admin",
+		Status:       "active",
 	}
 
 	err = s.repo.CreateFirst(appUser)
 
 	if err != nil {
-		return "","","",err 
+		return "", "", "", err
 	}
 	ctx := context.Background()
-	err = s.toplan.AddToDefault(ctx,appID)
+	err = s.toplan.AddToDefault(ctx, appID)
 
 	if err != nil {
-		return "","","",err
+		return "", "", "", err
 	}
 
-	return appID,name,pass,nil 
+	return appID, name, pass, nil
 }
 
-func (s *AppService) List()([]*entities.AppDetails,error) {
+func (s *AppService) List() ([]*entities.AppDetails, error) {
 	return s.repo.FindAll()
 }
 
-func(s *AppService) Block(appID string) error {
-	return s.repo.UpdateStatus(appID,"blocked")
+func (s *AppService) Block(appID string) error {
+	return s.repo.UpdateStatus(appID, "blocked")
 }
 
-func(s *AppService) Unblock(appID string) error {
-	return s.repo.UpdateStatus(appID,"active")
+func (s *AppService) Unblock(appID string) error {
+	return s.repo.UpdateStatus(appID, "active")
 }

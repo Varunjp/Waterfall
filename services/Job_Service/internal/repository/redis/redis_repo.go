@@ -99,12 +99,12 @@ func (r *RedisRepo) getPlanLimit(ctx context.Context, appID string) (int, error)
 		if err != nil {
 			return 0, err
 		}
-		name,limit, err := r.adminRepo.GetPlanDetails(ctx, planID)
+		name, limit, err := r.adminRepo.GetPlanDetails(ctx, planID)
 		if err != nil {
 			return 0, err
 		}
 		if name == "FREE" {
-			return 0,interceptor.ErrQuotaExceeded
+			return 0, interceptor.ErrQuotaExceeded
 		}
 		err = r.redis.Set(planKey, any(limit), 24*time.Hour).Err()
 		if err != nil {
