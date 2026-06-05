@@ -28,7 +28,6 @@ require (
 require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-redis/redis v6.15.9+incompatible
-	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.11.2
 	github.com/stripe/stripe-go/v78 v78.12.0
 	golang.org/x/net v0.49.0 // indirect
