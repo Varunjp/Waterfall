@@ -46,7 +46,7 @@ message LoginResponse {
 
 message CreatePlanRequest {
     string name = 1;
-    int32  joblimit = 2;
+    int32  jobLimit = 2;
     double price = 3;
     string stripePriceID = 4;
 }
