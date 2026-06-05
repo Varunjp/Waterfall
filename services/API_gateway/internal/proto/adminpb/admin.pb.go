@@ -390,7 +390,7 @@ type UpdatePlanRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlanID        string                 `protobuf:"bytes,1,opt,name=planID,proto3" json:"planID,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	JobLimt       int32                  `protobuf:"varint,3,opt,name=jobLimt,proto3" json:"jobLimt,omitempty"`
+	JobLimit      int32                  `protobuf:"varint,3,opt,name=jobLimit,proto3" json:"jobLimit,omitempty"`
 	Price         float64                `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
 	StripePriceID string                 `protobuf:"bytes,5,opt,name=stripePriceID,proto3" json:"stripePriceID,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -441,9 +441,9 @@ func (x *UpdatePlanRequest) GetName() string {
 	return ""
 }
 
-func (x *UpdatePlanRequest) GetJobLimt() int32 {
+func (x *UpdatePlanRequest) GetJobLimit() int32 {
 	if x != nil {
-		return x.JobLimt
+		return x.JobLimit
 	}
 	return 0
 }
@@ -531,11 +531,11 @@ const file_proto_admin_proto_rawDesc = "" +
 	"\x05price\x18\x04 \x01(\x01R\x05price\x12$\n" +
 	"\rstripePriceID\x18\x05 \x01(\tR\rstripePriceID\"5\n" +
 	"\x10ListPlanResponse\x12!\n" +
-	"\x05plans\x18\x01 \x03(\v2\v.admin.PlanR\x05plans\"\x95\x01\n" +
+	"\x05plans\x18\x01 \x03(\v2\v.admin.PlanR\x05plans\"\x97\x01\n" +
 	"\x11UpdatePlanRequest\x12\x16\n" +
 	"\x06planID\x18\x01 \x01(\tR\x06planID\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\ajobLimt\x18\x03 \x01(\x05R\ajobLimt\x12\x14\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
+	"\bjobLimit\x18\x03 \x01(\x05R\bjobLimit\x12\x14\n" +
 	"\x05price\x18\x04 \x01(\x01R\x05price\x12$\n" +
 	"\rstripePriceID\x18\x05 \x01(\tR\rstripePriceID\"C\n" +
 	"\x12UpdatePlanResponse\x12-\n" +

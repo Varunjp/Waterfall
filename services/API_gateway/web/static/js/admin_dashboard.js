@@ -428,7 +428,7 @@
 
     if (nameVal)   body.name          = nameVal;
     if (priceVal)  body.price         = Number(priceVal);
-    if (limitVal)  body.jobLimt      = Number(limitVal);
+    if (limitVal)  body.jobLimit      = Number(limitVal);
     if (stripeVal) body.stripePriceID = stripeVal;
 
     if (!Object.keys(body).length) { errEl.textContent = 'Enter at least one field to update.'; return; }
