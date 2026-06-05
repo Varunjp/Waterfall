@@ -436,7 +436,7 @@
     btn.disabled = true; btn.textContent = 'Saving…';
     try {
       const url    = planId ? `/api/v1/admin/plans/${planId}` : '/api/v1/admin/plans';
-      const method = 'PUT';
+      const method = planId ? 'PUT': 'POST';
       const res    = await fetch(url, { method, headers: H, body: JSON.stringify(body) });
       const data   = await res.json().catch(()=>({}));
       if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
@@ -599,7 +599,7 @@
   /* ── Logout ───────────────────────────────────────── */
   $('btn-logout').addEventListener('click', () => {
     document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    window.location.href = '/admin/login';
+    window.location.href = '/admin';
   });
 
   /* ── Boot ─────────────────────────────────────────── */

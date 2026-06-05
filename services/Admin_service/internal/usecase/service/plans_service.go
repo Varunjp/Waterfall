@@ -16,7 +16,7 @@ func NewPlanService(r repo.PlansRepository) *PlanService {
 	return &PlanService{repo: r}
 }
 
-func (s *PlanService) CreatePlan(name string,jobLimit int,price float64) error {
+func (s *PlanService) CreatePlan(name string,jobLimit int,price float64,stripe_id string) error {
 
 	if !validation.IsValidLimit(jobLimit) {
 		return errors.New("invalid job limit provided")
@@ -34,6 +34,7 @@ func (s *PlanService) CreatePlan(name string,jobLimit int,price float64) error {
 		Name: name,
 		MonthlyJobLimit: jobLimit,
 		Price: price,
+		StripeID: stripe_id,
 	}
 
 	err := s.repo.CreatePlan(newPlan)
