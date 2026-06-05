@@ -72,7 +72,7 @@ message ListPlanResponse {
 message UpdatePlanRequest {
     string planID = 1;
     string name = 2;
-    int32  jobLimt = 3;
+    int32  jobLimit = 3;
     double price = 4;
     string stripePriceID = 5;
 }
