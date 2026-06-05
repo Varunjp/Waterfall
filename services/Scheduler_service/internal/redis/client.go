@@ -9,14 +9,14 @@ import (
 
 type Client struct {
 	*redis.Client
-	AssignSHA string 
+	AssignSHA string
 }
 
 func NewRedisClient(addr string) *Client {
 	r := redis.NewClient(&redis.Options{Addr: addr})
 
-	lua,_ := os.ReadFile("internal/redis/lua/assign_job.lua")
-	sha,_ := r.ScriptLoad(context.Background(),string(lua)).Result()
+	lua, _ := os.ReadFile("internal/redis/lua/assign_job.lua")
+	sha, _ := r.ScriptLoad(context.Background(), string(lua)).Result()
 
-	return &Client{Client: r,AssignSHA: sha}
+	return &Client{Client: r, AssignSHA: sha}
 }

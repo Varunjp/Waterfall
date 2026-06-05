@@ -53,15 +53,11 @@ func main() {
 	resultProcess := usecase.NewJobResultProcess(adminRepo, metricsP, kafkaProducer, log, 3, redisClient)
 	workerManage := grpcserver.NewWorkerManager()
 
-	
 	runtimeStore := monitoring.NewStore(redisClient.Client)
-	server := grpcserver.NewServer(redisClient.Client,kafkaProducer,metricsP,resultProcess,log,runtimeStore,workerManage)
-	
+	server := grpcserver.NewServer(redisClient.Client, kafkaProducer, metricsP, resultProcess, log, runtimeStore, workerManage)
 
-	assigner := usecase.NewAssigner(redisClient, metricsP, kafkaProducer, runtimeStore,workerManage,server,resultProcess)
+	assigner := usecase.NewAssigner(redisClient, metricsP, kafkaProducer, runtimeStore, workerManage, server, resultProcess)
 	stallMonitor := usecase.NewStallMonitor(redisClient, kafkaRunConsumer, kafkaProducer, runtimeStore)
-	
-	
 
 	runner := scheduler.NewRunner(
 		kafkaConsumer, assigner, kafkaProducer, redisClient.Client, log,

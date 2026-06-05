@@ -28,31 +28,31 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("no .env file found, using system envs")
 	}
-	
+
 	cfg := config.Load()
 
-	logg,err := logger.Newlogger("job-service")
+	logg, err := logger.Newlogger("job-service")
 	if err != nil {
 		panic(err)
 	}
-	
+
 	db := postgresclient.MustConntect(cfg.DBDSN)
 	adminDb := postgresclient.MustConntect(cfg.DBADMINDNS)
 	jobRepo := repository.NewJobRepo(db)
 	logRepo := repository.NewLogRepo(db)
 	adminRepo := repository.NewAdminRepo(adminDb)
-	rc,err := redisclient.NewRedisClient(cfg.RedisAddr,cfg.RedisPassword,cfg.RedisDB)
+	rc, err := redisclient.NewRedisClient(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB)
 	if err != nil {
 		panic(err)
 	}
-	rr := redisRepo.NewRedisRepo(rc.Client,adminRepo)
-	queueProducer := queue.NewKafkaProducer([]string{cfg.KafkaBrokers[0]},cfg.KafkaTopic)
-	testProducer := producer.NewTestKafkaProducer(cfg.KafkaBrokers,cfg.TestTopic)
-	producer := producer.NewKafkaProducer(cfg.KafkaBrokers,cfg.KafkaTopic)
-	
-	uc := usecase.NewJobUsecase(producer,testProducer,logg,rr)
-	dc := usecase.NewDashboardUsecase(jobRepo,logRepo,queueProducer,rr)
-	h := handler.NewJobHandler(uc,*dc)
+	rr := redisRepo.NewRedisRepo(rc.Client, adminRepo)
+	queueProducer := queue.NewKafkaProducer([]string{cfg.KafkaBrokers[0]}, cfg.KafkaTopic)
+	testProducer := producer.NewTestKafkaProducer(cfg.KafkaBrokers, cfg.TestTopic)
+	producer := producer.NewKafkaProducer(cfg.KafkaBrokers, cfg.KafkaTopic)
+
+	uc := usecase.NewJobUsecase(producer, testProducer, logg, rr)
+	dc := usecase.NewDashboardUsecase(jobRepo, logRepo, queueProducer, rr)
+	h := handler.NewJobHandler(uc, *dc)
 
 	server := grpc.NewServer(
 		// grpc.UnaryInterceptor(middleware.APIKeyInterceptor(cfg.JWTKey)),
@@ -61,14 +61,14 @@ func main() {
 			interceptor.UnaryErrorInterceptor(),
 		),
 	)
-	
-	jobpb.RegisterJobServiceServer(server,h)
 
-	lis, err := net.Listen("tcp",":"+cfg.PORT)
+	jobpb.RegisterJobServiceServer(server, h)
+
+	lis, err := net.Listen("tcp", ":"+cfg.PORT)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("Job service running on :",cfg.PORT)
+	log.Println("Job service running on :", cfg.PORT)
 	server.Serve(lis)
 }

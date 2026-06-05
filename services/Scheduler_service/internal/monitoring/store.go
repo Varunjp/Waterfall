@@ -69,24 +69,21 @@ func (s *Store) WorkerStreamHeartbeat(
 	activeJobs int,
 	ts time.Time,
 ) error {
-	key := s.workerKey(appID,workerID,)
+	key := s.workerKey(appID, workerID)
 
-	fields :=map[string]any{
-		"last_seen":
-			ts.Unix(),
+	fields := map[string]any{
+		"last_seen": ts.Unix(),
 
-		"active_jobs":
-			activeJobs,
+		"active_jobs": activeJobs,
 
-		"worker_state":
-			"active",
+		"worker_state": "active",
 	}
 
 	pipe := s.redis.TxPipeline()
 
-	pipe.HSet(ctx,key,fields)
+	pipe.HSet(ctx, key, fields)
 
-	pipe.Expire(ctx,key,stateTTL)
+	pipe.Expire(ctx, key, stateTTL)
 
 	_, err :=
 		pipe.Exec(ctx)

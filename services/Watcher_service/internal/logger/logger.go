@@ -8,14 +8,14 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-func Newlogger(serviceName string) (*zap.Logger,error) {
+func Newlogger(serviceName string) (*zap.Logger, error) {
 
 	fileWriter := zapcore.AddSync(&lumberjack.Logger{
-		Filename: "logs/app.log",
-		MaxSize: 100,
+		Filename:   "logs/app.log",
+		MaxSize:    100,
 		MaxBackups: 5,
-		MaxAge: 30,
-		Compress: true,
+		MaxAge:     30,
+		Compress:   true,
 	})
 
 	encoderConfig := zap.NewProductionEncoderConfig()
@@ -28,17 +28,17 @@ func Newlogger(serviceName string) (*zap.Logger,error) {
 	level := zap.InfoLevel
 
 	core := zapcore.NewTee(
-		zapcore.NewCore(jsonEncoder,fileWriter,level),
-		zapcore.NewCore(consoleEncoder,zapcore.AddSync(os.Stdout),level),
+		zapcore.NewCore(jsonEncoder, fileWriter, level),
+		zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), level),
 	)
-	
+
 	logger := zap.New(core,
 		zap.AddCaller(),
 		zap.AddStacktrace(zap.ErrorLevel),
 		zap.Fields(
-			zap.String("service",serviceName),
+			zap.String("service", serviceName),
 		),
 	)
-	
-	return logger,nil 
+
+	return logger, nil
 }

@@ -3,9 +3,9 @@ package interfaces
 import "admin_service/internal/domain/entities"
 
 type AppRepository interface {
-	Create(app *entities.App) (string,error) 
+	Create(app *entities.App) (string, error)
 	CreateFirst(user *entities.AppUser) error
-	FindAll() ([]*entities.AppDetails,error)
-	UpdateStatus(appID, status string)error 
-	CreateFreePlan(sub *entities.Subscription) error 
+	FindAll() ([]*entities.AppDetails, error)
+	UpdateStatus(appID, status string) error
+	CreateFreePlan(sub *entities.Subscription) error
 }

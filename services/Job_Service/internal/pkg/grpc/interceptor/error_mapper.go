@@ -8,20 +8,20 @@ import (
 )
 
 var (
-	ErrQuotaExceeded 	= errors.New("quota exceeded")
-	ErrNotFound  		= errors.New("not found")
-	ErrUnauthorized 	= errors.New("unauthorized")
-	ErrInvalidInput 	= errors.New("invalid input")
+	ErrQuotaExceeded = errors.New("quota exceeded")
+	ErrNotFound      = errors.New("not found")
+	ErrUnauthorized  = errors.New("unauthorized")
+	ErrInvalidInput  = errors.New("invalid input")
 )
 
 func MapError(err error) error {
 	if err == nil {
-		return nil 
+		return nil
 	}
-	
+
 	switch {
-	case errors.Is(err,ErrQuotaExceeded):
-		return status.Error(codes.ResourceExhausted,err.Error())
+	case errors.Is(err, ErrQuotaExceeded):
+		return status.Error(codes.ResourceExhausted, err.Error())
 	case errors.Is(err, ErrNotFound):
 		return status.Error(codes.NotFound, err.Error())
 

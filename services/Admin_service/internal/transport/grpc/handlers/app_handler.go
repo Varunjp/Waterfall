@@ -10,17 +10,17 @@ import (
 )
 
 type AppHandler struct {
-	pb.UnimplementedAppServiceServer 
+	pb.UnimplementedAppServiceServer
 	usecase interface {
-		Register(string,string)(string,string,string,error) 
-		List()([]*entities.AppDetails,error)
-		Block(string)error 
-		Unblock(string)error 
+		Register(string, string) (string, string, string, error)
+		List() ([]*entities.AppDetails, error)
+		Block(string) error
+		Unblock(string) error
 	}
 }
 
-func NewAppHandler(u interface{
-	Register(string,string)(string,string,string,error) 
+func NewAppHandler(u interface {
+	Register(string, string) (string, string, string, error)
 	List() ([]*entities.AppDetails, error)
 	Block(string) error
 	Unblock(string) error
@@ -28,30 +28,30 @@ func NewAppHandler(u interface{
 	return &AppHandler{usecase: u}
 }
 
-func (h *AppHandler) RegisterApp(ctx context.Context, req *pb.RegisterAppRequest) (*pb.RegisterAppResponse,error) {
-	app_id,app_name,app_pass,err := h.usecase.Register(req.AppName,req.AppEmail)
-	return &pb.RegisterAppResponse{AppId: app_id,AppName: app_name,AppPassword: app_pass},err 
+func (h *AppHandler) RegisterApp(ctx context.Context, req *pb.RegisterAppRequest) (*pb.RegisterAppResponse, error) {
+	app_id, app_name, app_pass, err := h.usecase.Register(req.AppName, req.AppEmail)
+	return &pb.RegisterAppResponse{AppId: app_id, AppName: app_name, AppPassword: app_pass}, err
 }
 
-func (h *AppHandler) ListApps(ctx context.Context,_ *pb.ListAppsRequest)(*pb.ListAppsResponse,error) {
-	apps,err := h.usecase.List()
+func (h *AppHandler) ListApps(ctx context.Context, _ *pb.ListAppsRequest) (*pb.ListAppsResponse, error) {
+	apps, err := h.usecase.List()
 	if err != nil {
-		return nil ,err 
+		return nil, err
 	}
 
 	var result []*pb.App
-	for _,a := range apps {
+	for _, a := range apps {
 		result = append(result, &pb.App{
-			AppId: a.AppID,
-			AppName: a.AppName,
+			AppId:    a.AppID,
+			AppName:  a.AppName,
 			AppEmail: a.AppEmail,
-			Status: a.Status,
+			Status:   a.Status,
 			PlanName: a.PlanName,
-			EndDate: formatUTC(a.EndDate),
+			EndDate:  formatUTC(a.EndDate),
 		})
 	}
 
-	return &pb.ListAppsResponse{Apps: result},nil 
+	return &pb.ListAppsResponse{Apps: result}, nil
 }
 
 func (h *AppHandler) BlockApp(ctx context.Context, req *pb.BlockAppRequest) (*emptypb.Empty, error) {

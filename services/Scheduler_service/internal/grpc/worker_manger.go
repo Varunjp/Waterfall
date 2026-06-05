@@ -8,21 +8,21 @@ import (
 )
 
 type WorkerConnection struct {
-	AppID	string 
-	WorkerID string 
+	AppID    string
+	WorkerID string
 
-	JobTypes	[]string 
-	MaxConcurrency	int32 
-	
-	activeJobs 	 atomic.Int32 
+	JobTypes       []string
+	MaxConcurrency int32
 
-	Stream schedulerpb.Scheduler_JobStreamServer
+	activeJobs atomic.Int32
+
+	Stream    schedulerpb.Scheduler_JobStreamServer
 	SendQueue chan *schedulerpb.SchedulerMessage
 
-	Ctx context.Context
+	Ctx    context.Context
 	Cancel context.CancelFunc
 
-	mu sync.Mutex
+	mu        sync.Mutex
 	closeOnce sync.Once
 }
 
@@ -48,29 +48,29 @@ func (w *WorkerConnection) WritePump() {
 	for {
 		select {
 		case <-w.Ctx.Done():
-			return 
-		case msg,ok := <-w.SendQueue:
+			return
+		case msg, ok := <-w.SendQueue:
 			if !ok {
-				return 
+				return
 			}
 
 			err := w.Stream.Send(msg)
 			if err != nil {
-				return 
+				return
 			}
 		}
 	}
 }
 
 func (w *WorkerConnection) Close() {
-	w.closeOnce.Do(func(){
+	w.closeOnce.Do(func() {
 		w.Cancel()
 		close(w.SendQueue)
 	})
 }
 
 type WorkerManger struct {
-	mu sync.RWMutex
+	mu      sync.RWMutex
 	workers map[string]*WorkerConnection
 }
 
@@ -91,7 +91,7 @@ func (wm *WorkerManger) Remove(workerID string) {
 	wm.mu.Lock()
 	defer wm.mu.Unlock()
 
-	delete(wm.workers,workerID)
+	delete(wm.workers, workerID)
 }
 
 func (wm *WorkerManger) FindAvailableWorker(appID string, jobType string) *WorkerConnection {
@@ -101,13 +101,13 @@ func (wm *WorkerManger) FindAvailableWorker(appID string, jobType string) *Worke
 
 	var best *WorkerConnection
 
-	for _,worker := range wm.workers {
+	for _, worker := range wm.workers {
 
 		if worker.AppID != appID {
 			continue
 		}
 
-		if !contains(worker.JobTypes,jobType) {
+		if !contains(worker.JobTypes, jobType) {
 			continue
 		}
 
@@ -115,7 +115,7 @@ func (wm *WorkerManger) FindAvailableWorker(appID string, jobType string) *Worke
 			continue
 		}
 
-		if best == nil || worker.ActiveJobs() < best.ActiveJobs(){
+		if best == nil || worker.ActiveJobs() < best.ActiveJobs() {
 			best = worker
 		}
 

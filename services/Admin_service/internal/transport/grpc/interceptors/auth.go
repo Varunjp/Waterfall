@@ -16,39 +16,39 @@ type contextKey string
 const ClaimsKey contextKey = "claims"
 
 func AuthInterceptor(secret string) grpc.UnaryServerInterceptor {
-	return func( 
+	return func(
 		ctx context.Context,
 		req interface{},
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
-	)(interface{},error) {
+	) (interface{}, error) {
 
 		if publicMethods[info.FullMethod] {
-			return handler(ctx,req)
+			return handler(ctx, req)
 		}
 
-		md,ok := metadata.FromIncomingContext(ctx)
+		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
-			return nil,domainErr.ErrUnauthenticated
+			return nil, domainErr.ErrUnauthenticated
 		}
 		auth := md.Get("authorization")
 		if len(auth) == 0 {
-			return nil,domainErr.ErrUnauthenticated
+			return nil, domainErr.ErrUnauthenticated
 		}
-		
-		tokenStr := strings.TrimPrefix(auth[0],"Bearer ")
-		token,err := jwt.Parse(tokenStr,func(t *jwt.Token)(interface{},error){
-			return []byte(secret),nil 
+
+		tokenStr := strings.TrimPrefix(auth[0], "Bearer ")
+		token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+			return []byte(secret), nil
 		})
 		if err != nil || !token.Valid {
 			return nil, domainErr.ErrUnauthenticated
 		}
 
-		claims,ok := token.Claims.(jwt.MapClaims)
-		if !ok  {
-			return nil,domainErr.ErrUnauthenticated
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return nil, domainErr.ErrUnauthenticated
 		}
-		ctx = context.WithValue(ctx,ClaimsKey,claims)
-		return handler(ctx,req)
+		ctx = context.WithValue(ctx, ClaimsKey, claims)
+		return handler(ctx, req)
 	}
 }

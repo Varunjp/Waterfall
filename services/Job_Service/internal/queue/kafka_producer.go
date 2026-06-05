@@ -14,17 +14,17 @@ type kafkaProducer struct {
 func NewKafkaProducer(brokers []string, topic string) Producer {
 	return &kafkaProducer{
 		writer: &kafka.Writer{
-			Addr: kafka.TCP(brokers...),
-			Topic: topic,
+			Addr:     kafka.TCP(brokers...),
+			Topic:    topic,
 			Balancer: &kafka.LeastBytes{},
 		},
 	}
 }
 
-func (k *kafkaProducer) Publish(ctx context.Context,job JobEvent) error {
-	bytes,err := json.Marshal(job)
+func (k *kafkaProducer) Publish(ctx context.Context, job JobEvent) error {
+	bytes, err := json.Marshal(job)
 	if err != nil {
-		return err 
+		return err
 	}
 
 	return k.writer.WriteMessages(ctx, kafka.Message{

@@ -12,113 +12,113 @@ import (
 )
 
 type DashboardUsecase struct {
-	jobs repository.JobRepository
-	logs repository.JobLogRepository
+	jobs  repository.JobRepository
+	logs  repository.JobLogRepository
 	queue queue.Producer
 	redis *redisRepo.RedisRepo
 }
 
-func NewDashboardUsecase(j repository.JobRepository,l repository.JobLogRepository, q queue.Producer,r *redisRepo.RedisRepo) *DashboardUsecase {
-	return &DashboardUsecase{jobs: j, logs: l, queue: q,redis: r}
+func NewDashboardUsecase(j repository.JobRepository, l repository.JobLogRepository, q queue.Producer, r *redisRepo.RedisRepo) *DashboardUsecase {
+	return &DashboardUsecase{jobs: j, logs: l, queue: q, redis: r}
 }
 
-func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit,offset int,startDate,endDate *time.Time)([]domain.Job,int,error) {
-	
-	appID,err := middleware.AppIDFromContext(ctx)
+func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit, offset int, startDate, endDate *time.Time) ([]domain.Job, int, error) {
+
+	appID, err := middleware.AppIDFromContext(ctx)
 	if err != nil {
 		log.Println(err.Error())
-		return nil,0,err 
+		return nil, 0, err
 	}
 
 	if !isValidTime(startDate) {
-		startDate = nil 
+		startDate = nil
 	}
 
 	if !isValidTime(endDate) {
-		endDate = nil 
+		endDate = nil
 	}
 
-	jobs,limit,err := uc.jobs.ListByApp(ctx,appID,status,limit,offset,startDate,endDate)
+	jobs, limit, err := uc.jobs.ListByApp(ctx, appID, status, limit, offset, startDate, endDate)
 
 	if err != nil {
 		log.Println(err)
 	}
 
-	return jobs,limit,err
+	return jobs, limit, err
 }
 
-func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context,limit,offset int)([]domain.Job,int,error) {
-	return uc.jobs.ListFailed(ctx,limit,offset)
+func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context, limit, offset int) ([]domain.Job, int, error) {
+	return uc.jobs.ListFailed(ctx, limit, offset)
 }
 
 func (uc *DashboardUsecase) GetJobLogs(
-	ctx context.Context,jobID string,
-)([]domain.JobLog,error) {
-	appID,err := middleware.AppIDFromContext(ctx)
+	ctx context.Context, jobID string,
+) ([]domain.JobLog, error) {
+	appID, err := middleware.AppIDFromContext(ctx)
 	if err != nil {
 		log.Println(err.Error())
-		return nil,err 
+		return nil, err
 	}
-	return uc.logs.GetByJobID(ctx,jobID,appID)
+	return uc.logs.GetByJobID(ctx, jobID, appID)
 }
 
-func (uc *DashboardUsecase) GetJobAdminLogs(ctx context.Context,jobID string)([]domain.JobLog,error) {
-	return uc.logs.GetByJobIdAdmin(ctx,jobID)
+func (uc *DashboardUsecase) GetJobAdminLogs(ctx context.Context, jobID string) ([]domain.JobLog, error) {
+	return uc.logs.GetByJobIdAdmin(ctx, jobID)
 }
 
-func (uc *DashboardUsecase) RetryJob(ctx context.Context,jobID string)(string,error) {
+func (uc *DashboardUsecase) RetryJob(ctx context.Context, jobID string) (string, error) {
 
-	role,err := middleware.RoleFromContext(ctx)
-	
+	role, err := middleware.RoleFromContext(ctx)
+
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	if role == "viewer" {
-		return "",domain.ErrForbidden
+		return "", domain.ErrForbidden
 	}
 
-	job, err := uc.jobs.GetByID(ctx,jobID)
+	job, err := uc.jobs.GetByID(ctx, jobID)
 	if err != nil {
-		return "",err 
+		return "", err
 	}
-	
+
 	err = uc.queue.Publish(ctx, queue.JobEvent{
-		JobID: job.JobID,
-		AppID: job.AppID,
-		Type: job.Type,
-		Status: string(domain.JobRetry),
-		Payload: string(job.Payload),
-		EventType: queue.JobRetry,
+		JobID:       job.JobID,
+		AppID:       job.AppID,
+		Type:        job.Type,
+		Status:      string(domain.JobRetry),
+		Payload:     string(job.Payload),
+		EventType:   queue.JobRetry,
 		ManualRetry: job.ManualRetry,
 	})
 
 	if err != nil {
-		return "",err 
+		return "", err
 	}
-	
-	return job.JobID,nil 
+
+	return job.JobID, nil
 }
 
-func (uc *DashboardUsecase) GetJobStats(ctx context.Context)(*domain.JobStats,error) {
-	
-	appID,err := middleware.AppIDFromContext(ctx)
+func (uc *DashboardUsecase) GetJobStats(ctx context.Context) (*domain.JobStats, error) {
+
+	appID, err := middleware.AppIDFromContext(ctx)
 	if err != nil {
 		log.Println(err.Error())
-		return nil,err 
+		return nil, err
 	}
 
-	return uc.jobs.GetJobStats(ctx,appID)
+	return uc.jobs.GetJobStats(ctx, appID)
 }
 
-func (uc *DashboardUsecase) GetJobMetrics(ctx context.Context,from,to time.Time,bucket string)([]domain.MetricBucket,error) {
+func (uc *DashboardUsecase) GetJobMetrics(ctx context.Context, from, to time.Time, bucket string) ([]domain.MetricBucket, error) {
 
-	appID,err := middleware.AppIDFromContext(ctx)
+	appID, err := middleware.AppIDFromContext(ctx)
 	if err != nil {
 		log.Println(err.Error())
-		return nil,err 
+		return nil, err
 	}
 
-	return uc.jobs.GetJobMetrics(ctx,appID,from,to,bucket)
+	return uc.jobs.GetJobMetrics(ctx, appID, from, to, bucket)
 }
 
 func isValidTime(t *time.Time) bool {

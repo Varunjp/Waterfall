@@ -114,7 +114,7 @@ func (r *jobRepo) FetchDueTestJobs(ctx context.Context, now time.Time) ([]domain
 	return jobs, nil
 }
 
-func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
+func (r *jobRepo) RunningJobs(ctx context.Context) ([]domain.Job, error) {
 	now := time.Now()
 	startOfDay := time.Date(
 		now.Year(),
@@ -144,10 +144,10 @@ func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
 			)
 		FOR UPDATE SKIP LOCKED;
 	`
-	rows, err := r.db.QueryContext(ctx,query,startOfDay,endOfDay)
+	rows, err := r.db.QueryContext(ctx, query, startOfDay, endOfDay)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 	defer rows.Close()
 	var jobs []domain.Job
@@ -169,7 +169,7 @@ func (r *jobRepo) RunningJobs(ctx context.Context)([]domain.Job,error) {
 		jobs = append(jobs, j)
 	}
 
-	return jobs,nil 
+	return jobs, nil
 }
 
 func (r *jobRepo) MarkQueued(ctx context.Context, jobID string) error {
@@ -214,7 +214,7 @@ func (r *jobRepo) Insert(ctx context.Context, job domain.Job) error {
 	return err
 }
 
-func (r *jobRepo) InsertTest(ctx context.Context,job domain.Job) error {
+func (r *jobRepo) InsertTest(ctx context.Context, job domain.Job) error {
 
 	query := `
 		INSERT INTO jobs_test(job_id, app_id, type, payload, status, created_at, updated_at, schedule_at)
@@ -237,7 +237,7 @@ func (r *jobRepo) InsertTest(ctx context.Context,job domain.Job) error {
 	return err
 }
 
-func (r *jobRepo) UpdatePayload(ctx context.Context, jobID, payload string,schedule_at time.Time,scheduleModify bool) (bool,error) {
+func (r *jobRepo) UpdatePayload(ctx context.Context, jobID, payload string, schedule_at time.Time, scheduleModify bool) (bool, error) {
 
 	query := `UPDATE jobs SET `
 	args := []any{}
@@ -271,16 +271,16 @@ func (r *jobRepo) UpdatePayload(ctx context.Context, jobID, payload string,sched
 
 	args = append(args, jobID)
 
-	var id string 
+	var id string
 	err := r.db.QueryRowContext(ctx, query, args...).Scan(&id)
 
 	if err == sql.ErrNoRows {
-		return false,nil 
+		return false, nil
 	}
 	if err != nil {
-		return false,err 
+		return false, err
 	}
-	return true,nil 
+	return true, nil
 }
 
 func (r *jobRepo) UpdateStatus(ctx context.Context, jobID string, status domain.JobStatus) error {
@@ -293,7 +293,7 @@ func (r *jobRepo) UpdateStatus(ctx context.Context, jobID string, status domain.
 	return err
 }
 
-func (r *jobRepo) RetryJob(ctx context.Context, jobID string, status domain.JobStatus, retry int,nextRun time.Time) error {
+func (r *jobRepo) RetryJob(ctx context.Context, jobID string, status domain.JobStatus, retry int, nextRun time.Time) error {
 	_, err := r.db.ExecContext(
 		ctx,
 		`UPDATE jobs SET status=$1,retry=$2, schedule_at=$3 WHERE job_id=$4`,
@@ -305,7 +305,7 @@ func (r *jobRepo) RetryJob(ctx context.Context, jobID string, status domain.JobS
 	return err
 }
 
-func (r *jobRepo) JobLog(ctx context.Context,jobEvent domain.JobRunEvent) error {
+func (r *jobRepo) JobLog(ctx context.Context, jobEvent domain.JobRunEvent) error {
 	query := `
 		INSERT INTO job_logs(job_id, attempt, status, error)
 		VALUES($1,$2,$3,$4);
@@ -319,11 +319,11 @@ func (r *jobRepo) JobLog(ctx context.Context,jobEvent domain.JobRunEvent) error 
 		jobEvent.Error,
 	)
 
-	return err 
+	return err
 }
 
-func (r *jobRepo) JobManualRetry(ctx context.Context,jobID string, status domain.JobStatus) error {
-	
+func (r *jobRepo) JobManualRetry(ctx context.Context, jobID string, status domain.JobStatus) error {
+
 	_, err := r.db.ExecContext(
 		ctx,
 		`UPDATE jobs SET manual_retry=manual_retry+1, status=$1, updated_at=NOW() WHERE job_id=$2`,
@@ -333,7 +333,7 @@ func (r *jobRepo) JobManualRetry(ctx context.Context,jobID string, status domain
 	return err
 }
 
-func (r *jobRepo) CancelJob(ctx context.Context,jobID string) (bool,error) {
+func (r *jobRepo) CancelJob(ctx context.Context, jobID string) (bool, error) {
 
 	query := `UPDATE jobs
 		SET status = 'CANCELLED',
@@ -342,14 +342,14 @@ func (r *jobRepo) CancelJob(ctx context.Context,jobID string) (bool,error) {
 		AND status IN ('SCHEDULED','PENDING')
 		RETURNING job_id;
 		`
-	var id string 
-	err := r.db.QueryRowContext(ctx,query,jobID).Scan(&id)
+	var id string
+	err := r.db.QueryRowContext(ctx, query, jobID).Scan(&id)
 
 	if err == sql.ErrNoRows {
-		return false,nil 
+		return false, nil
 	}
 	if err != nil {
-		return false,err 
+		return false, err
 	}
-	return true,nil 
+	return true, nil
 }

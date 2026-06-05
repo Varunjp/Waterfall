@@ -15,8 +15,8 @@ type KafkaProducer struct {
 func NewKafkaProducer(brokers []string, topic string) *KafkaProducer {
 	return &KafkaProducer{
 		writer: &kafka.Writer{
-			Addr: kafka.TCP(brokers...),
-			Topic: topic,
+			Addr:     kafka.TCP(brokers...),
+			Topic:    topic,
 			Balancer: &kafka.LeastBytes{},
 		},
 	}
@@ -25,11 +25,11 @@ func NewKafkaProducer(brokers []string, topic string) *KafkaProducer {
 func (p *KafkaProducer) Publish(ctx context.Context, value any) error {
 	data, err := json.Marshal(value)
 	if err != nil {
-		return err 
+		return err
 	}
 
 	return p.writer.WriteMessages(ctx, kafka.Message{
 		Value: data,
-		Time: time.Now(),
+		Time:  time.Now(),
 	})
 }

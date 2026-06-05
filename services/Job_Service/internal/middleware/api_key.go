@@ -18,47 +18,47 @@ func APIKeyInterceptor(jwtSecret string) grpc.UnaryServerInterceptor {
 		req any,
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
-	)(any,error) {
+	) (any, error) {
 
 		if publicMethods[info.FullMethod] {
-			return handler(ctx,req)
+			return handler(ctx, req)
 		}
 
-		md,ok := metadata.FromIncomingContext(ctx)
+		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
-			return nil,errors.New("missing metadata")
+			return nil, errors.New("missing metadata")
 		}
 
 		authHeader := md.Get("authorization")
 		if len(authHeader) == 0 {
-			return nil,status.Error(
+			return nil, status.Error(
 				codes.Unauthenticated,
 				"missing authorization header",
 			)
 		}
 
 		tokenStr := strings.TrimSpace(authHeader[0])
-		if !strings.HasPrefix(tokenStr,"Bearer "){
+		if !strings.HasPrefix(tokenStr, "Bearer ") {
 			return nil, status.Error(
 				codes.Unauthenticated,
 				"invalid authorization format",
 			)
 		}
 
-		tokenStr = strings.TrimPrefix(tokenStr,"Bearer ")
+		tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
 
 		claims := &Claims{}
-		token,err := jwt.ParseWithClaims(
+		token, err := jwt.ParseWithClaims(
 			tokenStr,
 			claims,
-			func(t *jwt.Token)(any,error) {
-				if _,ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil,status.Error(
+			func(t *jwt.Token) (any, error) {
+				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+					return nil, status.Error(
 						codes.Unauthenticated,
 						"unexpected signing method",
 					)
 				}
-				return []byte(jwtSecret),nil 
+				return []byte(jwtSecret), nil
 			},
 		)
 
@@ -69,8 +69,8 @@ func APIKeyInterceptor(jwtSecret string) grpc.UnaryServerInterceptor {
 			)
 		}
 
-		if claims.AppID == "" && claims.Role != appAdminRole{
-			return nil,status.Error(
+		if claims.AppID == "" && claims.Role != appAdminRole {
+			return nil, status.Error(
 				codes.PermissionDenied,
 				"missing app_id claim",
 			)
@@ -83,20 +83,20 @@ func APIKeyInterceptor(jwtSecret string) grpc.UnaryServerInterceptor {
 			)
 		}
 
-		if appAdmin[info.FullMethod] && claims.Role != appAdminRole{
-			return nil,status.Error(
+		if appAdmin[info.FullMethod] && claims.Role != appAdminRole {
+			return nil, status.Error(
 				codes.PermissionDenied,
-				"not app admin", 
+				"not app admin",
 			)
 		}
 
-		ctx = context.WithValue(ctx, ctxAppID,claims.AppID)
-		ctx = context.WithValue(ctx,ctxRole,claims.Role)
+		ctx = context.WithValue(ctx, ctxAppID, claims.AppID)
+		ctx = context.WithValue(ctx, ctxRole, claims.Role)
 
 		if claims.Subject != "" {
-			ctx = context.WithValue(ctx,ctxSub,claims.Subject)
+			ctx = context.WithValue(ctx, ctxSub, claims.Subject)
 		}
 
-		return handler(ctx,req)
+		return handler(ctx, req)
 	}
 }

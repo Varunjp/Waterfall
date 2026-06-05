@@ -15,13 +15,13 @@ func RateLimitMiddleware(rdb *redis.Client, limit int) gin.HandlerFunc {
 		path := c.Request.URL.Path
 		ctx := context.Background()
 
-		if strings.HasPrefix(path,"/api/v1/jobs") && c.Request.Method == "POST" {
+		if strings.HasPrefix(path, "/api/v1/jobs") && c.Request.Method == "POST" {
 			key := "rate:jobs:" + c.ClientIP()
 			count, _ := rdb.Incr(ctx, key).Result()
 			if count == 1 {
 				rdb.Expire(ctx, key, time.Second)
 			}
-			if count > 1000 { 
+			if count > 1000 {
 				c.AbortWithStatusJSON(429, gin.H{"error": "too many jobs"})
 				return
 			}

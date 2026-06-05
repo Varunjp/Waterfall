@@ -9,14 +9,14 @@ import (
 )
 
 type PlanService struct {
-	repo  repo.PlansRepository
+	repo repo.PlansRepository
 }
 
 func NewPlanService(r repo.PlansRepository) *PlanService {
 	return &PlanService{repo: r}
 }
 
-func (s *PlanService) CreatePlan(name string,jobLimit int,price float64,stripe_id string) error {
+func (s *PlanService) CreatePlan(name string, jobLimit int, price float64, stripe_id string) error {
 
 	if !validation.IsValidLimit(jobLimit) {
 		return errors.New("invalid job limit provided")
@@ -31,32 +31,32 @@ func (s *PlanService) CreatePlan(name string,jobLimit int,price float64,stripe_i
 	}
 
 	newPlan := &entities.Plan{
-		Name: name,
+		Name:            name,
 		MonthlyJobLimit: jobLimit,
-		Price: price,
-		StripeID: stripe_id,
+		Price:           price,
+		StripeID:        stripe_id,
 	}
 
 	err := s.repo.CreatePlan(newPlan)
 
-	return err 
+	return err
 }
 
-func (s *PlanService) ListPlan()([]*entities.Plan,error) {
+func (s *PlanService) ListPlan() ([]*entities.Plan, error) {
 	return s.repo.GetPlans()
 }
 
-func (s *PlanService) UpdatePlans(planId,name string,jobLimit int,price float64,stripePriceID string) (*entities.Plan,error) {
-	
+func (s *PlanService) UpdatePlans(planId, name string, jobLimit int, price float64, stripePriceID string) (*entities.Plan, error) {
+
 	if jobLimit != 0 {
 		if !validation.IsValidLimit(jobLimit) {
-			return nil,errors.New("invalid job limit provided")
+			return nil, errors.New("invalid job limit provided")
 		}
 	}
 
 	if price != 0 {
 		if !validation.IsValidPrice(price) {
-			return nil,errors.New("Price cannot be less than Rs.1")
+			return nil, errors.New("Price cannot be less than Rs.1")
 		}
 	}
 
@@ -65,11 +65,11 @@ func (s *PlanService) UpdatePlans(planId,name string,jobLimit int,price float64,
 	name = strings.TrimSpace(name)
 
 	updatePlan := &entities.Plan{
-		PlanID: planId,
-		Name: name,
+		PlanID:          planId,
+		Name:            name,
 		MonthlyJobLimit: jobLimit,
-		Price: price,
-		StripeID: stripePriceID,
+		Price:           price,
+		StripeID:        stripePriceID,
 	}
 
 	return s.repo.UpdatePlan(updatePlan)

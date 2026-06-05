@@ -3,19 +3,19 @@ package domain
 import "time"
 
 type Job struct {
-	JobID     	string `json:"job_id"`
-	AppID     	string `json:"app_id"`
-	Type      	string `json:"type"`
-	Payload   	string `json:"payload"`
-	Status    	JobStatus
-	CreatedAt 	time.Time
-	UpdateAt 	time.Time
-	Retry 		int `json:"retry"`
+	JobID       string `json:"job_id"`
+	AppID       string `json:"app_id"`
+	Type        string `json:"type"`
+	Payload     string `json:"payload"`
+	Status      JobStatus
+	CreatedAt   time.Time
+	UpdateAt    time.Time
+	Retry       int `json:"retry"`
 	MaxRetries  int `json:"max_retries"`
 	ManualRetry int `json:"manual_retry"`
 }
 
 type Usage struct {
-	AppID   	string 	`json:"app_id"`
-	JobExecuted int 	`json:"job_executed"`
+	AppID       string `json:"app_id"`
+	JobExecuted int    `json:"job_executed"`
 }

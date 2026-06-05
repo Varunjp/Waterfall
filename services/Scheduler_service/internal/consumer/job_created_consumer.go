@@ -10,21 +10,20 @@ type JobCreatedConsumer struct {
 	reader *kafka.Reader
 }
 
-
-func NewJobCreatedConsumer(brokers,topic,groupID string) *JobCreatedConsumer {
+func NewJobCreatedConsumer(brokers, topic, groupID string) *JobCreatedConsumer {
 	return &JobCreatedConsumer{
 		reader: kafka.NewReader(kafka.ReaderConfig{
 			Brokers: []string{brokers},
-			Topic: topic,
+			Topic:   topic,
 			GroupID: groupID,
 		}),
 	}
 }
 
-func (c *JobCreatedConsumer) Read(ctx context.Context) ([]byte,error) {
+func (c *JobCreatedConsumer) Read(ctx context.Context) ([]byte, error) {
 	msg, err := c.reader.ReadMessage(ctx)
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
-	return msg.Value,nil 
+	return msg.Value, nil
 }

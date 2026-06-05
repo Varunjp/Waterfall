@@ -12,13 +12,13 @@ func UnaryErrorInterceptor() grpc.UnaryServerInterceptor {
 		req interface{},
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
-	)(interface{},error){
+	) (interface{}, error) {
 
-		resp,err := handler(ctx,req)
+		resp, err := handler(ctx, req)
 		if err != nil {
-			return nil,MapError(err)
+			return nil, MapError(err)
 		}
 
-		return resp,nil 
+		return resp, nil
 	}
 }

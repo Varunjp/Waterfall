@@ -8,11 +8,11 @@ import (
 
 func GenerateJWT(secret, userID, role, appID string) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id":userID,
-		"role": role,
-		"app_id": appID,
-		"exp": time.Now().Add(24 * time.Hour).Unix(),
+		"user_id": userID,
+		"role":    role,
+		"app_id":  appID,
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256,claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secret))
 }

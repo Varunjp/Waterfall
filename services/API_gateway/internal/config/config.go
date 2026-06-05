@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	Port                string
-	PPROF 				string 
+	PPROF               string
 	JobServiceURL       string
 	AdminServiceURL     string
 	SchedulerServiceURL string
@@ -21,10 +21,10 @@ type Config struct {
 func Load() *Config {
 
 	_ = godotenv.Load()
-	
+
 	return &Config{
 		Port:                getEnv("PORT", "8081"),
-		PPROF: 				 getEnv("PPROFPORT","6060"),
+		PPROF:               getEnv("PPROFPORT", "6060"),
 		JobServiceURL:       getEnv("JOB_SERVICE_URL", "localhost:50051"),
 		AdminServiceURL:     getEnv("ADMIN_SERVICE_URL", ""),
 		SchedulerServiceURL: getEnv("SCHEDULER_SERVICE_URL", "localhost:50052"),
