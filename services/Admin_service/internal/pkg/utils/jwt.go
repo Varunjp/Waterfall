@@ -27,8 +27,8 @@ func GenerateResetToken(email string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	return token.SignedString(secret)
+	
+	return token.SignedString([]byte(secret))
 }
 
 func ParseResetToken(tokenString string) (string, error) {
@@ -39,7 +39,7 @@ func ParseResetToken(tokenString string) (string, error) {
 		tokenString,
 		&ResetClaims{},
 		func(token *jwt.Token) (interface{}, error) {
-			return secret, nil
+			return []byte(secret), nil
 		},
 	)
 

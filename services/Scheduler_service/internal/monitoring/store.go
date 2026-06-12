@@ -274,6 +274,8 @@ func (s *Store) SnapshotTenant(ctx context.Context, appID string, now time.Time)
 		case domain.WorkerStatusBusy:
 			snapshot.OnlineWorkers++
 			snapshot.BusyWorkers++
+		case domain.WorkerStatusStale:
+			snapshot.OnlineWorkers++
 		}
 
 		for _, jobType := range jobTypes {
@@ -466,14 +468,16 @@ func deriveWorkerStatus(workerState string, now time.Time, lastSeen time.Time, a
 		return domain.WorkerStatusOffline
 	}
 
+	if activeJobs > 0 {
+		return domain.WorkerStatusBusy
+	}
+
 	age := now.Sub(lastSeen)
 	switch {
 	case age > workerStaleFor:
 		return domain.WorkerStatusOffline
 	case age > workerFreshFor:
 		return domain.WorkerStatusStale
-	case activeJobs > 0:
-		return domain.WorkerStatusBusy
 	default:
 		return domain.WorkerStatusOnline
 	}

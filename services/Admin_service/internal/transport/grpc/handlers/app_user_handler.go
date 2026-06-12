@@ -65,7 +65,8 @@ func (h *AppUserHandler) AppLogin(ctx context.Context, req *pb.AppLoginRequest) 
 	return &pb.AppLoginResponse{AccessToken: token}, nil
 }
 
-func (h *AppUserHandler) RequestPasswordReset(ctx context.Context, req *pb.RequestResetPasswordRequest) (*pb.RequestResetPasswordResponse, error) {
+func (h *AppUserHandler) RequestResetPassword(ctx context.Context, req *pb.RequestResetPasswordRequest) (*pb.RequestResetPasswordResponse, error) {
+
 	err := h.usecase.RequestPasswordReset(ctx, req.Email)
 	if err != nil {
 		return nil, err

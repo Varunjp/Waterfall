@@ -22,4 +22,8 @@ var publicMethods = map[string]bool{
 	"/admin.AdminService/Login":       true,
 	"/admin.AppUserService/AppLogin":  true,
 	"/admin.AppUserService/ListPlans": true,
+	"/admin.AppUserService/RequestResetPassword" : true,
+	"/admin.AppUserService/VerifyPasswordResetOtp" : true,
+	"/admin.AppUserService/ResetPassword" : true,
+
 }

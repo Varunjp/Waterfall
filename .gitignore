@@ -14,6 +14,10 @@
 **/*.dev
 create-topics.ps1
 
+/jobs
+cpu
+flame_graph.svg
+
 dev.bat
 dev.sh
 docker-compose.dev.yml

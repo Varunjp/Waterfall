@@ -168,6 +168,22 @@ func (s *Server) handleProgress(ctx context.Context, worker *WorkerConnection, r
 		req.Timestamp,
 		30*time.Second,
 	)
+
+	input := domain.JobResultInput {
+		JobID: req.JobId,
+		AppID: worker.AppID,
+		Status: string(domain.JobRunning),
+	}
+
+	err := s.jobResultProcess.ProcessJobResult(ctx,input)
+
+	if err != nil {
+		s.log.Warn("failed to send job status update",
+			zap.String("job id :",req.JobId),
+			zap.String("worker id :",worker.WorkerID),
+			zap.Error(err),
+		)
+	}
 }
 
 func (s *Server) handleResult(ctx context.Context, worker *WorkerConnection, req *schedulerpb.JobExecutionResult) {
@@ -177,6 +193,8 @@ func (s *Server) handleResult(ctx context.Context, worker *WorkerConnection, req
 
 	_ = s.redis.Del(ctx, "heartbeat:"+jobID)
 	_ = s.redis.Decr(ctx, "concurrency:"+appID)
+
+	worker.activeJobs.Add(-1)
 
 	status := "COMPLETED"
 
@@ -188,6 +206,16 @@ func (s *Server) handleResult(ctx context.Context, worker *WorkerConnection, req
 	}
 
 	s.metrics.RunningJobs.Dec()
+
+	if s.runtime != nil {
+		if err := s.runtime.RecordJobFinished(ctx, appID, worker.WorkerID, jobID, time.Now().UTC()); err != nil {
+			s.log.Warn("failed to record job finish",
+				zap.String("job_id", jobID),
+				zap.String("worker_id", worker.WorkerID),
+				zap.Error(err),
+			)
+		}
+	}
 
 	input := domain.JobResultInput{
 		JobID:        jobID,
@@ -231,6 +259,17 @@ func (s *Server) DispatchJob(ctx context.Context, job domain.Job, worker *Worker
 	}
 
 	worker.activeJobs.Add(1)
+
+	if s.runtime != nil {
+		if err := s.runtime.RecordJobStarted(ctx, job.AppID, worker.WorkerID, job.JobID, time.Now().UTC()); err != nil {
+			s.log.Warn("failed to record job start",
+				zap.String("job_id", job.JobID),
+				zap.String("worker_id", worker.WorkerID),
+				zap.Error(err),
+			)
+		}
+	}
+
 	return nil
 }
 

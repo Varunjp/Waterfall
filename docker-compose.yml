@@ -193,9 +193,11 @@ services:
       - ./services/Scheduler_service/.env
     ports:
       - "50052:50052"
+      - "6060:6060"
     expose:
       - "50052"
       - "9100"
+      - "6060"
     depends_on:
       postgres:
         condition: service_healthy

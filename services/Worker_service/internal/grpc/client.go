@@ -39,6 +39,7 @@ type Client struct {
 }
 
 func NewGrpcClient(addr string,log *zap.Logger) (*Client,error) {
+	//conn, err := grpc.NewClient(addr,grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})))
 	conn, err := grpc.NewClient(addr,grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil,err 
@@ -183,7 +184,7 @@ func (c *Client) heartbeatLoop(ctx context.Context) {
 
 	ticker :=
 		time.NewTicker(
-			10 * time.Second,
+			2 * time.Second,
 		)
 
 	defer ticker.Stop()
@@ -298,7 +299,12 @@ func (c *Client) Progress(
 	jobID string,
 	progress int64,
 ) {
-
+	switch progress {
+	case 0:
+		c.activeJobs.Add(1)
+	case 100:
+		c.activeJobs.Add(-1)
+	}
 	_ = c.send(
 		&pb.WorkerMessage{
 			Payload:

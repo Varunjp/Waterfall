@@ -200,9 +200,9 @@
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
-      if (!data.accessToken) throw new Error('Invalid response — no token received.');
+      if (!data.resetToken) throw new Error('Invalid response — no token received.');
 
-      resetToken = data.accessToken;
+      resetToken = data.resetToken;
       clearInterval(timerHandle);
       showStep('step-reset');
       document.getElementById('new-password').focus();
@@ -274,7 +274,9 @@
           'Content-Type':  'application/json',
           'Authorization': `Bearer ${resetToken}`,
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ 
+          resetToken,
+          newPassword : password, }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
