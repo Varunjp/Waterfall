@@ -100,7 +100,8 @@ func (r *Runner) executeJob(ctx context.Context,job *pb.JobAssignment) {
 		r.client.ReportResult(false,job.JobId,err.Error(),int(job.RetryCount))
 		return 
 	}
-
+	
+	r.client.Progress(job.JobId,100)
 	r.client.ReportResult(true,job.JobId,"",int(job.RetryCount))
 }
 

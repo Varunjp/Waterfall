@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"net/smtp"
 )
 
@@ -32,11 +33,18 @@ func (m *Mailer) SendOtp(email, otp string) error {
 
 	addr := m.host + ":" + m.port
 
-	return smtp.SendMail(
+	err := smtp.SendMail(
 		addr,
 		auth,
 		m.user,
 		[]string{email},
 		msg,
 	)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil 
 }
