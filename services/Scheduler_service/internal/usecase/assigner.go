@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log"
 	"scheduler_service/internal/domain"
 	grpcserver "scheduler_service/internal/grpc"
 	"scheduler_service/internal/grpc/schedulerpb"
@@ -70,7 +71,7 @@ func (a *Assigner) Assign(ctx context.Context, job domain.Job) error {
 			JobID:        job.JobID,
 			AppID:        job.AppID,
 			Retry:        job.Retry,
-			Status:       "FAILED",
+			Status:       string(domain.JobFailed),
 			ErrorMessage: "No worker available",
 		}
 		a.metrics.JobsFailed.Inc()
@@ -100,7 +101,10 @@ func (a *Assigner) Assign(ctx context.Context, job domain.Job) error {
 			a.metrics.RunningJobs.Inc()
 			a.metrics.JobsAssigned.Inc()
 			if a.runtime != nil {
-				_ = a.runtime.RecordQueuedJob(ctx, job, time.Now().UTC())
+				err := a.runtime.RecordQueuedJob(ctx, job, time.Now().UTC())
+				if err != nil {
+					log.Println("failed to record queued job",err)
+				}
 			}
 			return nil
 		case <-time.After(3 * time.Second):
