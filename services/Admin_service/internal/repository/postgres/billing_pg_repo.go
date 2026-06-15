@@ -254,3 +254,56 @@ func (r *BillingPGRepo) GetSubscription(ctx context.Context, appID string) (*ent
 
 	return &s, nil
 }
+
+func (r *BillingPGRepo) GetSubscriptionDetails(ctx context.Context, stripeSubID string)(*entities.InvoiceData,error) {
+
+	var data entities.InvoiceData
+
+	subsQuery := `
+		SELECT app_id,plan_id,current_period_start,current_period_end
+		FROM subscriptions
+		WHERE stripe_subscription_id = $1;
+	`
+	err := r.db.QueryRowContext(
+		ctx,
+		subsQuery,
+		stripeSubID,
+	).Scan(&data.UserID,&data.PlanID,&data.CreatedDate,&data.NextPayment)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	userQuery := `
+		SELECT app_name, app_email
+		FROM apps
+		WHERE app_id = $1;
+	`
+	err = r.db.QueryRowContext(
+		ctx,
+		userQuery,
+		data.UserID,
+	).Scan(&data.UserName,&data.UserEmail)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	planQuery := `
+		SELECT name,price
+		FROM plans 
+		WHERE plan_id = $1;
+	`
+
+	err = r.db.QueryRowContext(
+		ctx,
+		planQuery,
+		data.PlanID,
+	).Scan(&data.PlanName,&data.PlanAmount)
+
+	if err != nil {
+		return nil ,err 
+	}
+
+	return &data,nil 
+}

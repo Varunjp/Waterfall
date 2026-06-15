@@ -108,7 +108,10 @@ func (s *AppUserService) VerifyOtp(ctx context.Context, email, otp string) (stri
 	}
 
 	if storedotp != otp {
-		s.otpRepo.IncrementAttempt(email)
+		err := s.otpRepo.IncrementAttempt(email)
+		if err != nil {
+			return "",err 
+		}
 		return "", errors.New("invalid otp")
 	}
 

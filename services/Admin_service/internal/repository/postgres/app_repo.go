@@ -79,7 +79,9 @@ func (r *AppRepo) Create(app *entities.App) (string, error) {
 	).Scan(&appID)
 
 	if err != nil {
-		tx.Rollback()
+		if err := tx.Rollback(); err != nil {
+			return "",err
+		}
 		var pqErr *pq.Error
 
 		if errors.As(err, &pqErr) {
@@ -102,7 +104,9 @@ func (r *AppRepo) Create(app *entities.App) (string, error) {
 		ON CONFLICT (app_id, month) DO NOTHING
 	`, appID)
 	if err != nil {
-		tx.Rollback()
+		if err := tx.Rollback(); err != nil {
+			return "",err 
+		}
 		return "", err
 	}
 
