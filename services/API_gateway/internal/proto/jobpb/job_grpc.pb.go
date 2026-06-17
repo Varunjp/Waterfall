@@ -24,6 +24,7 @@ const (
 	JobService_UpdateJob_FullMethodName       = "/job.JobService/UpdateJob"
 	JobService_CancelJob_FullMethodName       = "/job.JobService/CancelJob"
 	JobService_ListJobs_FullMethodName        = "/job.JobService/ListJobs"
+	JobService_ListAllJobs_FullMethodName     = "/job.JobService/ListAllJobs"
 	JobService_ListFailedJobs_FullMethodName  = "/job.JobService/ListFailedJobs"
 	JobService_GetJobLogs_FullMethodName      = "/job.JobService/GetJobLogs"
 	JobService_GetJobStats_FullMethodName     = "/job.JobService/GetJobStats"
@@ -41,6 +42,7 @@ type JobServiceClient interface {
 	UpdateJob(ctx context.Context, in *UpdateJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
 	CancelJob(ctx context.Context, in *CancelJobRequest, opts ...grpc.CallOption) (*JobResponse, error)
 	ListJobs(ctx context.Context, in *ListJobsRequest, opts ...grpc.CallOption) (*ListJobsResponse, error)
+	ListAllJobs(ctx context.Context, in *ListAllJobsRequest, opts ...grpc.CallOption) (*ListAllJobsResponse, error)
 	ListFailedJobs(ctx context.Context, in *ListFailedJobsRequest, opts ...grpc.CallOption) (*ListJobsResponse, error)
 	GetJobLogs(ctx context.Context, in *GetJobLogsRequest, opts ...grpc.CallOption) (*GetJobLogsResponse, error)
 	GetJobStats(ctx context.Context, in *GetJobStatsRequest, opts ...grpc.CallOption) (*GetJobStatsResponse, error)
@@ -101,6 +103,16 @@ func (c *jobServiceClient) ListJobs(ctx context.Context, in *ListJobsRequest, op
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListJobsResponse)
 	err := c.cc.Invoke(ctx, JobService_ListJobs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *jobServiceClient) ListAllJobs(ctx context.Context, in *ListAllJobsRequest, opts ...grpc.CallOption) (*ListAllJobsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAllJobsResponse)
+	err := c.cc.Invoke(ctx, JobService_ListAllJobs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -176,6 +188,7 @@ type JobServiceServer interface {
 	UpdateJob(context.Context, *UpdateJobRequest) (*JobResponse, error)
 	CancelJob(context.Context, *CancelJobRequest) (*JobResponse, error)
 	ListJobs(context.Context, *ListJobsRequest) (*ListJobsResponse, error)
+	ListAllJobs(context.Context, *ListAllJobsRequest) (*ListAllJobsResponse, error)
 	ListFailedJobs(context.Context, *ListFailedJobsRequest) (*ListJobsResponse, error)
 	GetJobLogs(context.Context, *GetJobLogsRequest) (*GetJobLogsResponse, error)
 	GetJobStats(context.Context, *GetJobStatsRequest) (*GetJobStatsResponse, error)
@@ -206,6 +219,9 @@ func (UnimplementedJobServiceServer) CancelJob(context.Context, *CancelJobReques
 }
 func (UnimplementedJobServiceServer) ListJobs(context.Context, *ListJobsRequest) (*ListJobsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListJobs not implemented")
+}
+func (UnimplementedJobServiceServer) ListAllJobs(context.Context, *ListAllJobsRequest) (*ListAllJobsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAllJobs not implemented")
 }
 func (UnimplementedJobServiceServer) ListFailedJobs(context.Context, *ListFailedJobsRequest) (*ListJobsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListFailedJobs not implemented")
@@ -332,6 +348,24 @@ func _JobService_ListJobs_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(JobServiceServer).ListJobs(ctx, req.(*ListJobsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _JobService_ListAllJobs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAllJobsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobServiceServer).ListAllJobs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JobService_ListAllJobs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobServiceServer).ListAllJobs(ctx, req.(*ListAllJobsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -470,6 +504,10 @@ var JobService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListJobs",
 			Handler:    _JobService_ListJobs_Handler,
+		},
+		{
+			MethodName: "ListAllJobs",
+			Handler:    _JobService_ListAllJobs_Handler,
 		},
 		{
 			MethodName: "ListFailedJobs",

@@ -273,6 +273,7 @@ type Plan struct {
 	JobLimit      int32                  `protobuf:"varint,3,opt,name=jobLimit,proto3" json:"jobLimit,omitempty"`
 	Price         float64                `protobuf:"fixed64,4,opt,name=price,proto3" json:"price,omitempty"`
 	StripePriceID string                 `protobuf:"bytes,5,opt,name=stripePriceID,proto3" json:"stripePriceID,omitempty"`
+	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -338,6 +339,13 @@ func (x *Plan) GetPrice() float64 {
 func (x *Plan) GetStripePriceID() string {
 	if x != nil {
 		return x.StripePriceID
+	}
+	return ""
+}
+
+func (x *Plan) GetStatus() string {
+	if x != nil {
+		return x.Status
 	}
 	return ""
 }
@@ -506,6 +514,102 @@ func (x *UpdatePlanResponse) GetUpdatedPlan() *Plan {
 	return nil
 }
 
+type UpdatePlanStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlanID        string                 `protobuf:"bytes,1,opt,name=planID,proto3" json:"planID,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePlanStatusRequest) Reset() {
+	*x = UpdatePlanStatusRequest{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePlanStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePlanStatusRequest) ProtoMessage() {}
+
+func (x *UpdatePlanStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePlanStatusRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePlanStatusRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UpdatePlanStatusRequest) GetPlanID() string {
+	if x != nil {
+		return x.PlanID
+	}
+	return ""
+}
+
+func (x *UpdatePlanStatusRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type UpdatePlanStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Plan          *Plan                  `protobuf:"bytes,1,opt,name=plan,proto3" json:"plan,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePlanStatusResponse) Reset() {
+	*x = UpdatePlanStatusResponse{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePlanStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePlanStatusResponse) ProtoMessage() {}
+
+func (x *UpdatePlanStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePlanStatusResponse.ProtoReflect.Descriptor instead.
+func (*UpdatePlanStatusResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UpdatePlanStatusResponse) GetPlan() *Plan {
+	if x != nil {
+		return x.Plan
+	}
+	return nil
+}
+
 var File_internal_proto_admin_admin_proto protoreflect.FileDescriptor
 
 const file_internal_proto_admin_admin_proto_rawDesc = "" +
@@ -523,13 +627,14 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\rstripePriceID\x18\x04 \x01(\tR\rstripePriceID\".\n" +
 	"\x12CreatePlanResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"\x11\n" +
-	"\x0fListPlanRequest\"\x8a\x01\n" +
+	"\x0fListPlanRequest\"\xa2\x01\n" +
 	"\x04Plan\x12\x16\n" +
 	"\x06planID\x18\x01 \x01(\tR\x06planID\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\bjobLimit\x18\x03 \x01(\x05R\bjobLimit\x12\x14\n" +
 	"\x05price\x18\x04 \x01(\x01R\x05price\x12$\n" +
-	"\rstripePriceID\x18\x05 \x01(\tR\rstripePriceID\"5\n" +
+	"\rstripePriceID\x18\x05 \x01(\tR\rstripePriceID\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\"5\n" +
 	"\x10ListPlanResponse\x12!\n" +
 	"\x05plans\x18\x01 \x03(\v2\v.admin.PlanR\x05plans\"\x97\x01\n" +
 	"\x11UpdatePlanRequest\x12\x16\n" +
@@ -539,14 +644,20 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\x05price\x18\x04 \x01(\x01R\x05price\x12$\n" +
 	"\rstripePriceID\x18\x05 \x01(\tR\rstripePriceID\"C\n" +
 	"\x12UpdatePlanResponse\x12-\n" +
-	"\vupdatedPlan\x18\x01 \x01(\v2\v.admin.PlanR\vupdatedPlan2\x8c\x03\n" +
+	"\vupdatedPlan\x18\x01 \x01(\v2\v.admin.PlanR\vupdatedPlan\"I\n" +
+	"\x17UpdatePlanStatusRequest\x12\x16\n" +
+	"\x06planID\x18\x01 \x01(\tR\x06planID\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\";\n" +
+	"\x18UpdatePlanStatusResponse\x12\x1f\n" +
+	"\x04plan\x18\x01 \x01(\v2\v.admin.PlanR\x04plan2\x92\x04\n" +
 	"\fAdminService\x12R\n" +
 	"\x05Login\x12\x13.admin.LoginRequest\x1a\x14.admin.LoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/login\x12a\n" +
 	"\n" +
 	"CreatePlan\x12\x18.admin.CreatePlanRequest\x1a\x19.admin.CreatePlanResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/plans\x12Y\n" +
 	"\tListPlans\x12\x16.admin.ListPlanRequest\x1a\x17.admin.ListPlanResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/admin/plans\x12j\n" +
 	"\n" +
-	"UpdatePlan\x12\x18.admin.UpdatePlanRequest\x1a\x19.admin.UpdatePlanResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\x1a\x1c/api/v1/admin/plans/{planID}B\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
+	"UpdatePlan\x12\x18.admin.UpdatePlanRequest\x1a\x19.admin.UpdatePlanResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\x1a\x1c/api/v1/admin/plans/{planID}\x12\x83\x01\n" +
+	"\x10UpdatePlanStatus\x12\x1e.admin.UpdatePlanStatusRequest\x1a\x1f.admin.UpdatePlanStatusResponse\".\x82\xd3\xe4\x93\x02(:\x01*2#/api/v1/admin/plans/{planID}/statusB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
 
 var (
 	file_internal_proto_admin_admin_proto_rawDescOnce sync.Once
@@ -560,34 +671,39 @@ func file_internal_proto_admin_admin_proto_rawDescGZIP() []byte {
 	return file_internal_proto_admin_admin_proto_rawDescData
 }
 
-var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_internal_proto_admin_admin_proto_goTypes = []any{
-	(*LoginRequest)(nil),       // 0: admin.LoginRequest
-	(*LoginResponse)(nil),      // 1: admin.LoginResponse
-	(*CreatePlanRequest)(nil),  // 2: admin.CreatePlanRequest
-	(*CreatePlanResponse)(nil), // 3: admin.CreatePlanResponse
-	(*ListPlanRequest)(nil),    // 4: admin.ListPlanRequest
-	(*Plan)(nil),               // 5: admin.Plan
-	(*ListPlanResponse)(nil),   // 6: admin.ListPlanResponse
-	(*UpdatePlanRequest)(nil),  // 7: admin.UpdatePlanRequest
-	(*UpdatePlanResponse)(nil), // 8: admin.UpdatePlanResponse
+	(*LoginRequest)(nil),             // 0: admin.LoginRequest
+	(*LoginResponse)(nil),            // 1: admin.LoginResponse
+	(*CreatePlanRequest)(nil),        // 2: admin.CreatePlanRequest
+	(*CreatePlanResponse)(nil),       // 3: admin.CreatePlanResponse
+	(*ListPlanRequest)(nil),          // 4: admin.ListPlanRequest
+	(*Plan)(nil),                     // 5: admin.Plan
+	(*ListPlanResponse)(nil),         // 6: admin.ListPlanResponse
+	(*UpdatePlanRequest)(nil),        // 7: admin.UpdatePlanRequest
+	(*UpdatePlanResponse)(nil),       // 8: admin.UpdatePlanResponse
+	(*UpdatePlanStatusRequest)(nil),  // 9: admin.UpdatePlanStatusRequest
+	(*UpdatePlanStatusResponse)(nil), // 10: admin.UpdatePlanStatusResponse
 }
 var file_internal_proto_admin_admin_proto_depIdxs = []int32{
-	5, // 0: admin.ListPlanResponse.plans:type_name -> admin.Plan
-	5, // 1: admin.UpdatePlanResponse.updatedPlan:type_name -> admin.Plan
-	0, // 2: admin.AdminService.Login:input_type -> admin.LoginRequest
-	2, // 3: admin.AdminService.CreatePlan:input_type -> admin.CreatePlanRequest
-	4, // 4: admin.AdminService.ListPlans:input_type -> admin.ListPlanRequest
-	7, // 5: admin.AdminService.UpdatePlan:input_type -> admin.UpdatePlanRequest
-	1, // 6: admin.AdminService.Login:output_type -> admin.LoginResponse
-	3, // 7: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
-	6, // 8: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
-	8, // 9: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
-	6, // [6:10] is the sub-list for method output_type
-	2, // [2:6] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	5,  // 0: admin.ListPlanResponse.plans:type_name -> admin.Plan
+	5,  // 1: admin.UpdatePlanResponse.updatedPlan:type_name -> admin.Plan
+	5,  // 2: admin.UpdatePlanStatusResponse.plan:type_name -> admin.Plan
+	0,  // 3: admin.AdminService.Login:input_type -> admin.LoginRequest
+	2,  // 4: admin.AdminService.CreatePlan:input_type -> admin.CreatePlanRequest
+	4,  // 5: admin.AdminService.ListPlans:input_type -> admin.ListPlanRequest
+	7,  // 6: admin.AdminService.UpdatePlan:input_type -> admin.UpdatePlanRequest
+	9,  // 7: admin.AdminService.UpdatePlanStatus:input_type -> admin.UpdatePlanStatusRequest
+	1,  // 8: admin.AdminService.Login:output_type -> admin.LoginResponse
+	3,  // 9: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
+	6,  // 10: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
+	8,  // 11: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
+	10, // 12: admin.AdminService.UpdatePlanStatus:output_type -> admin.UpdatePlanStatusResponse
+	8,  // [8:13] is the sub-list for method output_type
+	3,  // [3:8] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_internal_proto_admin_admin_proto_init() }
@@ -601,7 +717,7 @@ func file_internal_proto_admin_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_admin_proto_rawDesc), len(file_internal_proto_admin_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

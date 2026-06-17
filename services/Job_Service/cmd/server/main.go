@@ -70,5 +70,7 @@ func main() {
 	}
 
 	log.Println("Job service running on :", cfg.PORT)
-	server.Serve(lis)
+	if err := server.Serve(lis); err != nil {
+		log.Fatal(err)
+	}
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"log"
 )
 
 type adminRepo struct {
@@ -21,7 +22,9 @@ func (a *adminRepo) UpdateUsageIncr(ctx context.Context, appID string) error {
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			if err := tx.Rollback(); err != nil {
+				log.Println("rollback failed :",err)
+			}
 		}
 	}()
 
@@ -76,7 +79,9 @@ func (a *adminRepo) UpdateUsageDecr(ctx context.Context, appID string) error {
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			if err := tx.Rollback(); err != nil {
+				log.Println("failed to rollback :",err)
+			}
 		}
 	}()
 

@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS plans (
     monthly_job_limit INT NOT NULL,
     price NUMERIC(12,2) NOT NULL DEFAULT 0,
     stripe_price_id TEXT NOT NULL,
+    status     VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

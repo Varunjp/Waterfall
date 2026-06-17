@@ -89,7 +89,7 @@ func (r *AppUserRepo) ListPlans() ([]*entities.Plan, error) {
 	rows, err := r.db.Query(`
 		SELECT plan_id,name,monthly_job_limit,price,created_at
 		FROM plans
-		WHERE name != 'FREE'`,
+		WHERE name != 'FREE' AND status = 'ACTIVE'`,
 	)
 	if err != nil {
 		return nil, err

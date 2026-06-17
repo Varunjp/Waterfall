@@ -21,6 +21,12 @@ service AppUserService {
     };
   }
 
+  rpc ListAppUsers(ListAppUserRequest) returns (ListAppUserResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/apps/{app_id}/users"
+    };
+  }
+
   rpc AppLogin(AppLoginRequest) returns (AppLoginResponse) {
     option (google.api.http) = {
       post: "/api/v1/users/login"
@@ -108,6 +114,10 @@ message CreateUserRequest {
 
 message ListUsersRequest {}
 
+message ListAppUserRequest{
+  string app_id = 1;
+}
+
 message AppUser {
   string id = 1;
   string email = 2;
@@ -116,6 +126,10 @@ message AppUser {
 }
 
 message ListUsersResponse {
+  repeated AppUser users = 1;
+}
+
+message ListAppUserResponse {
   repeated AppUser users = 1;
 }
 

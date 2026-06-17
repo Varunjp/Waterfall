@@ -30,8 +30,11 @@ func main() {
 	validateConfig(cfg)
 
 	logg, err := logger.Newlogger("watcher-service")
-	defer logg.Sync()
-
+	defer func (){ 
+		if err := logg.Sync(); err != nil {
+			log.Println(err)
+		}
+	}()
 	if err != nil {
 		panic(err)
 	}

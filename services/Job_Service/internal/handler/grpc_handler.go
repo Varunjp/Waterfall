@@ -79,6 +79,17 @@ func (h *JobHandler) ListJobs(ctx context.Context, req *jobpb.ListJobsRequest) (
 	return mapJobs(jobs, total, int(req.Limit), int(req.Offset)), nil
 }
 
+func (h *JobHandler) ListAllJobs(ctx context.Context, req *jobpb.ListAllJobsRequest) (*jobpb.ListAllJobsResponse,error) {
+
+	jobs,total,err := h.dc.ListAllJobs(ctx,req.Status,int(req.Limit),int(req.Offset),optionalTimestamp(req.StartDate),optionalTimestamp(req.EndDate))
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return mapAllJobs(jobs,total,int(req.Limit),int(req.Offset)),nil 
+}
+
 func (h *JobHandler) ListFailedJobs(ctx context.Context, req *jobpb.ListFailedJobsRequest) (*jobpb.ListJobsResponse, error) {
 	jobs, total, err := h.dc.ListFailedJobs(
 		ctx,
@@ -177,6 +188,31 @@ func (h *JobHandler) GetJobMetrics(ctx context.Context, req *jobpb.GetJobMetrics
 
 func mapJobs(jobs []domain.Job, total, limit, offset int) *jobpb.ListJobsResponse {
 	resp := &jobpb.ListJobsResponse{}
+	for _, j := range jobs {
+		resp.Jobs = append(resp.Jobs, &jobpb.Job{
+			JobId:       j.JobID,
+			AppId:       j.AppID,
+			Type:        j.Type,
+			Status:      j.Status,
+			Payload:     string(j.Payload),
+			Retry:       int32(j.Retry),
+			MaxRetry:    int32(j.MaxRetry),
+			ScheduleAt:  formatUTC(j.ScheduledAt),
+			CreatedAt:   formatUTC(j.CreatedAt),
+			UpdatedAt:   formatUTC(j.UpdatedAt),
+			ManualRetry: int32(j.ManualRetry),
+		})
+	}
+
+	resp.Total = int32(total)
+	resp.Limit = int32(limit)
+	resp.Offset = int32(offset)
+
+	return resp
+}
+
+func mapAllJobs(jobs []domain.Job,total,limit,offset int) *jobpb.ListAllJobsResponse {
+	resp := &jobpb.ListAllJobsResponse{}
 	for _, j := range jobs {
 		resp.Jobs = append(resp.Jobs, &jobpb.Job{
 			JobId:       j.JobID,

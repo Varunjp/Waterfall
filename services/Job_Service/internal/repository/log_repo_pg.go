@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"job_service/internal/domain"
+	"log"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -36,7 +37,10 @@ func (r *logRepo) GetByJobID(ctx context.Context, jobID, appID string) ([]domain
 	var logs []domain.JobLog
 	for rows.Next() {
 		var l domain.JobLog
-		rows.Scan(&l.Timestamp, &l.Status, &l.ErrorMessage)
+		err := rows.Scan(&l.Timestamp, &l.Status, &l.ErrorMessage)
+		if err != nil {
+			log.Println("error :",err)
+		}
 		logs = append(logs, l)
 	}
 	return logs, nil
@@ -60,7 +64,10 @@ func (r *logRepo) GetByJobIdAdmin(ctx context.Context, jobID string) ([]domain.J
 	var logs []domain.JobLog
 	for rows.Next() {
 		var l domain.JobLog
-		rows.Scan(&l.Timestamp, &l.Status, &l.ErrorMessage)
+		err := rows.Scan(&l.Timestamp, &l.Status, &l.ErrorMessage)
+		if err != nil {
+			log.Println("error :",err)
+		}
 		logs = append(logs, l)
 	}
 	return logs, nil

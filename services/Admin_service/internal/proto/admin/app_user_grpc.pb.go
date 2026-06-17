@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	AppUserService_CreateUser_FullMethodName             = "/admin.AppUserService/CreateUser"
 	AppUserService_ListUsers_FullMethodName              = "/admin.AppUserService/ListUsers"
+	AppUserService_ListAppUsers_FullMethodName           = "/admin.AppUserService/ListAppUsers"
 	AppUserService_AppLogin_FullMethodName               = "/admin.AppUserService/AppLogin"
 	AppUserService_ListPlans_FullMethodName              = "/admin.AppUserService/ListPlans"
 	AppUserService_RequestResetPassword_FullMethodName   = "/admin.AppUserService/RequestResetPassword"
@@ -36,6 +37,7 @@ const (
 type AppUserServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
+	ListAppUsers(ctx context.Context, in *ListAppUserRequest, opts ...grpc.CallOption) (*ListAppUserResponse, error)
 	AppLogin(ctx context.Context, in *AppLoginRequest, opts ...grpc.CallOption) (*AppLoginResponse, error)
 	ListPlans(ctx context.Context, in *ListPlansRequest, opts ...grpc.CallOption) (*ListPlansResponse, error)
 	RequestResetPassword(ctx context.Context, in *RequestResetPasswordRequest, opts ...grpc.CallOption) (*RequestResetPasswordResponse, error)
@@ -66,6 +68,16 @@ func (c *appUserServiceClient) ListUsers(ctx context.Context, in *ListUsersReque
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListUsersResponse)
 	err := c.cc.Invoke(ctx, AppUserService_ListUsers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appUserServiceClient) ListAppUsers(ctx context.Context, in *ListAppUserRequest, opts ...grpc.CallOption) (*ListAppUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAppUserResponse)
+	err := c.cc.Invoke(ctx, AppUserService_ListAppUsers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +150,7 @@ func (c *appUserServiceClient) UpdateUserStatus(ctx context.Context, in *UpdateU
 type AppUserServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*emptypb.Empty, error)
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
+	ListAppUsers(context.Context, *ListAppUserRequest) (*ListAppUserResponse, error)
 	AppLogin(context.Context, *AppLoginRequest) (*AppLoginResponse, error)
 	ListPlans(context.Context, *ListPlansRequest) (*ListPlansResponse, error)
 	RequestResetPassword(context.Context, *RequestResetPasswordRequest) (*RequestResetPasswordResponse, error)
@@ -159,6 +172,9 @@ func (UnimplementedAppUserServiceServer) CreateUser(context.Context, *CreateUser
 }
 func (UnimplementedAppUserServiceServer) ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListUsers not implemented")
+}
+func (UnimplementedAppUserServiceServer) ListAppUsers(context.Context, *ListAppUserRequest) (*ListAppUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAppUsers not implemented")
 }
 func (UnimplementedAppUserServiceServer) AppLogin(context.Context, *AppLoginRequest) (*AppLoginResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AppLogin not implemented")
@@ -231,6 +247,24 @@ func _AppUserService_ListUsers_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppUserServiceServer).ListUsers(ctx, req.(*ListUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppUserService_ListAppUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAppUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppUserServiceServer).ListAppUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppUserService_ListAppUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppUserServiceServer).ListAppUsers(ctx, req.(*ListAppUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -357,6 +391,10 @@ var AppUserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListUsers",
 			Handler:    _AppUserService_ListUsers_Handler,
+		},
+		{
+			MethodName: "ListAppUsers",
+			Handler:    _AppUserService_ListAppUsers_Handler,
 		},
 		{
 			MethodName: "AppLogin",
