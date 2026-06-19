@@ -103,7 +103,7 @@ func (a *Assigner) Assign(ctx context.Context, job domain.Job) error {
 			if a.runtime != nil {
 				err := a.runtime.RecordQueuedJob(ctx, job, time.Now().UTC())
 				if err != nil {
-					log.Println("failed to record queued job",err)
+					log.Println("failed to record queued job", err)
 				}
 			}
 			return nil

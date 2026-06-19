@@ -16,10 +16,10 @@ import (
 )
 
 type BillingService struct {
-	repo  interfaces.BillingRepository
-	cfg   Config
-	redis *redis.Client
-	mailer  *utils.Mailer
+	repo   interfaces.BillingRepository
+	cfg    Config
+	redis  *redis.Client
+	mailer *utils.Mailer
 }
 
 type Config struct {
@@ -46,9 +46,9 @@ func NewBillingService(r interfaces.BillingRepository, c struct {
 	}
 }, rd *redis.Client, mail *utils.Mailer) *BillingService {
 	return &BillingService{
-		repo:  r,
-		cfg:   c,
-		redis: rd,
+		repo:   r,
+		cfg:    c,
+		redis:  rd,
 		mailer: mail,
 	}
 }
@@ -215,32 +215,32 @@ func (s *BillingService) HandlePaymentSuccess(
 	return nil
 }
 
-func (s *BillingService) SendInvoicePdf(ctx context.Context,subscriptionID, invoiceNumber string, totalPaid float64) error {
+func (s *BillingService) SendInvoicePdf(ctx context.Context, subscriptionID, invoiceNumber string, totalPaid float64) error {
 
 	amount := totalPaid / 100
 
-	data,err := s.repo.GetSubscriptionDetails(ctx,subscriptionID)
+	data, err := s.repo.GetSubscriptionDetails(ctx, subscriptionID)
 
 	if err != nil {
-		return err 
+		return err
 	}
 
 	data.InvoiceNumber = invoiceNumber
 	data.TotalPaid = amount
 
-	pdf,err := utils.GeneratePDF(*data)
+	pdf, err := utils.GeneratePDF(*data)
 
-	if err != nil {
-		return err 
-	}
-
-	err = s.mailer.SendInvoicePdf(data.UserEmail,data,pdf)
-	
 	if err != nil {
 		return err
 	}
 
-	return nil 
+	err = s.mailer.SendInvoicePdf(data.UserEmail, data, pdf)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *BillingService) HandlePaymentFailure(

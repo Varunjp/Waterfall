@@ -86,7 +86,7 @@ func main() {
 	st.Stripe.SuccessURL = cfg.Stripe.SuccessURL
 	st.Stripe.CancelURL = cfg.Stripe.CancelURL
 
-	billingService := service.NewBillingService(billingRepo, st, redisClient.Client,mailer)
+	billingService := service.NewBillingService(billingRepo, st, redisClient.Client, mailer)
 
 	handler := handlers.NewAdminHandler(usecase, planUC)
 	adminMetrics := metrics.NewMetrics(dbConn)

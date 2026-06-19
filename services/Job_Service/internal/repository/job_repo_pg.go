@@ -87,7 +87,7 @@ func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit, of
 	return jobs, total, nil
 }
 
-func (r *jobRepo) ListAllJobs(ctx context.Context, status string, limit, offset int, startDate, endDate *time.Time) ([]domain.Job,int,error) {
+func (r *jobRepo) ListAllJobs(ctx context.Context, status string, limit, offset int, startDate, endDate *time.Time) ([]domain.Job, int, error) {
 	baseQuery := `FROM jobs WHERE 1=1`
 	args := []any{}
 	argPos := 1

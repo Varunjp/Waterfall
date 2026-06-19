@@ -103,7 +103,7 @@ func (r *PlanRepo) UpdatePlan(plan *entities.Plan) (*entities.Plan, error) {
 
 	var p entities.Plan
 	err = r.db.QueryRow(nquery, plan.PlanID).Scan(
-		&p.PlanID, &p.Name,&p.Status ,&p.MonthlyJobLimit, &p.Price, &p.StripeID,
+		&p.PlanID, &p.Name, &p.Status, &p.MonthlyJobLimit, &p.Price, &p.StripeID,
 	)
 
 	if err != nil {
@@ -113,26 +113,26 @@ func (r *PlanRepo) UpdatePlan(plan *entities.Plan) (*entities.Plan, error) {
 	return &p, nil
 }
 
-func (r *PlanRepo) UpdatePlanStatus(planID,status string)(*entities.Plan,error) {
+func (r *PlanRepo) UpdatePlanStatus(planID, status string) (*entities.Plan, error) {
 
 	query := `UPDATE plans SET status = $1 WHERE plan_id = $2`
 
-	_,err := r.db.Exec(query,status,planID)
+	_, err := r.db.Exec(query, status, planID)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
 	nquery := `SELECT plan_id,name,status,monthly_job_limit,price,stripe_price_id FROM plans WHERE plan_id = $1`
 
 	var p entities.Plan
 	err = r.db.QueryRow(nquery, planID).Scan(
-		&p.PlanID, &p.Name,&p.Status, &p.MonthlyJobLimit, &p.Price, &p.StripeID,
+		&p.PlanID, &p.Name, &p.Status, &p.MonthlyJobLimit, &p.Price, &p.StripeID,
 	)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	return &p,nil 
+	return &p, nil
 }

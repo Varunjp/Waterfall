@@ -169,18 +169,18 @@ func (s *Server) handleProgress(ctx context.Context, worker *WorkerConnection, r
 		30*time.Second,
 	)
 
-	input := domain.JobResultInput {
-		JobID: req.JobId,
-		AppID: worker.AppID,
+	input := domain.JobResultInput{
+		JobID:  req.JobId,
+		AppID:  worker.AppID,
 		Status: string(domain.JobRunning),
 	}
 
-	err := s.jobResultProcess.ProcessJobResult(ctx,input)
+	err := s.jobResultProcess.ProcessJobResult(ctx, input)
 
 	if err != nil {
 		s.log.Warn("failed to send job status update",
-			zap.String("job id :",req.JobId),
-			zap.String("worker id :",worker.WorkerID),
+			zap.String("job id :", req.JobId),
+			zap.String("worker id :", worker.WorkerID),
 			zap.Error(err),
 		)
 	}

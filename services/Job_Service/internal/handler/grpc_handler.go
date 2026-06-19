@@ -79,15 +79,15 @@ func (h *JobHandler) ListJobs(ctx context.Context, req *jobpb.ListJobsRequest) (
 	return mapJobs(jobs, total, int(req.Limit), int(req.Offset)), nil
 }
 
-func (h *JobHandler) ListAllJobs(ctx context.Context, req *jobpb.ListAllJobsRequest) (*jobpb.ListAllJobsResponse,error) {
+func (h *JobHandler) ListAllJobs(ctx context.Context, req *jobpb.ListAllJobsRequest) (*jobpb.ListAllJobsResponse, error) {
 
-	jobs,total,err := h.dc.ListAllJobs(ctx,req.Status,int(req.Limit),int(req.Offset),optionalTimestamp(req.StartDate),optionalTimestamp(req.EndDate))
+	jobs, total, err := h.dc.ListAllJobs(ctx, req.Status, int(req.Limit), int(req.Offset), optionalTimestamp(req.StartDate), optionalTimestamp(req.EndDate))
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	return mapAllJobs(jobs,total,int(req.Limit),int(req.Offset)),nil 
+	return mapAllJobs(jobs, total, int(req.Limit), int(req.Offset)), nil
 }
 
 func (h *JobHandler) ListFailedJobs(ctx context.Context, req *jobpb.ListFailedJobsRequest) (*jobpb.ListJobsResponse, error) {
@@ -211,7 +211,7 @@ func mapJobs(jobs []domain.Job, total, limit, offset int) *jobpb.ListJobsRespons
 	return resp
 }
 
-func mapAllJobs(jobs []domain.Job,total,limit,offset int) *jobpb.ListAllJobsResponse {
+func mapAllJobs(jobs []domain.Job, total, limit, offset int) *jobpb.ListAllJobsResponse {
 	resp := &jobpb.ListAllJobsResponse{}
 	for _, j := range jobs {
 		resp.Jobs = append(resp.Jobs, &jobpb.Job{

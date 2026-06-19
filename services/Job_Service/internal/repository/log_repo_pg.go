@@ -39,7 +39,7 @@ func (r *logRepo) GetByJobID(ctx context.Context, jobID, appID string) ([]domain
 		var l domain.JobLog
 		err := rows.Scan(&l.Timestamp, &l.Status, &l.ErrorMessage)
 		if err != nil {
-			log.Println("error :",err)
+			log.Println("error :", err)
 		}
 		logs = append(logs, l)
 	}
@@ -66,7 +66,7 @@ func (r *logRepo) GetByJobIdAdmin(ctx context.Context, jobID string) ([]domain.J
 		var l domain.JobLog
 		err := rows.Scan(&l.Timestamp, &l.Status, &l.ErrorMessage)
 		if err != nil {
-			log.Println("error :",err)
+			log.Println("error :", err)
 		}
 		logs = append(logs, l)
 	}

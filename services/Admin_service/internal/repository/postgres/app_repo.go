@@ -80,7 +80,7 @@ func (r *AppRepo) Create(app *entities.App) (string, error) {
 
 	if err != nil {
 		if err := tx.Rollback(); err != nil {
-			return "",err
+			return "", err
 		}
 		var pqErr *pq.Error
 
@@ -105,7 +105,7 @@ func (r *AppRepo) Create(app *entities.App) (string, error) {
 	`, appID)
 	if err != nil {
 		if err := tx.Rollback(); err != nil {
-			return "",err 
+			return "", err
 		}
 		return "", err
 	}

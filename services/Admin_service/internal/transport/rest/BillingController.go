@@ -69,7 +69,7 @@ func (c *BillingController) CreateCheckout(w http.ResponseWriter, r *http.Reques
 	}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		log.Println("response error :",err)
+		log.Println("response error :", err)
 	}
 }
 
@@ -165,7 +165,7 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter, r *http.Request
 	case "invoice.payment_succeeded":
 
 		var raw map[string]interface{}
-		
+
 		if err := json.Unmarshal(event.Data.Raw, &raw); err != nil {
 			log.Println("unmarshal error:", err)
 			break
@@ -173,7 +173,7 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter, r *http.Request
 
 		if raw["billin_reason"] == "subscription_create" {
 			log.Println("skipping initial invoice, already handled by checkout.session.completed")
-        	break
+			break
 		}
 
 		subscriptionID := ""
@@ -183,20 +183,19 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter, r *http.Request
 			}
 		}
 
-
-		invoiceNumber,_ := raw["number"].(string)
-		amountPaid,_:= raw["amount_paid"].(float64)
+		invoiceNumber, _ := raw["number"].(string)
+		amountPaid, _ := raw["amount_paid"].(float64)
 
 		if subscriptionID == "" {
 			log.Println("could not extract subscription ID from invoice")
 			break
 		}
 
-		err := c.service.SendInvoicePdf(context.Background(),subscriptionID,invoiceNumber,amountPaid)
+		err := c.service.SendInvoicePdf(context.Background(), subscriptionID, invoiceNumber, amountPaid)
 
 		if err != nil {
-			log.Println("failed to send invoice pdf :",err)
-			break 
+			log.Println("failed to send invoice pdf :", err)
+			break
 		}
 
 	case "invoice.payment_failed":
@@ -288,8 +287,8 @@ func (c *BillingController) GetSubscription(
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(subscription); err != nil{
-		http.Error(w,err.Error(),http.StatusInternalServerError)
-		return 
+	if err := json.NewEncoder(w).Encode(subscription); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
