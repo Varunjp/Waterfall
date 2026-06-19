@@ -10,19 +10,19 @@ import (
 	"github.com/jung-kurt/gofpdf"
 )
 
-func GeneratePDF(data entities.InvoiceData) ([]byte,error) {
+func GeneratePDF(data entities.InvoiceData) ([]byte, error) {
 	const (
 		pageW  = 210.0 // A4 mm
 		pageH  = 297.0
 		margin = 18.0
 
 		// Brand colours (RGB)
-		inkR, inkG, inkB         = 15, 15, 15   // near-black body
-		accentR, accentG, accentB = 30, 30, 30  // slightly lighter
-		mutedR, mutedG, mutedB   = 110, 110, 110 // muted grey labels
-		lineR, lineG, lineB      = 220, 220, 215 // hairline rules
-		greenR, greenG, greenB   = 72, 187, 120  // success green badge
-		bgR, bgG, bgB            = 250, 250, 248 // very light tint band
+		inkR, inkG, inkB          = 15, 15, 15    // near-black body
+		accentR, accentG, accentB = 30, 30, 30    // slightly lighter
+		mutedR, mutedG, mutedB    = 110, 110, 110 // muted grey labels
+		lineR, lineG, lineB       = 220, 220, 215 // hairline rules
+		greenR, greenG, greenB    = 72, 187, 120  // success green badge
+		bgR, bgG, bgB             = 250, 250, 248 // very light tint band
 	)
 
 	f := gofpdf.New("P", "mm", "A4", "")
@@ -169,7 +169,6 @@ func GeneratePDF(data entities.InvoiceData) ([]byte,error) {
 	setColor(mutedR, mutedG, mutedB)
 	periodStr := fmt.Sprintf("Billing period: %s - %s", fmtDate(data.CreatedDate), fmtDate(data.NextPayment))
 	f.Text(colDesc, y, periodStr)
-
 
 	// ── Subtotal / Total block ────────────────────────────────────────────────
 	y += 10

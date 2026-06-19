@@ -57,11 +57,11 @@ func (h *AppUserHandler) ListUsers(ctx context.Context, req *pb.ListUsersRequest
 	return &pb.ListUsersResponse{Users: res}, nil
 }
 
-func (h *AppUserHandler) ListAppUsers(ctx context.Context, req *pb.ListAppUserRequest)(*pb.ListAppUserResponse,error) {
+func (h *AppUserHandler) ListAppUsers(ctx context.Context, req *pb.ListAppUserRequest) (*pb.ListAppUserResponse, error) {
 
 	appID := req.AppId
 
-	users,err := h.usecase.List(appID)
+	users, err := h.usecase.List(appID)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (h *AppUserHandler) ListAppUsers(ctx context.Context, req *pb.ListAppUserRe
 		})
 	}
 
-	return &pb.ListAppUserResponse{Users: res},nil 
+	return &pb.ListAppUserResponse{Users: res}, nil
 }
 
 func (h *AppUserHandler) AppLogin(ctx context.Context, req *pb.AppLoginRequest) (*pb.AppLoginResponse, error) {

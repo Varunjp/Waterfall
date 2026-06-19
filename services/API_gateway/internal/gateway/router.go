@@ -113,7 +113,7 @@ func customErrorHandler(
 	if err := json.NewEncoder(w).Encode(map[string]string{
 		"error": s.Message(),
 	}); err != nil {
-		log.Println("error :",err)
+		log.Println("error :", err)
 	}
 }
 

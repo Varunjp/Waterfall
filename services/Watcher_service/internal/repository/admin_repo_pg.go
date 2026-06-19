@@ -23,7 +23,7 @@ func (a *adminRepo) UpdateUsageIncr(ctx context.Context, appID string) error {
 	defer func() {
 		if err != nil {
 			if err := tx.Rollback(); err != nil {
-				log.Println("rollback failed :",err)
+				log.Println("rollback failed :", err)
 			}
 		}
 	}()
@@ -80,7 +80,7 @@ func (a *adminRepo) UpdateUsageDecr(ctx context.Context, appID string) error {
 	defer func() {
 		if err != nil {
 			if err := tx.Rollback(); err != nil {
-				log.Println("failed to rollback :",err)
+				log.Println("failed to rollback :", err)
 			}
 		}
 	}()

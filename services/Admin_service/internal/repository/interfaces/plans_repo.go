@@ -6,5 +6,5 @@ type PlansRepository interface {
 	CreatePlan(plan *entities.Plan) error
 	GetPlans() ([]*entities.Plan, error)
 	UpdatePlan(plan *entities.Plan) (*entities.Plan, error)
-	UpdatePlanStatus(planID, status string) (*entities.Plan,error)
+	UpdatePlanStatus(planID, status string) (*entities.Plan, error)
 }

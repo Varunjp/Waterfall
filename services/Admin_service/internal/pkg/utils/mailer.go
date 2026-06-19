@@ -41,7 +41,7 @@ func (m *Mailer) SendOtp(email, otp string) error {
 
 	— The Waterfall Team`, otp)
 
-		htmlBody := fmt.Sprintf(`<!DOCTYPE html>
+	htmlBody := fmt.Sprintf(`<!DOCTYPE html>
 	<html lang="en">
 	<head>
 	<meta charset="UTF-8" />
@@ -185,15 +185,15 @@ func (m *Mailer) SendOtp(email, otp string) error {
 
 	addr := m.host + ":" + m.port
 
-	if err := smtp.SendMail(addr,auth,m.user,[]string{email},msg); err != nil {
-		log.Printf("[mailer] failed to send OTP to %s: %v",email,err)
-		return err 
+	if err := smtp.SendMail(addr, auth, m.user, []string{email}, msg); err != nil {
+		log.Printf("[mailer] failed to send OTP to %s: %v", email, err)
+		return err
 	}
 
-	return nil 
+	return nil
 }
 
-func (m *Mailer) SendInvoicePdf(email string,data *entities.InvoiceData ,pdfBytes []byte) error {
+func (m *Mailer) SendInvoicePdf(email string, data *entities.InvoiceData, pdfBytes []byte) error {
 	subject := fmt.Sprintf("Your Waterfall Invoice %s", data.InvoiceNumber)
 	fileName := fmt.Sprintf("Waterfall_Invoice_%s.pdf", data.InvoiceNumber)
 
@@ -238,11 +238,11 @@ func (m *Mailer) SendInvoicePdf(email string,data *entities.InvoiceData ,pdfByte
 	addr := m.host + ":" + m.port
 	auth := smtp.PlainAuth("", m.user, m.pass, m.host)
 
-	if err := smtp.SendMail(addr,auth,m.user,[]string{data.UserEmail},body.Bytes()); err != nil {
-		return err 
+	if err := smtp.SendMail(addr, auth, m.user, []string{data.UserEmail}, body.Bytes()); err != nil {
+		return err
 	}
 
-	return nil 
+	return nil
 }
 
 func emailHTML(d *entities.InvoiceData) string {

@@ -76,10 +76,10 @@ func (s *PlanService) UpdatePlans(planId, name string, jobLimit int, price float
 	return s.repo.UpdatePlan(updatePlan)
 }
 
-func (s *PlanService) UpdateStatusPlan(planID, status string) (*entities.Plan,error) {
+func (s *PlanService) UpdateStatusPlan(planID, status string) (*entities.Plan, error) {
 
 	if planID == "" {
-		return nil,errors.New("require a valid planID")
+		return nil, errors.New("require a valid planID")
 	}
 
 	if status == "" {
@@ -88,12 +88,12 @@ func (s *PlanService) UpdateStatusPlan(planID, status string) (*entities.Plan,er
 
 	status = strings.ToUpper(status)
 
-	plan,err := s.repo.UpdatePlanStatus(planID,status)
+	plan, err := s.repo.UpdatePlanStatus(planID, status)
 
 	if err != nil {
-		log.Println("error :",err)
-		return nil,err 
+		log.Println("error :", err)
+		return nil, err
 	}
 
-	return plan,nil 
+	return plan, nil
 }

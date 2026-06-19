@@ -255,7 +255,7 @@ func (r *BillingPGRepo) GetSubscription(ctx context.Context, appID string) (*ent
 	return &s, nil
 }
 
-func (r *BillingPGRepo) GetSubscriptionDetails(ctx context.Context, stripeSubID string)(*entities.InvoiceData,error) {
+func (r *BillingPGRepo) GetSubscriptionDetails(ctx context.Context, stripeSubID string) (*entities.InvoiceData, error) {
 
 	var data entities.InvoiceData
 
@@ -268,10 +268,10 @@ func (r *BillingPGRepo) GetSubscriptionDetails(ctx context.Context, stripeSubID 
 		ctx,
 		subsQuery,
 		stripeSubID,
-	).Scan(&data.UserID,&data.PlanID,&data.CreatedDate,&data.NextPayment)
+	).Scan(&data.UserID, &data.PlanID, &data.CreatedDate, &data.NextPayment)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
 	userQuery := `
@@ -283,10 +283,10 @@ func (r *BillingPGRepo) GetSubscriptionDetails(ctx context.Context, stripeSubID 
 		ctx,
 		userQuery,
 		data.UserID,
-	).Scan(&data.UserName,&data.UserEmail)
+	).Scan(&data.UserName, &data.UserEmail)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
 	planQuery := `
@@ -299,11 +299,11 @@ func (r *BillingPGRepo) GetSubscriptionDetails(ctx context.Context, stripeSubID 
 		ctx,
 		planQuery,
 		data.PlanID,
-	).Scan(&data.PlanName,&data.PlanAmount)
+	).Scan(&data.PlanName, &data.PlanAmount)
 
 	if err != nil {
-		return nil ,err 
+		return nil, err
 	}
 
-	return &data,nil 
+	return &data, nil
 }
