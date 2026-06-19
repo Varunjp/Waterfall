@@ -47,7 +47,6 @@ func (w *WorkerConnection) DecrementJobs() {
 }
 
 func (w *WorkerConnection) WritePump() {
-	defer w.mu.Unlock()
 	defer w.Cancel()
 	w.mu.Lock()
 
@@ -64,6 +63,7 @@ func (w *WorkerConnection) WritePump() {
 			if err != nil {
 				return
 			}
+			w.mu.Unlock()
 		}
 	}
 }
