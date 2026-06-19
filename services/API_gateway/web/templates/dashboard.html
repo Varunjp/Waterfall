@@ -51,9 +51,15 @@
 
         <button class="nav-btn" data-section="monitor">
           <!-- icon: activity -->
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polyline points="1 9 4 5 7 8 10 3 13 6 15 4"/>
-            <line x1="1" y1="14" x2="15" y2="14"/>
+          <svg
+            class="nav-icon"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <polyline points="1 9 4 5 7 8 10 3 13 6 15 4" />
+            <line x1="1" y1="14" x2="15" y2="14" />
           </svg>
           Monitor
         </button>
@@ -88,8 +94,6 @@
           </svg>
           Subscription
         </button>
-
-
       </nav>
 
       <div class="sidebar-footer">
@@ -160,7 +164,7 @@
             </div>
 
             <div class="detail-cell">
-              <p class="detail-key">Retry / Max Retry</p>
+              <p class="detail-key">Auto Retry / Max Retry</p>
               <p class="detail-val" id="modal-retry">—</p>
             </div>
 
@@ -469,13 +473,21 @@
             <p class="modal-tag">Job Pipeline</p>
             <h3>WORKFLOW</h3>
           </div>
-          <button class="btn-close" onclick="closeWorkflowModal()" aria-label="Close">✕</button>
+          <button
+            class="btn-close"
+            onclick="closeWorkflowModal()"
+            aria-label="Close"
+          >
+            ✕
+          </button>
         </div>
         <div class="modal-body">
           <div id="workflow-viz-container"></div>
         </div>
         <div class="modal-footer">
-          <button class="btn-modal-close" onclick="closeWorkflowModal()">Close</button>
+          <button class="btn-modal-close" onclick="closeWorkflowModal()">
+            Close
+          </button>
         </div>
       </div>
     </div>

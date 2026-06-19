@@ -453,7 +453,7 @@
       <table>
         <thead>
           <tr>
-            <th>Job ID</th><th>Type</th><th>Status</th><th>Retry</th>
+            <th>Job ID</th><th>Type</th><th>Status</th><th>Auto Retry</th>
             <th>Scheduled At</th><th>Created At</th><th>Action</th>
           </tr>
         </thead>
