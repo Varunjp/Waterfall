@@ -58,12 +58,10 @@ func (w *WorkerConnection) WritePump() {
 			if !ok {
 				return
 			}
-			w.mu.Lock()
 			err := w.Stream.Send(msg)
 			if err != nil {
 				return
 			}
-			w.mu.Unlock()
 		}
 	}
 }
