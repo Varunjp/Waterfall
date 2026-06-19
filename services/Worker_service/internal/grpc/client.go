@@ -2,6 +2,7 @@ package grpcclient
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"sync"
 	"sync/atomic"
@@ -11,7 +12,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 )
 
@@ -39,8 +40,8 @@ type Client struct {
 }
 
 func NewGrpcClient(addr string,log *zap.Logger) (*Client,error) {
-	//conn, err := grpc.NewClient(addr,grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})))
-	conn, err := grpc.NewClient(addr,grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(addr,grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})))
+	//conn, err := grpc.NewClient(addr,grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil,err 
 	}
