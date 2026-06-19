@@ -48,22 +48,20 @@ func (w *WorkerConnection) DecrementJobs() {
 
 func (w *WorkerConnection) WritePump() {
 	defer w.Cancel()
-	w.mu.Lock()
 
 	for {
 		select {
 		case <-w.Ctx.Done():
+			w.mu.Unlock()
 			return
 		case msg, ok := <-w.SendQueue:
 			if !ok {
 				return
 			}
-
 			err := w.Stream.Send(msg)
 			if err != nil {
 				return
 			}
-			w.mu.Unlock()
 		}
 	}
 }
