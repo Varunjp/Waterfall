@@ -52,7 +52,6 @@ func (w *WorkerConnection) WritePump() {
 	for {
 		select {
 		case <-w.Ctx.Done():
-			w.mu.Unlock()
 			return
 		case msg, ok := <-w.SendQueue:
 			if !ok {
