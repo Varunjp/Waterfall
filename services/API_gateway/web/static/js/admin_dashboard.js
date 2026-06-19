@@ -635,5 +635,10 @@
   });
 
   /* ── Boot ─────────────────────────────────────────── */
-  overview();
+  // overview();
+  document.querySelector('.nav-btn[data-section="overview"]')?.classList.remove('active');
+  document.querySelector('.nav-btn[data-section="apps"]')?.classList.add('active');
+  $('topbar-title').textContent = 'APPS';
+  state.section = 'apps';
+  loadApps();
 })();
