@@ -45,7 +45,10 @@ func (r *OTPRepo) GetOTP(email string) (string, int, error) {
 		Attemps int    `json:"attempts"`
 	}
 
-	json.Unmarshal([]byte(val), &data)
+	if err := json.Unmarshal([]byte(val), &data); err != nil {
+		return "",0,err 
+	}
+
 	return data.Otp, data.Attemps, nil
 }
 
@@ -63,7 +66,9 @@ func (r *OTPRepo) IncrementAttempt(email string) error {
 		Attempts int    `json:"attempts"`
 	}
 
-	json.Unmarshal([]byte(val), &data)
+	if err := json.Unmarshal([]byte(val), &data); err != nil {
+		return err 
+	}
 
 	data.Attempts++
 

@@ -35,15 +35,21 @@ func (w *WorkerConnection) ActiveJobs() int32 {
 }
 
 func (w *WorkerConnection) IncrementJobs() {
+	defer w.mu.Unlock()
+	w.mu.Lock()
 	w.activeJobs.Add(1)
 }
 
 func (w *WorkerConnection) DecrementJobs() {
+	defer w.mu.Unlock()
+	w.mu.Lock()
 	w.activeJobs.Add(-1)
 }
 
 func (w *WorkerConnection) WritePump() {
+	defer w.mu.Unlock()
 	defer w.Cancel()
+	w.mu.Lock()
 
 	for {
 		select {

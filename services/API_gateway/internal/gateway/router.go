@@ -8,6 +8,7 @@ import (
 	"api_gateway/internal/proto/schedulerpb"
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -109,9 +110,11 @@ func customErrorHandler(
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
 
-	json.NewEncoder(w).Encode(map[string]string{
+	if err := json.NewEncoder(w).Encode(map[string]string{
 		"error": s.Message(),
-	})
+	}); err != nil {
+		log.Println("error :",err)
+	}
 }
 
 func headerMatcher(key string) (string, bool) {

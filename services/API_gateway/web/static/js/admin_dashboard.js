@@ -117,7 +117,8 @@
   function setArea(html) {
     const a = $('content-area');
     a.style.animation = 'none';
-    requestAnimationFrame(() => { a.style.animation = ''; a.innerHTML = html; });
+    a.innerHTML = html;
+    a.style.animation = '';
   }
 
   function paginationHtml(page, total, prevFn, nextFn) {
@@ -375,7 +376,7 @@
       <div id="plans-area"><div class="state-loading">Loading</div></div>`);
 
     try {
-      const res  = await fetch('/api/v1/plans', { headers: authH });
+      const res  = await fetch('/api/v1/admin/plans', { headers: authH });
       const data = await res.json();
       allPlans   = data.plans || [];
       renderPlans();
@@ -387,15 +388,46 @@
   function renderPlans() {
     if (!allPlans.length) { $('plans-area').innerHTML = '<div class="state-empty">No plans found</div>'; return; }
     $('plans-area').innerHTML = `<div class="admin-plans-grid">${
-      allPlans.map(p => `<div class="admin-plan-card">
-        <p class="admin-plan-name">${esc(p.planName)}</p>
-        <p class="admin-plan-price">${fmtMoney(p.planprice)} / mo</p>
-        <p class="admin-plan-limit">${Number(p.monthlyLimit).toLocaleString()} jobs / month</p>
-        <p class="admin-plan-id">${esc(p.planId)}</p>
-        <button class="btn-action-sm btn-amber" onclick="openPlanModal('${esc(p.planId)}')">Edit Plan</button>
-      </div>`).join('')
+      allPlans.map(p => {
+        const status = (p.status || 'active').toLowerCase();
+        const isActive = status === 'active';
+        return `<div class="admin-plan-card">
+        <div class="admin-plan-card-top">
+          <p class="admin-plan-name">${esc(p.name)}</p>
+          ${badge(status)}
+        </div>
+        <p class="admin-plan-price">${fmtMoney(p.price)} / mo</p>
+        <p class="admin-plan-limit">${Number(p.jobLimit).toLocaleString()} jobs / month</p>
+        <p class="admin-plan-id">${esc(p.planID)}</p>
+        <div class="action-cell">
+          <button class="btn-action-sm btn-amber" onclick="openPlanModal('${esc(p.planID)}')">Edit Plan</button>
+          ${isActive
+            ? `<button class="btn-action-sm btn-block" onclick="togglePlanStatus('${esc(p.planID)}','inactive',this)">Make Inactive</button>`
+            : `<button class="btn-action-sm btn-unblock" onclick="togglePlanStatus('${esc(p.planID)}','active',this)">Make Active</button>`}
+        </div>
+      </div>`;
+      }).join('')
     }</div>`;
   }
+
+  window.togglePlanStatus = async (planId, status, btn) => {
+    const orig = btn.textContent;
+    btn.disabled = true; btn.textContent = '…';
+    try {
+      const res  = await fetch(`/api/v1/admin/plans/${planId}/status`, {
+        method: 'PATCH',
+        headers: H,
+        body: JSON.stringify({ planID: planId, status }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
+      toast(`Plan marked ${status}`);
+      loadPlans();
+    } catch (err) {
+      toast(err.message || 'Failed to update plan status', 'error');
+      btn.disabled = false; btn.textContent = orig;
+    }
+  };
 
   window.openPlanModal = (planId) => {
     const plan = planId ? allPlans.find(p => p.planId === planId) : null;

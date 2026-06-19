@@ -47,6 +47,25 @@ func (uc *DashboardUsecase) ListJobs(ctx context.Context, status string, limit, 
 	return jobs, limit, err
 }
 
+func (uc *DashboardUsecase) ListAllJobs(ctx context.Context,status string, limit, offset int, startDate, endDate *time.Time) ([]domain.Job, int, error) {
+
+	if !isValidTime(startDate) {
+		startDate = nil
+	}
+
+	if !isValidTime(endDate) {
+		endDate = nil
+	}
+
+	jobs, limit, err := uc.jobs.ListAllJobs(ctx, status, limit, offset, startDate, endDate)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	return jobs,limit,err 
+} 
+
 func (uc *DashboardUsecase) ListFailedJobs(ctx context.Context, limit, offset int) ([]domain.Job, int, error) {
 	return uc.jobs.ListFailed(ctx, limit, offset)
 }

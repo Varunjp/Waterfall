@@ -64,12 +64,35 @@ func (h *AdminHandler) UpdatePlan(ctx context.Context, req *pb.UpdatePlanRequest
 	}, nil
 }
 
+func (h *AdminHandler) UpdatePlanStatus(ctx context.Context,req *pb.UpdatePlanStatusRequest) (*pb.UpdatePlanStatusResponse,error) {
+
+	plan,err := h.plan.UpdateStatusPlan(req.PlanID,req.Status)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	resp := &pb.Plan{
+		PlanID: plan.PlanID,
+		Name: plan.Name,
+		JobLimit: int32(plan.MonthlyJobLimit),
+		Price: plan.Price,
+		StripePriceID: plan.StripeID,
+		Status: plan.Status,
+	}
+
+	return &pb.UpdatePlanStatusResponse{
+		Plan: resp,
+	},nil 
+}
+
 func mapPlans(plans []*entities.Plan) *pb.ListPlanResponse {
 	resp := &pb.ListPlanResponse{}
 	for _, p := range plans {
 		resp.Plans = append(resp.Plans, &pb.Plan{
 			PlanID:   p.PlanID,
 			Name:     p.Name,
+			Status: p.Status,
 			JobLimit: int32(p.MonthlyJobLimit),
 			Price:    p.Price,
 		})

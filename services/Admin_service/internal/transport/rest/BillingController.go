@@ -68,7 +68,9 @@ func (c *BillingController) CreateCheckout(w http.ResponseWriter, r *http.Reques
 		CheckoutURL: url.CheckoutURL,
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.Println("response error :",err)
+	}
 }
 
 func (c *BillingController) StripeWebhook(w http.ResponseWriter, r *http.Request) {
@@ -106,8 +108,6 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter, r *http.Request
 		http.Error(w, "invalid signature", http.StatusBadRequest)
 		return
 	}
-
-	log.Println("stripe webhook event:", event.Type)
 
 	switch event.Type {
 	case "checkout.session.completed":
@@ -163,28 +163,41 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter, r *http.Request
 			return
 		}
 	case "invoice.payment_succeeded":
-		var invoice stripe.Invoice
-		if err := json.Unmarshal(event.Data.Raw, &invoice); err != nil {
+
+		var raw map[string]interface{}
+		
+		if err := json.Unmarshal(event.Data.Raw, &raw); err != nil {
 			log.Println("unmarshal error:", err)
 			break
 		}
 
-		if invoice.Subscription == nil {
-			log.Println("subscription missing in invoice")
+		if raw["billin_reason"] == "subscription_create" {
+			log.Println("skipping initial invoice, already handled by checkout.session.completed")
+        	break
+		}
+
+		subscriptionID := ""
+		if parent, ok := raw["parent"].(map[string]interface{}); ok {
+			if subDetails, ok := parent["subscription_details"].(map[string]interface{}); ok {
+				subscriptionID, _ = subDetails["subscription"].(string)
+			}
+		}
+
+
+		invoiceNumber,_ := raw["number"].(string)
+		amountPaid,_:= raw["amount_paid"].(float64)
+
+		if subscriptionID == "" {
+			log.Println("could not extract subscription ID from invoice")
 			break
 		}
 
-		// subscriptionID := invoice.Subscription.ID
+		err := c.service.SendInvoicePdf(context.Background(),subscriptionID,invoiceNumber,amountPaid)
 
-		// err := c.service.HandlePaymentSuccess(
-		// 	context.Background(),
-		// 	subscriptionID,
-		// 	"",
-		// )
-
-		// if err != nil {
-		// 	log.Println("service error:", err)
-		// }
+		if err != nil {
+			log.Println("failed to send invoice pdf :",err)
+			break 
+		}
 
 	case "invoice.payment_failed":
 
@@ -275,5 +288,8 @@ func (c *BillingController) GetSubscription(
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(subscription)
+	if err := json.NewEncoder(w).Encode(subscription); err != nil{
+		http.Error(w,err.Error(),http.StatusInternalServerError)
+		return 
+	}
 }

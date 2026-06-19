@@ -57,6 +57,28 @@ func (h *AppUserHandler) ListUsers(ctx context.Context, req *pb.ListUsersRequest
 	return &pb.ListUsersResponse{Users: res}, nil
 }
 
+func (h *AppUserHandler) ListAppUsers(ctx context.Context, req *pb.ListAppUserRequest)(*pb.ListAppUserResponse,error) {
+
+	appID := req.AppId
+
+	users,err := h.usecase.List(appID)
+	if err != nil {
+		return nil, err
+	}
+
+	var res []*pb.AppUser
+	for _, u := range users {
+		res = append(res, &pb.AppUser{
+			Id:     u.ID,
+			Email:  u.Email,
+			Role:   u.Role,
+			Status: u.Status,
+		})
+	}
+
+	return &pb.ListAppUserResponse{Users: res},nil 
+}
+
 func (h *AppUserHandler) AppLogin(ctx context.Context, req *pb.AppLoginRequest) (*pb.AppLoginResponse, error) {
 	token, err := h.usecase.AppLogin(req.Email, req.Password)
 	if err != nil {

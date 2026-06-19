@@ -2,6 +2,7 @@ package service
 
 import (
 	"admin_service/internal/domain/entities"
+	"admin_service/internal/pkg/utils"
 	"admin_service/internal/repository/interfaces"
 	"context"
 	"errors"
@@ -18,6 +19,7 @@ type BillingService struct {
 	repo  interfaces.BillingRepository
 	cfg   Config
 	redis *redis.Client
+	mailer  *utils.Mailer
 }
 
 type Config struct {
@@ -42,11 +44,12 @@ func NewBillingService(r interfaces.BillingRepository, c struct {
 		SuccessURL string
 		CancelURL  string
 	}
-}, rd *redis.Client) *BillingService {
+}, rd *redis.Client, mail *utils.Mailer) *BillingService {
 	return &BillingService{
 		repo:  r,
 		cfg:   c,
 		redis: rd,
+		mailer: mail,
 	}
 }
 
@@ -210,6 +213,34 @@ func (s *BillingService) HandlePaymentSuccess(
 	}
 
 	return nil
+}
+
+func (s *BillingService) SendInvoicePdf(ctx context.Context,subscriptionID, invoiceNumber string, totalPaid float64) error {
+
+	amount := totalPaid / 100
+
+	data,err := s.repo.GetSubscriptionDetails(ctx,subscriptionID)
+
+	if err != nil {
+		return err 
+	}
+
+	data.InvoiceNumber = invoiceNumber
+	data.TotalPaid = amount
+
+	pdf,err := utils.GeneratePDF(*data)
+
+	if err != nil {
+		return err 
+	}
+
+	err = s.mailer.SendInvoicePdf(data.UserEmail,data,pdf)
+	
+	if err != nil {
+		return err
+	}
+
+	return nil 
 }
 
 func (s *BillingService) HandlePaymentFailure(

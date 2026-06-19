@@ -87,6 +87,74 @@ func (r *jobRepo) ListByApp(ctx context.Context, appID, status string, limit, of
 	return jobs, total, nil
 }
 
+func (r *jobRepo) ListAllJobs(ctx context.Context, status string, limit, offset int, startDate, endDate *time.Time) ([]domain.Job,int,error) {
+	baseQuery := `FROM jobs WHERE 1=1`
+	args := []any{}
+	argPos := 1
+
+	// -------- STATUS FILTER --------
+	if status != "" {
+		baseQuery += fmt.Sprintf(" AND status = $%d", argPos)
+		args = append(args, strings.ToUpper(status))
+		argPos++
+	}
+
+	// -------- DATE FILTER --------
+	if startDate != nil && endDate != nil {
+		baseQuery += fmt.Sprintf(" AND created_at BETWEEN $%d AND $%d", argPos, argPos+1)
+		args = append(args, *startDate, *endDate)
+		argPos += 2
+
+	} else if startDate != nil {
+		baseQuery += fmt.Sprintf(" AND created_at >= $%d", argPos)
+		args = append(args, *startDate)
+		argPos++
+
+	} else if endDate != nil {
+		baseQuery += fmt.Sprintf(" AND created_at <= $%d", argPos)
+		args = append(args, *endDate)
+		argPos++
+	}
+
+	// -------- COUNT QUERY --------
+	countQuery := "SELECT COUNT(*) " + baseQuery
+
+	var total int
+	err := r.db.QueryRow(ctx, countQuery, args...).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// -------- DATA QUERY --------
+	dataQuery := `
+	SELECT job_id, app_id, type, payload, status, retry, max_retry,
+	       schedule_at, created_at, updated_at, manual_retry
+	` + baseQuery +
+		fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", argPos, argPos+1)
+
+	dataArgs := append(args, limit, offset)
+
+	rows, err := r.db.Query(ctx, dataQuery, dataArgs...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var jobs []domain.Job
+	for rows.Next() {
+		var j domain.Job
+		if err := rows.Scan(
+			&j.JobID, &j.AppID, &j.Type, &j.Payload,
+			&j.Status, &j.Retry, &j.MaxRetry,
+			&j.ScheduledAt, &j.CreatedAt, &j.UpdatedAt, &j.ManualRetry,
+		); err != nil {
+			return nil, 0, err
+		}
+		jobs = append(jobs, j)
+	}
+	return jobs, total, nil
+}
+
 func (r *jobRepo) ListFailed(ctx context.Context, limit, offset int) ([]domain.Job, int, error) {
 
 	totalQuery := `SELECT COUNT(*) FROM jobs WHERE status = 'FAILED' OR status = 'DQL';`

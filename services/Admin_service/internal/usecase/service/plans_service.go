@@ -5,6 +5,7 @@ import (
 	"admin_service/internal/pkg/validation"
 	repo "admin_service/internal/repository/interfaces"
 	"errors"
+	"log"
 	"strings"
 )
 
@@ -73,4 +74,26 @@ func (s *PlanService) UpdatePlans(planId, name string, jobLimit int, price float
 	}
 
 	return s.repo.UpdatePlan(updatePlan)
+}
+
+func (s *PlanService) UpdateStatusPlan(planID, status string) (*entities.Plan,error) {
+
+	if planID == "" {
+		return nil,errors.New("require a valid planID")
+	}
+
+	if status == "" {
+		return nil, errors.New("require proper status to update plan status")
+	}
+
+	status = strings.ToUpper(status)
+
+	plan,err := s.repo.UpdatePlanStatus(planID,status)
+
+	if err != nil {
+		log.Println("error :",err)
+		return nil,err 
+	}
+
+	return plan,nil 
 }

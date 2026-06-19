@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AdminService_Login_FullMethodName      = "/admin.AdminService/Login"
-	AdminService_CreatePlan_FullMethodName = "/admin.AdminService/CreatePlan"
-	AdminService_ListPlans_FullMethodName  = "/admin.AdminService/ListPlans"
-	AdminService_UpdatePlan_FullMethodName = "/admin.AdminService/UpdatePlan"
+	AdminService_Login_FullMethodName            = "/admin.AdminService/Login"
+	AdminService_CreatePlan_FullMethodName       = "/admin.AdminService/CreatePlan"
+	AdminService_ListPlans_FullMethodName        = "/admin.AdminService/ListPlans"
+	AdminService_UpdatePlan_FullMethodName       = "/admin.AdminService/UpdatePlan"
+	AdminService_UpdatePlanStatus_FullMethodName = "/admin.AdminService/UpdatePlanStatus"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -33,6 +34,7 @@ type AdminServiceClient interface {
 	CreatePlan(ctx context.Context, in *CreatePlanRequest, opts ...grpc.CallOption) (*CreatePlanResponse, error)
 	ListPlans(ctx context.Context, in *ListPlanRequest, opts ...grpc.CallOption) (*ListPlanResponse, error)
 	UpdatePlan(ctx context.Context, in *UpdatePlanRequest, opts ...grpc.CallOption) (*UpdatePlanResponse, error)
+	UpdatePlanStatus(ctx context.Context, in *UpdatePlanStatusRequest, opts ...grpc.CallOption) (*UpdatePlanStatusResponse, error)
 }
 
 type adminServiceClient struct {
@@ -83,6 +85,16 @@ func (c *adminServiceClient) UpdatePlan(ctx context.Context, in *UpdatePlanReque
 	return out, nil
 }
 
+func (c *adminServiceClient) UpdatePlanStatus(ctx context.Context, in *UpdatePlanStatusRequest, opts ...grpc.CallOption) (*UpdatePlanStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdatePlanStatusResponse)
+	err := c.cc.Invoke(ctx, AdminService_UpdatePlanStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServiceServer is the server API for AdminService service.
 // All implementations must embed UnimplementedAdminServiceServer
 // for forward compatibility.
@@ -91,6 +103,7 @@ type AdminServiceServer interface {
 	CreatePlan(context.Context, *CreatePlanRequest) (*CreatePlanResponse, error)
 	ListPlans(context.Context, *ListPlanRequest) (*ListPlanResponse, error)
 	UpdatePlan(context.Context, *UpdatePlanRequest) (*UpdatePlanResponse, error)
+	UpdatePlanStatus(context.Context, *UpdatePlanStatusRequest) (*UpdatePlanStatusResponse, error)
 	mustEmbedUnimplementedAdminServiceServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedAdminServiceServer) ListPlans(context.Context, *ListPlanReque
 }
 func (UnimplementedAdminServiceServer) UpdatePlan(context.Context, *UpdatePlanRequest) (*UpdatePlanResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdatePlan not implemented")
+}
+func (UnimplementedAdminServiceServer) UpdatePlanStatus(context.Context, *UpdatePlanStatusRequest) (*UpdatePlanStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdatePlanStatus not implemented")
 }
 func (UnimplementedAdminServiceServer) mustEmbedUnimplementedAdminServiceServer() {}
 func (UnimplementedAdminServiceServer) testEmbeddedByValue()                      {}
@@ -206,6 +222,24 @@ func _AdminService_UpdatePlan_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_UpdatePlanStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePlanStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).UpdatePlanStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_UpdatePlanStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).UpdatePlanStatus(ctx, req.(*UpdatePlanStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +262,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdatePlan",
 			Handler:    _AdminService_UpdatePlan_Handler,
+		},
+		{
+			MethodName: "UpdatePlanStatus",
+			Handler:    _AdminService_UpdatePlanStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

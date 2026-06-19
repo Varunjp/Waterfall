@@ -33,6 +33,13 @@ service AdminService {
             body: "*"
         };
     }
+
+    rpc UpdatePlanStatus(UpdatePlanStatusRequest) returns(UpdatePlanStatusResponse) {
+        option (google.api.http) = {
+            patch: "/api/v1/admin/plans/{planID}/status"
+            body:"*"
+        };
+    }
 }
 
 message LoginRequest {
@@ -63,6 +70,7 @@ message Plan {
     int32  jobLimit = 3;
     double price = 4;
     string stripePriceID = 5;
+    string status = 6;
 }
 
 message ListPlanResponse {
@@ -79,4 +87,13 @@ message UpdatePlanRequest {
 
 message UpdatePlanResponse {
     Plan updatedPlan = 1;
+}
+
+message UpdatePlanStatusRequest {
+    string planID = 1;
+    string status = 2;
+}
+
+message UpdatePlanStatusResponse {
+    Plan plan = 1;
 }

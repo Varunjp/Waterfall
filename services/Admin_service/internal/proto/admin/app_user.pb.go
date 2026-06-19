@@ -495,6 +495,50 @@ func (*ListUsersRequest) Descriptor() ([]byte, []int) {
 	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{9}
 }
 
+type ListAppUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppId         string                 `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAppUserRequest) Reset() {
+	*x = ListAppUserRequest{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAppUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAppUserRequest) ProtoMessage() {}
+
+func (x *ListAppUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAppUserRequest.ProtoReflect.Descriptor instead.
+func (*ListAppUserRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListAppUserRequest) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
 type AppUser struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -507,7 +551,7 @@ type AppUser struct {
 
 func (x *AppUser) Reset() {
 	*x = AppUser{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[10]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -519,7 +563,7 @@ func (x *AppUser) String() string {
 func (*AppUser) ProtoMessage() {}
 
 func (x *AppUser) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[10]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -532,7 +576,7 @@ func (x *AppUser) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppUser.ProtoReflect.Descriptor instead.
 func (*AppUser) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{10}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *AppUser) GetId() string {
@@ -572,7 +616,7 @@ type ListUsersResponse struct {
 
 func (x *ListUsersResponse) Reset() {
 	*x = ListUsersResponse{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[11]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -584,7 +628,7 @@ func (x *ListUsersResponse) String() string {
 func (*ListUsersResponse) ProtoMessage() {}
 
 func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[11]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -597,10 +641,54 @@ func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
 func (*ListUsersResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{11}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ListUsersResponse) GetUsers() []*AppUser {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
+type ListAppUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Users         []*AppUser             `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAppUserResponse) Reset() {
+	*x = ListAppUserResponse{}
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAppUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAppUserResponse) ProtoMessage() {}
+
+func (x *ListAppUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAppUserResponse.ProtoReflect.Descriptor instead.
+func (*ListAppUserResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ListAppUserResponse) GetUsers() []*AppUser {
 	if x != nil {
 		return x.Users
 	}
@@ -615,7 +703,7 @@ type ListPlansRequest struct {
 
 func (x *ListPlansRequest) Reset() {
 	*x = ListPlansRequest{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[12]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -627,7 +715,7 @@ func (x *ListPlansRequest) String() string {
 func (*ListPlansRequest) ProtoMessage() {}
 
 func (x *ListPlansRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[12]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -640,7 +728,7 @@ func (x *ListPlansRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPlansRequest.ProtoReflect.Descriptor instead.
 func (*ListPlansRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{12}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{14}
 }
 
 type UserPlan struct {
@@ -655,7 +743,7 @@ type UserPlan struct {
 
 func (x *UserPlan) Reset() {
 	*x = UserPlan{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[13]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -667,7 +755,7 @@ func (x *UserPlan) String() string {
 func (*UserPlan) ProtoMessage() {}
 
 func (x *UserPlan) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[13]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -680,7 +768,7 @@ func (x *UserPlan) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserPlan.ProtoReflect.Descriptor instead.
 func (*UserPlan) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{13}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *UserPlan) GetPlanId() string {
@@ -720,7 +808,7 @@ type ListPlansResponse struct {
 
 func (x *ListPlansResponse) Reset() {
 	*x = ListPlansResponse{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[14]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -732,7 +820,7 @@ func (x *ListPlansResponse) String() string {
 func (*ListPlansResponse) ProtoMessage() {}
 
 func (x *ListPlansResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[14]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -745,7 +833,7 @@ func (x *ListPlansResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPlansResponse.ProtoReflect.Descriptor instead.
 func (*ListPlansResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{14}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ListPlansResponse) GetPlans() []*UserPlan {
@@ -765,7 +853,7 @@ type UpdateUserStatusRequest struct {
 
 func (x *UpdateUserStatusRequest) Reset() {
 	*x = UpdateUserStatusRequest{}
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[15]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -777,7 +865,7 @@ func (x *UpdateUserStatusRequest) String() string {
 func (*UpdateUserStatusRequest) ProtoMessage() {}
 
 func (x *UpdateUserStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_admin_app_user_proto_msgTypes[15]
+	mi := &file_internal_proto_admin_app_user_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -790,7 +878,7 @@ func (x *UpdateUserStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserStatusRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserStatusRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{15}
+	return file_internal_proto_admin_app_user_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *UpdateUserStatusRequest) GetUserId() string {
@@ -837,13 +925,17 @@ const file_internal_proto_admin_app_user_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
 	"\x04role\x18\x03 \x01(\tR\x04role\"\x12\n" +
-	"\x10ListUsersRequest\"[\n" +
+	"\x10ListUsersRequest\"+\n" +
+	"\x12ListAppUserRequest\x12\x15\n" +
+	"\x06app_id\x18\x01 \x01(\tR\x05appId\"[\n" +
 	"\aAppUser\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x12\n" +
 	"\x04role\x18\x03 \x01(\tR\x04role\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\tR\x06status\"9\n" +
 	"\x11ListUsersResponse\x12$\n" +
+	"\x05users\x18\x01 \x03(\v2\x0e.admin.AppUserR\x05users\";\n" +
+	"\x13ListAppUserResponse\x12$\n" +
 	"\x05users\x18\x01 \x03(\v2\x0e.admin.AppUserR\x05users\"\x12\n" +
 	"\x10ListPlansRequest\"\x81\x01\n" +
 	"\bUserPlan\x12\x17\n" +
@@ -855,11 +947,12 @@ const file_internal_proto_admin_app_user_proto_rawDesc = "" +
 	"\x05plans\x18\x01 \x03(\v2\x0f.admin.UserPlanR\x05plans\"J\n" +
 	"\x17UpdateUserStatusRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status2\x8c\a\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status2\xf8\a\n" +
 	"\x0eAppUserService\x12X\n" +
 	"\n" +
 	"CreateUser\x12\x18.admin.CreateUserRequest\x1a\x16.google.protobuf.Empty\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/users\x12U\n" +
-	"\tListUsers\x12\x17.admin.ListUsersRequest\x1a\x18.admin.ListUsersResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/users\x12[\n" +
+	"\tListUsers\x12\x17.admin.ListUsersRequest\x1a\x18.admin.ListUsersResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/users\x12j\n" +
+	"\fListAppUsers\x12\x19.admin.ListAppUserRequest\x1a\x1a.admin.ListAppUserResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/apps/{app_id}/users\x12[\n" +
 	"\bAppLogin\x12\x16.admin.AppLoginRequest\x1a\x17.admin.AppLoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/users/login\x12U\n" +
 	"\tListPlans\x12\x17.admin.ListPlansRequest\x1a\x18.admin.ListPlansResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/plans\x12\x90\x01\n" +
 	"\x14RequestResetPassword\x12\".admin.RequestResetPasswordRequest\x1a#.admin.RequestResetPasswordResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/users/password/reset/request\x12\x95\x01\n" +
@@ -879,7 +972,7 @@ func file_internal_proto_admin_app_user_proto_rawDescGZIP() []byte {
 	return file_internal_proto_admin_app_user_proto_rawDescData
 }
 
-var file_internal_proto_admin_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_internal_proto_admin_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_internal_proto_admin_app_user_proto_goTypes = []any{
 	(*AppLoginRequest)(nil),                // 0: admin.AppLoginRequest
 	(*AppLoginResponse)(nil),               // 1: admin.AppLoginResponse
@@ -891,38 +984,43 @@ var file_internal_proto_admin_app_user_proto_goTypes = []any{
 	(*ResetPasswordResponse)(nil),          // 7: admin.ResetPasswordResponse
 	(*CreateUserRequest)(nil),              // 8: admin.CreateUserRequest
 	(*ListUsersRequest)(nil),               // 9: admin.ListUsersRequest
-	(*AppUser)(nil),                        // 10: admin.AppUser
-	(*ListUsersResponse)(nil),              // 11: admin.ListUsersResponse
-	(*ListPlansRequest)(nil),               // 12: admin.ListPlansRequest
-	(*UserPlan)(nil),                       // 13: admin.UserPlan
-	(*ListPlansResponse)(nil),              // 14: admin.ListPlansResponse
-	(*UpdateUserStatusRequest)(nil),        // 15: admin.UpdateUserStatusRequest
-	(*emptypb.Empty)(nil),                  // 16: google.protobuf.Empty
+	(*ListAppUserRequest)(nil),             // 10: admin.ListAppUserRequest
+	(*AppUser)(nil),                        // 11: admin.AppUser
+	(*ListUsersResponse)(nil),              // 12: admin.ListUsersResponse
+	(*ListAppUserResponse)(nil),            // 13: admin.ListAppUserResponse
+	(*ListPlansRequest)(nil),               // 14: admin.ListPlansRequest
+	(*UserPlan)(nil),                       // 15: admin.UserPlan
+	(*ListPlansResponse)(nil),              // 16: admin.ListPlansResponse
+	(*UpdateUserStatusRequest)(nil),        // 17: admin.UpdateUserStatusRequest
+	(*emptypb.Empty)(nil),                  // 18: google.protobuf.Empty
 }
 var file_internal_proto_admin_app_user_proto_depIdxs = []int32{
-	10, // 0: admin.ListUsersResponse.users:type_name -> admin.AppUser
-	13, // 1: admin.ListPlansResponse.plans:type_name -> admin.UserPlan
-	8,  // 2: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
-	9,  // 3: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
-	0,  // 4: admin.AppUserService.AppLogin:input_type -> admin.AppLoginRequest
-	12, // 5: admin.AppUserService.ListPlans:input_type -> admin.ListPlansRequest
-	2,  // 6: admin.AppUserService.RequestResetPassword:input_type -> admin.RequestResetPasswordRequest
-	4,  // 7: admin.AppUserService.VerifyPasswordResetOtp:input_type -> admin.VerifyPasswordResetOtpRequest
-	6,  // 8: admin.AppUserService.ResetPassword:input_type -> admin.ResetPasswordRequest
-	15, // 9: admin.AppUserService.UpdateUserStatus:input_type -> admin.UpdateUserStatusRequest
-	16, // 10: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
-	11, // 11: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
-	1,  // 12: admin.AppUserService.AppLogin:output_type -> admin.AppLoginResponse
-	14, // 13: admin.AppUserService.ListPlans:output_type -> admin.ListPlansResponse
-	3,  // 14: admin.AppUserService.RequestResetPassword:output_type -> admin.RequestResetPasswordResponse
-	5,  // 15: admin.AppUserService.VerifyPasswordResetOtp:output_type -> admin.VerifyPasswordResetOtpResponse
-	7,  // 16: admin.AppUserService.ResetPassword:output_type -> admin.ResetPasswordResponse
-	16, // 17: admin.AppUserService.UpdateUserStatus:output_type -> google.protobuf.Empty
-	10, // [10:18] is the sub-list for method output_type
-	2,  // [2:10] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	11, // 0: admin.ListUsersResponse.users:type_name -> admin.AppUser
+	11, // 1: admin.ListAppUserResponse.users:type_name -> admin.AppUser
+	15, // 2: admin.ListPlansResponse.plans:type_name -> admin.UserPlan
+	8,  // 3: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
+	9,  // 4: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
+	10, // 5: admin.AppUserService.ListAppUsers:input_type -> admin.ListAppUserRequest
+	0,  // 6: admin.AppUserService.AppLogin:input_type -> admin.AppLoginRequest
+	14, // 7: admin.AppUserService.ListPlans:input_type -> admin.ListPlansRequest
+	2,  // 8: admin.AppUserService.RequestResetPassword:input_type -> admin.RequestResetPasswordRequest
+	4,  // 9: admin.AppUserService.VerifyPasswordResetOtp:input_type -> admin.VerifyPasswordResetOtpRequest
+	6,  // 10: admin.AppUserService.ResetPassword:input_type -> admin.ResetPasswordRequest
+	17, // 11: admin.AppUserService.UpdateUserStatus:input_type -> admin.UpdateUserStatusRequest
+	18, // 12: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
+	12, // 13: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
+	13, // 14: admin.AppUserService.ListAppUsers:output_type -> admin.ListAppUserResponse
+	1,  // 15: admin.AppUserService.AppLogin:output_type -> admin.AppLoginResponse
+	16, // 16: admin.AppUserService.ListPlans:output_type -> admin.ListPlansResponse
+	3,  // 17: admin.AppUserService.RequestResetPassword:output_type -> admin.RequestResetPasswordResponse
+	5,  // 18: admin.AppUserService.VerifyPasswordResetOtp:output_type -> admin.VerifyPasswordResetOtpResponse
+	7,  // 19: admin.AppUserService.ResetPassword:output_type -> admin.ResetPasswordResponse
+	18, // 20: admin.AppUserService.UpdateUserStatus:output_type -> google.protobuf.Empty
+	12, // [12:21] is the sub-list for method output_type
+	3,  // [3:12] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_internal_proto_admin_app_user_proto_init() }
@@ -936,7 +1034,7 @@ func file_internal_proto_admin_app_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_app_user_proto_rawDesc), len(file_internal_proto_admin_app_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

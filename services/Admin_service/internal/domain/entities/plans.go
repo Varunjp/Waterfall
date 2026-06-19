@@ -8,5 +8,6 @@ type Plan struct {
 	MonthlyJobLimit int
 	Price           float64
 	StripeID        string
+	Status 			string 
 	CreatedAt       time.Time
 }
