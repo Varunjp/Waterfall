@@ -1,0 +1,1369 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Docs — Waterfall</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,200;0,300;0,400;0,500;1,300&family=DM+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --black: #080808;
+        --surface: #0e0e0e;
+        --surface-2: #141414;
+        --surface-3: #1c1c1c;
+        --white: #f2f2ec;
+        --gray-light: #d8d8d2;
+        --gray-mid: #6e6e68;
+        --gray-dim: #333330;
+        --border: rgba(242, 242, 236, 0.07);
+        --border-hi: rgba(242, 242, 236, 0.16);
+        --accent: #a8f0b8;
+        --accent-2: #a8d4f0;
+        --accent-red: #f0a8a8;
+        --accent-amb: #f0e6a8;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--black);
+        color: var(--white);
+        font-family: "DM Sans", sans-serif;
+        font-weight: 300;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--border) 1px, transparent 1px),
+          linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size: 72px 72px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      a {
+        color: inherit;
+      }
+      code {
+        font-family: "DM Mono", monospace;
+      }
+
+      /* ── NAV ── */
+      nav.topnav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 48px;
+        height: 68px;
+        background: rgba(8, 8, 8, 0.85);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-brand {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        text-decoration: none;
+      }
+      .nav-brand-label {
+        font-size: 9px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--gray-mid);
+      }
+      .nav-brand-name {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 22px;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        color: var(--white);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+      .nav-links a {
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--gray-mid);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover,
+      .nav-links a.active {
+        color: var(--white);
+      }
+
+      .nav-cta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn-ghost {
+        padding: 8px 22px;
+        background: none;
+        border: 1px solid var(--border-hi);
+        color: var(--white);
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 14px;
+        letter-spacing: 0.14em;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: inline-block;
+      }
+      .btn-ghost:hover {
+        background: rgba(242, 242, 236, 0.06);
+      }
+      .btn-primary {
+        padding: 8px 22px;
+        background: var(--white);
+        border: 1px solid var(--white);
+        color: var(--black);
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 14px;
+        letter-spacing: 0.14em;
+        text-decoration: none;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        display: inline-block;
+      }
+      .btn-primary:hover {
+        opacity: 0.85;
+      }
+
+      /* ── DOCS LAYOUT ── */
+      .docs-shell {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 264px 1fr;
+        max-width: 1320px;
+        margin: 0 auto;
+        padding-top: 68px;
+      }
+
+      /* Sidebar */
+      .docs-sidebar {
+        position: sticky;
+        top: 68px;
+        height: calc(100vh - 68px);
+        overflow-y: auto;
+        padding: 40px 28px 40px 48px;
+        border-right: 1px solid var(--border);
+      }
+
+      .docs-sidebar::-webkit-scrollbar {
+        width: 3px;
+      }
+      .docs-sidebar::-webkit-scrollbar-thumb {
+        background: var(--gray-dim);
+      }
+
+      .side-group {
+        margin-bottom: 30px;
+      }
+      .side-group-label {
+        font-size: 9px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--gray-dim);
+        margin-bottom: 12px;
+      }
+      .side-link {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 6px 0;
+        font-size: 12.5px;
+        letter-spacing: 0.02em;
+        color: var(--gray-mid);
+        text-decoration: none;
+        border-left: 1px solid transparent;
+        padding-left: 12px;
+        margin-left: -13px;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .side-link:hover {
+        color: var(--gray-light);
+      }
+      .side-link.active {
+        color: var(--white);
+        border-left-color: var(--accent);
+      }
+      .side-link .tag {
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        color: var(--gray-dim);
+      }
+
+      /* Content */
+      .docs-content {
+        padding: 56px 56px 160px 56px;
+        max-width: 880px;
+      }
+
+      .docs-kicker {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .docs-kicker-line {
+        width: 32px;
+        height: 1px;
+        background: var(--gray-mid);
+      }
+      .docs-kicker-text {
+        font-size: 10px;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        color: var(--gray-mid);
+      }
+
+      .docs-h1 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(48px, 6vw, 76px);
+        letter-spacing: 0.03em;
+        line-height: 0.92;
+        margin-bottom: 18px;
+      }
+
+      .docs-lede {
+        font-size: 15.5px;
+        line-height: 1.85;
+        color: var(--gray-mid);
+        max-width: 620px;
+        margin-bottom: 56px;
+        font-weight: 300;
+      }
+
+      .doc-section {
+        padding-top: 84px;
+        margin-top: -68px;
+      }
+      .doc-section:first-of-type {
+        padding-top: 0;
+        margin-top: 0;
+      }
+
+      .doc-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      .doc-eyebrow-num {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--gray-dim);
+        letter-spacing: 0.06em;
+      }
+      .doc-eyebrow-text {
+        font-size: 9px;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        color: var(--gray-mid);
+      }
+
+      .doc-h2 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(30px, 4vw, 42px);
+        letter-spacing: 0.03em;
+        line-height: 1;
+        margin-bottom: 18px;
+      }
+
+      .doc-p {
+        font-size: 14.5px;
+        line-height: 1.85;
+        color: var(--gray-light);
+        font-weight: 300;
+        margin-bottom: 18px;
+        max-width: 680px;
+      }
+      .doc-p.dim {
+        color: var(--gray-mid);
+      }
+
+      .doc-p code,
+      .doc-p-inline {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        padding: 2px 7px;
+        font-size: 12.5px;
+        color: var(--accent-2);
+        border-radius: 2px;
+      }
+
+      .step-list {
+        counter-reset: step;
+        margin: 28px 0 36px;
+      }
+      .step-item {
+        display: flex;
+        gap: 20px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .step-item:first-child {
+        padding-top: 0;
+      }
+      .step-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .step-mark {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--border-hi);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--accent);
+        margin-top: 2px;
+      }
+      .step-item h4 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 16px;
+        letter-spacing: 0.05em;
+        color: var(--white);
+        margin-bottom: 6px;
+      }
+      .step-item p {
+        font-size: 13px;
+        line-height: 1.75;
+        color: var(--gray-mid);
+      }
+
+      /* Code panel — reused from landing page */
+      .code-panel {
+        background: var(--black);
+        border: 1px solid var(--border-hi);
+        position: relative;
+        margin: 22px 0 30px;
+      }
+      .code-panel::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(242, 242, 236, 0.3),
+          transparent
+        );
+      }
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 18px;
+        border-bottom: 1px solid var(--border);
+      }
+      .code-dots {
+        display: flex;
+        gap: 7px;
+      }
+      .code-dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--gray-dim);
+      }
+      .code-lang {
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--gray-mid);
+      }
+      .code-copy {
+        background: none;
+        border: 1px solid var(--border-hi);
+        color: var(--gray-mid);
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        cursor: pointer;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .code-copy:hover {
+        color: var(--white);
+        border-color: var(--border-hi);
+      }
+      .code-copy.copied {
+        color: var(--accent);
+        border-color: rgba(168, 240, 184, 0.3);
+      }
+
+      pre {
+        padding: 20px 20px 22px;
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        font-weight: 300;
+        line-height: 1.85;
+        color: var(--gray-light);
+        overflow-x: auto;
+      }
+      .code-comment {
+        color: var(--gray-dim);
+      }
+      .code-key {
+        color: var(--accent-2);
+      }
+      .code-str {
+        color: var(--accent);
+      }
+      .code-fn {
+        color: var(--accent-amb);
+      }
+      .code-num {
+        color: var(--accent-red);
+      }
+
+      /* Note / callout boxes */
+      .callout {
+        display: flex;
+        gap: 14px;
+        border: 1px solid var(--border-hi);
+        background: var(--surface);
+        padding: 18px 20px;
+        margin: 24px 0 30px;
+      }
+      .callout-icon {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 13px;
+        border: 1px solid currentColor;
+        border-radius: 50%;
+      }
+      .callout p {
+        font-size: 12.5px;
+        line-height: 1.75;
+        color: var(--gray-light);
+      }
+      .callout-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        margin-bottom: 4px;
+        display: block;
+      }
+      .callout.warn {
+        color: var(--accent-amb);
+      }
+      .callout.warn .callout-title {
+        color: var(--accent-amb);
+      }
+      .callout.info {
+        color: var(--accent-2);
+      }
+      .callout.info .callout-title {
+        color: var(--accent-2);
+      }
+      .callout.dev {
+        color: var(--accent-red);
+      }
+      .callout.dev .callout-title {
+        color: var(--accent-red);
+      }
+
+      /* Tables */
+      .doc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 22px 0 32px;
+        font-size: 12.5px;
+      }
+      .doc-table th {
+        text-align: left;
+        padding: 10px 14px;
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--gray-mid);
+        border-bottom: 1px solid var(--border-hi);
+      }
+      .doc-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        color: var(--gray-light);
+        vertical-align: top;
+      }
+      .doc-table td:first-child,
+      .doc-table th:first-child {
+        font-family: "DM Mono", monospace;
+        color: var(--accent-2);
+        white-space: nowrap;
+      }
+      .doc-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Field grid for proto messages */
+      .proto-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        margin: 24px 0 32px;
+      }
+      .proto-card {
+        background: var(--surface);
+        padding: 22px 24px;
+      }
+      .proto-card h4 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 16px;
+        letter-spacing: 0.05em;
+        color: var(--white);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .proto-card h4::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: var(--accent);
+        box-shadow: 0 0 5px var(--accent);
+      }
+      .proto-field {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-family: "DM Mono", monospace;
+        font-size: 11.5px;
+        padding: 5px 0;
+        color: var(--gray-mid);
+        border-bottom: 1px solid var(--border);
+      }
+      .proto-field:last-child {
+        border-bottom: none;
+      }
+      .proto-field b {
+        color: var(--gray-light);
+        font-weight: 400;
+      }
+
+      /* Status badges */
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        padding: 3px 10px;
+        border: 1px solid var(--border-hi);
+        text-transform: uppercase;
+      }
+      .pill.green {
+        color: var(--accent);
+        border-color: rgba(168, 240, 184, 0.3);
+        background: rgba(168, 240, 184, 0.06);
+      }
+      .pill.amber {
+        color: var(--accent-amb);
+        border-color: rgba(240, 230, 168, 0.3);
+        background: rgba(240, 230, 168, 0.06);
+      }
+
+      /* Download card */
+      .download-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid var(--border-hi);
+        background: var(--surface);
+        padding: 22px 26px;
+        margin: 24px 0 36px;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      .download-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .download-icon {
+        width: 40px;
+        height: 40px;
+        border: 1px solid var(--border-hi);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: var(--gray-mid);
+        flex-shrink: 0;
+      }
+      .download-name {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 17px;
+        letter-spacing: 0.04em;
+        color: var(--white);
+      }
+      .download-sub {
+        font-size: 11.5px;
+        color: var(--gray-mid);
+        margin-top: 3px;
+      }
+      .btn-download {
+        padding: 10px 24px;
+        background: var(--white);
+        border: 1px solid var(--white);
+        color: var(--black);
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.14em;
+        text-decoration: none;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        flex-shrink: 0;
+      }
+      .btn-download:hover {
+        opacity: 0.85;
+      }
+
+      /* Sub-nav chips for response codes etc */
+      .doc-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 56px 0;
+      }
+
+      .doc-footer-nav {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 40px;
+        border-top: 1px solid var(--border);
+        margin-top: 60px;
+      }
+      .doc-footer-nav a {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--gray-mid);
+        text-decoration: none;
+      }
+      .doc-footer-nav a:hover {
+        color: var(--white);
+      }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--gray-dim);
+      }
+
+      @media (max-width: 980px) {
+        .docs-shell {
+          grid-template-columns: 1fr;
+        }
+        .docs-sidebar {
+          position: relative;
+          height: auto;
+          top: 0;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+          padding: 28px 24px;
+        }
+        .docs-content {
+          padding: 40px 24px 120px;
+        }
+        .proto-grid {
+          grid-template-columns: 1fr;
+        }
+        nav.topnav {
+          padding: 0 24px;
+        }
+        .nav-links {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="topnav">
+      <a class="nav-brand" href="/">
+        <p class="nav-brand-label">Job Queue</p>
+        <p class="nav-brand-name">WATERFALL</p>
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/docs" class="active">Docs</a>
+      </div>
+      <div class="nav-cta">
+        <a class="btn-ghost" href="/login">Log in</a>
+        <a class="btn-primary" href="/register">Get Started</a>
+      </div>
+    </nav>
+
+    <div class="docs-shell">
+      <!-- ── SIDEBAR ── -->
+      <aside class="docs-sidebar">
+        <div class="side-group">
+          <p class="side-group-label">Start Here</p>
+          <a class="side-link" href="#quickstart">Quickstart</a>
+          <a class="side-link" href="#auth">App ID &amp; Auth</a>
+        </div>
+        <div class="side-group">
+          <p class="side-group-label">Jobs API</p>
+          <a class="side-link" href="#enqueue">Enqueue a Job</a>
+          <a class="side-link" href="#scheduling">Scheduled Jobs</a>
+          <a class="side-link" href="#response">Response Format</a>
+        </div>
+        <div class="side-group">
+          <p class="side-group-label">Workers</p>
+          <a class="side-link" href="#workers">Building a Worker</a>
+          <a class="side-link" href="#stream"
+            >JobStream <span class="tag">grpc</span></a
+          >
+          <a class="side-link" href="#runtime">Runtime &amp; Monitoring</a>
+        </div>
+        <div class="side-group">
+          <p class="side-group-label">SDKs</p>
+          <a class="side-link" href="#sdks"
+            >Go SDK <span class="tag">beta</span></a
+          >
+        </div>
+      </aside>
+
+      <!-- ── CONTENT ── -->
+      <main class="docs-content">
+        <div class="docs-kicker">
+          <div class="docs-kicker-line"></div>
+          <p class="docs-kicker-text">Documentation</p>
+        </div>
+        <h1 class="docs-h1">USING<br />WATERFALL</h1>
+        <p class="docs-lede">
+          Everything you need to enqueue jobs, schedule them for the future, and
+          connect your own workers to the queue over gRPC — with full visibility
+          into every run from the admin dashboard.
+        </p>
+
+        <!-- ════════ QUICKSTART ════════ -->
+        <section class="doc-section" id="quickstart">
+          <div class="doc-eyebrow">
+            <span class="doc-eyebrow-num">01</span
+            ><span class="doc-eyebrow-text">Getting Started</span>
+          </div>
+          <h2 class="doc-h2">CREATE AN ACCOUNT</h2>
+          <p class="doc-p">
+            Every job, worker, and metric in Waterfall is scoped to an
+            <strong>App</strong>. You'll create one account, get back a
+            permanent <code>app_id</code>, and use that ID on every request from
+            then on.
+          </p>
+
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-mark">1</div>
+              <div>
+                <h4>Register</h4>
+                <p>
+                  Sign up at
+                  <a href="/register" class="doc-p-inline">/register</a> with
+                  your email and a workspace name. No credit card required on
+                  the free tier.
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-mark">2</div>
+              <div>
+                <h4>Copy your App ID</h4>
+                <p>
+                  Your dashboard shows a generated <code>app_id</code> (a UUID)
+                  the moment your account is created. This identifies your app
+                  on every API call and every worker connection.
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-mark">3</div>
+              <div>
+                <h4>Store it safely</h4>
+                <p>
+                  Save it in your environment config or secrets manager. It
+                  cannot be recovered automatically from the dashboard later —
+                  only regenerated, which invalidates the old one.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout warn">
+            <div class="callout-icon">!</div>
+            <p>
+              <span class="callout-title">Save your App ID immediately</span> It
+              will not be shown again in full after you leave the account
+              creation screen. If you lose it, you'll need to connect
+              <strong>Waterfall Admin</strong>, for App ID recovery.
+            </p>
+          </div>
+        </section>
+
+        <section class="doc-section" id="auth">
+          <div class="doc-eyebrow">
+            <span class="doc-eyebrow-num">02</span
+            ><span class="doc-eyebrow-text">Identification</span>
+          </div>
+          <h2 class="doc-h2">APP ID &amp; AUTH</h2>
+          <p class="doc-p">
+            The Jobs API identifies your app via the <code>app_id</code> field
+            in the request body. The Admin Dashboard and account-level endpoints
+            instead use a bearer token, issued when you log in, and sent as an
+            <code>Authorization: Bearer &lt;token&gt;</code> header.
+          </p>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Credential</th>
+                <th>Used for</th>
+                <th>Where it goes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>app_id</td>
+                <td>Enqueuing jobs, worker registration</td>
+                <td>Request body field</td>
+              </tr>
+              <tr>
+                <td>admin_token</td>
+                <td>Dashboard, account &amp; plan management</td>
+                <td><code>Authorization</code> header</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- ════════ ENQUEUE ════════ -->
+        <section class="doc-section" id="enqueue">
+          <div class="doc-eyebrow">
+            <span class="doc-eyebrow-num">03</span
+            ><span class="doc-eyebrow-text">Jobs API</span>
+          </div>
+          <h2 class="doc-h2">ENQUEUE A JOB</h2>
+          <p class="doc-p">
+            Send a <code>POST</code> request to
+            <code>https://waterfall.varunjp.in/api/v1/jobs</code> with your
+            <code>app_id</code>, a job <code>type</code>, and a
+            <code>payload</code> string. The payload is opaque to Waterfall —
+            it's handed back to your worker exactly as you sent it, so encode it
+            however your worker expects (JSON-as-string is the common case).
+          </p>
+
+          <div class="code-panel">
+            <div class="code-header">
+              <div class="code-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="code-lang">HTTP · JSON</span>
+              <button class="code-copy" onclick="copyCode(this, 'enqueue')">
+                Copy
+              </button>
+            </div>
+            <pre
+              id="enqueue"
+            ><span class="code-fn">POST</span> https://waterfall.varunjp.in/api/v1/jobs
+<span class="code-key">Content-Type:</span> application/json
+
+{
+  <span class="code-key">"app_id"</span>: <span class="code-str">"2377843c-8e5f-413c-b276-faa78c90c16f"</span>,
+  <span class="code-key">"type"</span>: <span class="code-str">"email"</span>,
+  <span class="code-key">"payload"</span>: <span class="code-str">"{\"to\":\"test@mail.com\",\"body\":\"Hello\"}"</span>
+}</pre>
+          </div>
+
+          <p class="doc-p dim">
+            <code>type</code> is your own label — it's how Waterfall routes the
+            job to the workers registered to handle it (see
+            <a href="#workers" class="doc-p-inline">Building a Worker</a>). A
+            job with no matching worker type stays queued until one connects.
+          </p>
+        </section>
+
+        <section class="doc-section" id="scheduling">
+          <div class="doc-eyebrow">
+            <span class="doc-eyebrow-num">04</span
+            ><span class="doc-eyebrow-text">Jobs API</span>
+          </div>
+          <h2 class="doc-h2">SCHEDULE FOR LATER</h2>
+          <p class="doc-p">
+            Add a <code>schedule_at</code> field with an ISO-8601 UTC timestamp
+            to defer execution. The job sits in <code>SCHEDULED</code> status
+            until that moment, then moves to the ready queue for pickup — with
+            the same millisecond precision either way.
+          </p>
+
+          <div class="code-panel">
+            <div class="code-header">
+              <div class="code-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="code-lang">HTTP · JSON</span>
+              <button class="code-copy" onclick="copyCode(this, 'schedule')">
+                Copy
+              </button>
+            </div>
+            <pre
+              id="schedule"
+            ><span class="code-fn">POST</span> https://waterfall.varunjp.in/api/v1/jobs
+<span class="code-key">Content-Type:</span> application/json
+
+{
+  <span class="code-key">"app_id"</span>: <span class="code-str">"416668fb-2344-4f3d-9f26-7f1e64e248b8"</span>,
+  <span class="code-key">"type"</span>: <span class="code-str">"email"</span>,
+  <span class="code-key">"payload"</span>: <span class="code-str">"{\"to\":\"test@mail.com\",\"body\":\"Hello\"}"</span>,
+  <span class="code-key">"schedule_at"</span>: <span class="code-str">"2026-03-21T10:12:05.146Z"</span>
+}</pre>
+          </div>
+
+          <div class="callout info">
+            <div class="callout-icon">i</div>
+            <p>
+              <span class="callout-title">Timestamps are always UTC</span>
+              Convert local times before sending. The dashboard displays
+              scheduled and created times in your browser's local timezone, but
+              the wire format is always UTC.
+            </p>
+          </div>
+        </section>
+
+        <section class="doc-section" id="response">
+          <div class="doc-eyebrow">
+            <span class="doc-eyebrow-num">05</span
+            ><span class="doc-eyebrow-text">Jobs API</span>
+          </div>
+          <h2 class="doc-h2">RESPONSE FORMAT</h2>
+          <p class="doc-p">
+            Both calls above return the created job record, including the retry
+            budget assigned by your plan.
+          </p>
+
+          <div class="code-panel">
+            <div class="code-header">
+              <div class="code-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="code-lang">JSON</span>
+            </div>
+            <pre><span class="code-key">"jobId"</span>: <span class="code-str">"3f8a91d2-9b7e-4a31-8e0f-2a6c7d4b9e10"</span>,
+<span class="code-key">"status"</span>: <span class="code-str">"SCHEDULED"</span>,
+<span class="code-key">"retry"</span>: <span class="code-num">0</span>,
+<span class="code-key">"maxRetry"</span>: <span class="code-num">3</span></pre>
+          </div>
+
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>QUEUED</td>
+                <td>Ready immediately, waiting for a worker</td>
+              </tr>
+              <tr>
+                <td>SCHEDULED</td>
+                <td>Waiting for its <code>schedule_at</code> time</td>
+              </tr>
+              <tr>
+                <td>RUNNING</td>
+                <td>A worker has claimed it and is executing</td>
+              </tr>
+              <tr>
+                <td>COMPLETED</td>
+                <td>Finished successfully</td>
+              </tr>
+              <tr>
+                <td>FAILED</td>
+                <td>Exhausted all retries</td>
+              </tr>
+              <tr>
+                <td>CANCELLED</td>
+                <td>Cancelled before execution</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div class="doc-divider"></div>
+
+        <!-- ════════ WORKERS ════════ -->
+        <section class="doc-section" id="workers">
+          <div class="doc-eyebrow">
+            <span class="doc-eyebrow-num">06</span
+            ><span class="doc-eyebrow-text">Workers</span>
+          </div>
+          <h2 class="doc-h2">BUILDING A WORKER</h2>
+          <p class="doc-p">
+            Workers don't poll a REST endpoint — they open a single, long-lived
+            bidirectional gRPC stream to the scheduler. Everything a worker
+            needs to do is defined as a message in <code>scheduler.proto</code>:
+            registering itself, sending heartbeats, reporting progress, and
+            returning a final result.
+          </p>
+          <p class="doc-p">
+            This is also what powers the live worker view in the admin dashboard
+            — a worker only appears as
+            <span class="pill green">● online</span> there because it registered
+            and is heartbeating over this same stream.
+          </p>
+
+          <div class="proto-grid">
+            <div class="proto-card">
+              <h4>WorkerRegister</h4>
+              <div class="proto-field"><span>app_id</span><b>string</b></div>
+              <div class="proto-field"><span>worker_id</span><b>string</b></div>
+              <div class="proto-field">
+                <span>job_types</span><b>repeated string</b>
+              </div>
+              <div class="proto-field">
+                <span>max_concurrency</span><b>int32</b>
+              </div>
+            </div>
+            <div class="proto-card">
+              <h4>WorkerHeartbeat</h4>
+              <div class="proto-field">
+                <span>active_jobs</span><b>int32</b>
+              </div>
+              <div class="proto-field"><span>timestamp</span><b>int64</b></div>
+            </div>
+            <div class="proto-card">
+              <h4>JobProgress</h4>
+              <div class="proto-field"><span>job_id</span><b>string</b></div>
+              <div class="proto-field"><span>progress</span><b>int64</b></div>
+              <div class="proto-field"><span>timestamp</span><b>int64</b></div>
+            </div>
+            <div class="proto-card">
+              <h4>JobExecutionResult</h4>
+              <div class="proto-field"><span>job_id</span><b>string</b></div>
+              <div class="proto-field">
+                <span>status</span><b>JobResultStatus</b>
+              </div>
+              <div class="proto-field">
+                <span>error_message</span><b>string</b>
+              </div>
+              <div class="proto-field">
+                <span>stacktrace</span><b>string</b>
+              </div>
+              <div class="proto-field"><span>retry</span><b>int32</b></div>
+            </div>
+          </div>
+
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-mark">1</div>
+              <div>
+                <h4>Open the stream</h4>
+                <p>
+                  Call <code>Scheduler.JobStream</code> — a bidirectional stream
+                  of <code>WorkerMessage</code> sent by you and
+                  <code>SchedulerMessage</code> sent back.
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-mark">2</div>
+              <div>
+                <h4>Register first</h4>
+                <p>
+                  Send a <code>WorkerRegister</code> with your
+                  <code>app_id</code>, the <code>job_types</code> you can
+                  handle, and your <code>max_concurrency</code>. The scheduler
+                  replies with a <code>StreamAck</code>.
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-mark">3</div>
+              <div>
+                <h4>Heartbeat continuously</h4>
+                <p>
+                  Send a <code>WorkerHeartbeat</code> on an interval (every few
+                  seconds) with your current <code>active_jobs</code> count.
+                  Miss too many and the dashboard marks you <code>STALE</code>,
+                  then <code>OFFLINE</code>.
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-mark">4</div>
+              <div>
+                <h4>Receive assignments</h4>
+                <p>
+                  The scheduler pushes <code>JobAssignment</code> messages as
+                  jobs of your registered types become ready, up to your
+                  declared concurrency.
+                </p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-mark">5</div>
+              <div>
+                <h4>Report the result</h4>
+                <p>
+                  Optionally stream <code>JobProgress</code> while running, then
+                  send a <code>JobExecutionResult</code> with
+                  <code>JOB_RESULT_SUCCESS</code> or
+                  <code>JOB_RESULT_FAILED</code> when done.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="stream">
+          <div class="doc-eyebrow">
+            <span class="doc-eyebrow-num">07</span
+            ><span class="doc-eyebrow-text">Workers</span>
+          </div>
+          <h2 class="doc-h2">THE JOBSTREAM RPC</h2>
+          <p class="doc-p">
+            This is the full picture from <code>scheduler.proto</code> — a
+            single streaming RPC carries every message type in both directions,
+            multiplexed with a <code>oneof</code>.
+          </p>
+
+          <div class="code-panel">
+            <div class="code-header">
+              <div class="code-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="code-lang">PROTOBUF</span>
+              <button
+                class="code-copy"
+                onclick="copyCode(this, 'protosnippet')"
+              >
+                Copy
+              </button>
+            </div>
+            <pre
+              id="protosnippet"
+            ><span class="code-fn">service</span> Scheduler {
+  <span class="code-fn">rpc</span> JobStream(<span class="code-key">stream</span> WorkerMessage) <span class="code-fn">returns</span> (<span class="code-key">stream</span> SchedulerMessage);
+}
+
+<span class="code-fn">message</span> WorkerMessage {
+  <span class="code-fn">oneof</span> payload {
+    WorkerRegister register = <span class="code-num">1</span>;
+    WorkerHeartbeat heartbeat = <span class="code-num">2</span>;
+    JobProgress progress = <span class="code-num">3</span>;
+    JobExecutionResult result = <span class="code-num">4</span>;
+  }
+}
+
+<span class="code-fn">message</span> SchedulerMessage {
+  <span class="code-fn">oneof</span> payload {
+    JobAssignment job = <span class="code-num">1</span>;
+    StreamAck ack = <span class="code-num">2</span>;
+  }
+}</pre>
+          </div>
+
+          <div class="download-card">
+            <div class="download-meta">
+              <div class="download-icon">.proto</div>
+              <div>
+                <p class="download-name">scheduler.proto</p>
+                <p class="download-sub">
+                  Full service &amp; message definitions — compile with protoc
+                  for any language
+                </p>
+              </div>
+            </div>
+            <a class="btn-download" href="/scheduler.proto" download
+              >Download File</a
+            >
+          </div>
+        </section>
+
+        <section class="doc-section" id="runtime">
+          <div class="doc-eyebrow">
+            <span class="doc-eyebrow-num">08</span
+            ><span class="doc-eyebrow-text">Workers</span>
+          </div>
+          <h2 class="doc-h2">RUNTIME &amp; MONITORING</h2>
+          <p class="doc-p">
+            Once your workers are registering and heartbeating, the dashboard's
+            Monitor panel populates automatically — no extra integration needed.
+            You can also pull the same data yourself over REST.
+          </p>
+
+          <div class="code-panel">
+            <div class="code-header">
+              <div class="code-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="code-lang">HTTP</span>
+            </div>
+            <pre><span class="code-fn">GET</span> /api/v1/runtime/overview
+
+<span class="code-comment">// returns queue depth, running jobs, and worker</span>
+<span class="code-comment">// status (online / busy / stale / offline) per queue</span></pre>
+          </div>
+          <p class="doc-p dim">
+            Backed by <code>GetTenantRuntimeResponse</code> in the proto file —
+            the same per-queue and per-worker breakdown shown in the dashboard's
+            live monitor.
+          </p>
+        </section>
+
+        <div class="doc-divider"></div>
+
+        <!-- ════════ SDKS ════════ -->
+        <section class="doc-section" id="sdks">
+          <div class="doc-eyebrow">
+            <span class="doc-eyebrow-num">09</span
+            ><span class="doc-eyebrow-text">SDKs</span>
+          </div>
+          <h2 class="doc-h2">GO SDK</h2>
+
+          <div class="callout dev">
+            <div class="callout-icon">⚒</div>
+            <p>
+              <span class="callout-title"
+                >In active development
+                <span class="pill amber" style="margin-left: 8px"
+                  >beta soon</span
+                ></span
+              >
+              A first-class Go SDK that wraps the worker handshake, heartbeat
+              loop, and job dispatch is currently being built and isn't
+              published yet. In the meantime, generate a client directly from
+              <code>scheduler.proto</code> with <code>protoc</code> — the wire
+              contract is stable and won't change underneath you.
+            </p>
+          </div>
+
+          <div class="code-panel">
+            <div class="code-header">
+              <div class="code-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="code-lang">SHELL</span>
+              <button class="code-copy" onclick="copyCode(this, 'protoc')">
+                Copy
+              </button>
+            </div>
+            <pre
+              id="protoc"
+            ><span class="code-comment"># generate a Go gRPC client from the proto file</span>
+protoc --go_out=. --go-grpc_out=. scheduler.proto
+
+<span class="code-comment"># then implement WorkerRegister → heartbeat loop →</span>
+<span class="code-comment"># handle JobAssignment → send JobExecutionResult</span></pre>
+          </div>
+
+          <p class="doc-p dim">
+            Once published, the SDK will expose this same flow as a small
+            <code>waterfall.Worker</code> interface — register a handler per job
+            type and the client manages the stream, heartbeats, and retries for
+            you.
+          </p>
+        </section>
+
+        <div class="doc-footer-nav">
+          <a href="/">← Back to Overview</a>
+          <a href="#quickstart">Back to Top ↑</a>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      function copyCode(btn, id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard?.writeText(text).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = "Copied";
+          btn.classList.add("copied");
+          setTimeout(() => {
+            btn.textContent = orig;
+            btn.classList.remove("copied");
+          }, 1600);
+        });
+      }
+
+      // Active link highlighting on scroll
+      const links = document.querySelectorAll(".side-link");
+      const sections = [...links]
+        .map((l) => document.querySelector(l.getAttribute("href")))
+        .filter(Boolean);
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const id = "#" + entry.target.id;
+            const link = document.querySelector(`.side-link[href="${id}"]`);
+            if (!link) return;
+            if (entry.isIntersecting) {
+              links.forEach((l) => l.classList.remove("active"));
+              link.classList.add("active");
+            }
+          });
+        },
+        { rootMargin: "-15% 0px -70% 0px", threshold: 0 },
+      );
+      sections.forEach((s) => io.observe(s));
+    </script>
+  </body>
+</html>
