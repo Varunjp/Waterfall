@@ -30,6 +30,8 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 		"/payment-cancel":  true,
 		"/forgot-password": true,
 		"/admin":           true,
+		"/docs" :			true,
+		"/scheduler.proto": true,
 	}
 
 	return func(c *gin.Context) {

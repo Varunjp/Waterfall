@@ -72,4 +72,14 @@ func RegisterUIRoutes(r *gin.Engine) {
 		}
 		c.HTML(http.StatusOK, "admin_dashboard.html", nil)
 	})
+
+	r.GET("/docs",func(c *gin.Context){
+		c.HTML(http.StatusOK,"docs.html",nil)
+	})
+
+	r.GET("/scheduler.proto",func(c *gin.Context) {
+		c.Header("Content-Type","text/plain; charset=utf-8")
+		c.Header("Content-Disposition",`attachment; filename="scheduler.proto"`)
+		c.File("./web/static/scheduler.proto")
+	})
 }
