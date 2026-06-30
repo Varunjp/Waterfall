@@ -113,12 +113,12 @@ func (s *Server) JobStream(stream schedulerpb.Scheduler_JobStreamServer) error {
 	if err := stream.Send(&schedulerpb.SchedulerMessage{
 		Payload: &schedulerpb.SchedulerMessage_Ack{
 			Ack: &schedulerpb.StreamAck{
-				Ok: true,
+				Ok:      true,
 				Message: "registered",
 			},
 		},
 	}); err != nil {
-		return err 
+		return err
 	}
 
 	for {
