@@ -14,4 +14,5 @@ type AppUserUsecase interface {
 	ResetPassword(ctx context.Context, token, password string) error
 	ListPlans(ctx context.Context) ([]*entities.Plan, error)
 	BlockUser(ctx context.Context, userId, status string) error
+	UpdateUser(ctx context.Context, userID, role, passwordHash string) error
 }

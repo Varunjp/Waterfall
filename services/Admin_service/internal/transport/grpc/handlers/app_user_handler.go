@@ -134,9 +134,37 @@ func (h *AppUserHandler) ListPlans(ctx context.Context, req *pb.ListPlansRequest
 	return mapUPlans(plan), nil
 }
 
+func (h *AppUserHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*emptypb.Empty, error) {
+	userID, err := utils.GetUserIDFromContext(ctx)
+
+	if err != nil {
+		return &emptypb.Empty{}, errors.ErrUnauthenticated
+	}
+
+	if userID == req.UserId {
+		return &emptypb.Empty{}, errors.ErrInvalidOperation
+	}
+
+	err = h.usecase.UpdateUser(ctx, req.UserId, req.Role, req.Password)
+	if err != nil {
+		return &emptypb.Empty{}, err
+	}
+	return &emptypb.Empty{}, nil
+}
+
 func (h *AppUserHandler) UpdateUserStatus(ctx context.Context, req *pb.UpdateUserStatusRequest) (*emptypb.Empty, error) {
 
-	err := h.usecase.BlockUser(ctx, req.UserId, req.Status)
+	userID, err := utils.GetUserIDFromContext(ctx)
+
+	if err != nil {
+		return &emptypb.Empty{}, errors.ErrUnauthenticated
+	}
+
+	if userID == req.UserId {
+		return &emptypb.Empty{}, errors.ErrInvalidOperation
+	}
+
+	err = h.usecase.BlockUser(ctx, req.UserId, req.Status)
 	if err != nil {
 		return &emptypb.Empty{}, err
 	}

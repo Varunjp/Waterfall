@@ -21,3 +21,17 @@ func GetAppIDFromContext(ctx context.Context) (string, error) {
 
 	return appID, nil
 }
+
+func GetUserIDFromContext(ctx context.Context) (string, error) {
+	claims, ok := ctx.Value(interceptors.ClaimsKey).(jwt.MapClaims)
+	if !ok {
+		return "", errors.New("claims not found in context")
+	}
+
+	userID, ok := claims["user_id"].(string)
+	if !ok || userID == "" {
+		return "", errors.New("user_id missing in token")
+	}
+
+	return userID, nil
+}

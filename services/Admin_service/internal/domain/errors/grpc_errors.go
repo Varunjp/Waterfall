@@ -15,4 +15,8 @@ var (
 		codes.PermissionDenied,
 		"you do not have permission to perform this action",
 	)
+
+	ErrInvalidOperation = status.Error(
+		codes.InvalidArgument, "Cannot update status of same user",
+	)
 )

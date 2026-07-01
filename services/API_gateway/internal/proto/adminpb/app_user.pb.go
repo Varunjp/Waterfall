@@ -895,6 +895,66 @@ func (x *UpdateUserStatusRequest) GetStatus() string {
 	return ""
 }
 
+type UpdateUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Role          string                 `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserRequest) Reset() {
+	*x = UpdateUserRequest{}
+	mi := &file_proto_app_user_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserRequest) ProtoMessage() {}
+
+func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_app_user_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
+	return file_proto_app_user_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *UpdateUserRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
 var File_proto_app_user_proto protoreflect.FileDescriptor
 
 const file_proto_app_user_proto_rawDesc = "" +
@@ -947,10 +1007,16 @@ const file_proto_app_user_proto_rawDesc = "" +
 	"\x05plans\x18\x01 \x03(\v2\x0f.admin.UserPlanR\x05plans\"J\n" +
 	"\x17UpdateUserStatusRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status2\xf8\a\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\"\\\n" +
+	"\x11UpdateUserRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04role\x18\x02 \x01(\tR\x04role\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword2\xdc\b\n" +
 	"\x0eAppUserService\x12X\n" +
 	"\n" +
-	"CreateUser\x12\x18.admin.CreateUserRequest\x1a\x16.google.protobuf.Empty\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/users\x12U\n" +
+	"CreateUser\x12\x18.admin.CreateUserRequest\x1a\x16.google.protobuf.Empty\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/users\x12b\n" +
+	"\n" +
+	"UpdateUser\x12\x18.admin.UpdateUserRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*2\x17/api/v1/users/{user_id}\x12U\n" +
 	"\tListUsers\x12\x17.admin.ListUsersRequest\x1a\x18.admin.ListUsersResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/users\x12j\n" +
 	"\fListAppUsers\x12\x19.admin.ListAppUserRequest\x1a\x1a.admin.ListAppUserResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/apps/{app_id}/users\x12[\n" +
 	"\bAppLogin\x12\x16.admin.AppLoginRequest\x1a\x17.admin.AppLoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/users/login\x12U\n" +
@@ -972,7 +1038,7 @@ func file_proto_app_user_proto_rawDescGZIP() []byte {
 	return file_proto_app_user_proto_rawDescData
 }
 
-var file_proto_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_proto_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_proto_app_user_proto_goTypes = []any{
 	(*AppLoginRequest)(nil),                // 0: admin.AppLoginRequest
 	(*AppLoginResponse)(nil),               // 1: admin.AppLoginResponse
@@ -992,32 +1058,35 @@ var file_proto_app_user_proto_goTypes = []any{
 	(*UserPlan)(nil),                       // 15: admin.UserPlan
 	(*ListPlansResponse)(nil),              // 16: admin.ListPlansResponse
 	(*UpdateUserStatusRequest)(nil),        // 17: admin.UpdateUserStatusRequest
-	(*emptypb.Empty)(nil),                  // 18: google.protobuf.Empty
+	(*UpdateUserRequest)(nil),              // 18: admin.UpdateUserRequest
+	(*emptypb.Empty)(nil),                  // 19: google.protobuf.Empty
 }
 var file_proto_app_user_proto_depIdxs = []int32{
 	11, // 0: admin.ListUsersResponse.users:type_name -> admin.AppUser
 	11, // 1: admin.ListAppUserResponse.users:type_name -> admin.AppUser
 	15, // 2: admin.ListPlansResponse.plans:type_name -> admin.UserPlan
 	8,  // 3: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
-	9,  // 4: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
-	10, // 5: admin.AppUserService.ListAppUsers:input_type -> admin.ListAppUserRequest
-	0,  // 6: admin.AppUserService.AppLogin:input_type -> admin.AppLoginRequest
-	14, // 7: admin.AppUserService.ListPlans:input_type -> admin.ListPlansRequest
-	2,  // 8: admin.AppUserService.RequestResetPassword:input_type -> admin.RequestResetPasswordRequest
-	4,  // 9: admin.AppUserService.VerifyPasswordResetOtp:input_type -> admin.VerifyPasswordResetOtpRequest
-	6,  // 10: admin.AppUserService.ResetPassword:input_type -> admin.ResetPasswordRequest
-	17, // 11: admin.AppUserService.UpdateUserStatus:input_type -> admin.UpdateUserStatusRequest
-	18, // 12: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
-	12, // 13: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
-	13, // 14: admin.AppUserService.ListAppUsers:output_type -> admin.ListAppUserResponse
-	1,  // 15: admin.AppUserService.AppLogin:output_type -> admin.AppLoginResponse
-	16, // 16: admin.AppUserService.ListPlans:output_type -> admin.ListPlansResponse
-	3,  // 17: admin.AppUserService.RequestResetPassword:output_type -> admin.RequestResetPasswordResponse
-	5,  // 18: admin.AppUserService.VerifyPasswordResetOtp:output_type -> admin.VerifyPasswordResetOtpResponse
-	7,  // 19: admin.AppUserService.ResetPassword:output_type -> admin.ResetPasswordResponse
-	18, // 20: admin.AppUserService.UpdateUserStatus:output_type -> google.protobuf.Empty
-	12, // [12:21] is the sub-list for method output_type
-	3,  // [3:12] is the sub-list for method input_type
+	18, // 4: admin.AppUserService.UpdateUser:input_type -> admin.UpdateUserRequest
+	9,  // 5: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
+	10, // 6: admin.AppUserService.ListAppUsers:input_type -> admin.ListAppUserRequest
+	0,  // 7: admin.AppUserService.AppLogin:input_type -> admin.AppLoginRequest
+	14, // 8: admin.AppUserService.ListPlans:input_type -> admin.ListPlansRequest
+	2,  // 9: admin.AppUserService.RequestResetPassword:input_type -> admin.RequestResetPasswordRequest
+	4,  // 10: admin.AppUserService.VerifyPasswordResetOtp:input_type -> admin.VerifyPasswordResetOtpRequest
+	6,  // 11: admin.AppUserService.ResetPassword:input_type -> admin.ResetPasswordRequest
+	17, // 12: admin.AppUserService.UpdateUserStatus:input_type -> admin.UpdateUserStatusRequest
+	19, // 13: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
+	19, // 14: admin.AppUserService.UpdateUser:output_type -> google.protobuf.Empty
+	12, // 15: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
+	13, // 16: admin.AppUserService.ListAppUsers:output_type -> admin.ListAppUserResponse
+	1,  // 17: admin.AppUserService.AppLogin:output_type -> admin.AppLoginResponse
+	16, // 18: admin.AppUserService.ListPlans:output_type -> admin.ListPlansResponse
+	3,  // 19: admin.AppUserService.RequestResetPassword:output_type -> admin.RequestResetPasswordResponse
+	5,  // 20: admin.AppUserService.VerifyPasswordResetOtp:output_type -> admin.VerifyPasswordResetOtpResponse
+	7,  // 21: admin.AppUserService.ResetPassword:output_type -> admin.ResetPasswordResponse
+	19, // 22: admin.AppUserService.UpdateUserStatus:output_type -> google.protobuf.Empty
+	13, // [13:23] is the sub-list for method output_type
+	3,  // [3:13] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
 	3,  // [3:3] is the sub-list for extension extendee
 	0,  // [0:3] is the sub-list for field type_name
@@ -1034,7 +1103,7 @@ func file_proto_app_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_app_user_proto_rawDesc), len(file_proto_app_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

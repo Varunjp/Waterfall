@@ -11,6 +11,8 @@ import (
 	redisclient "admin_service/internal/repository/redis"
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,9 +29,7 @@ func NewAppUserService(r repo.AppUserRepository, rd *redisclient.OTPRepo, m *uti
 }
 
 func (s *AppUserService) Create(app_id, email, password, role string) error {
-	if role != enums.RoleSuperAdmin &&
-		role != enums.RoleAdmin &&
-		role != enums.RoleViewer {
+	if !enums.ValidUserRoles[role] {
 		return domainErr.ErrInvalidRole
 	}
 
@@ -147,10 +147,49 @@ func (s *AppUserService) ListPlans(ctx context.Context) ([]*entities.Plan, error
 
 func (s *AppUserService) BlockUser(ctx context.Context, userId, status string) error {
 
-	err := s.repo.BlockUser(userId, status)
+	err := s.repo.BlockUser(ctx, userId, status)
 
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (s *AppUserService) UpdateUser(ctx context.Context, userID, role, passwordHash string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	userID = strings.TrimSpace(userID)
+	role = strings.TrimSpace(role)
+	passwordHash = strings.TrimSpace(passwordHash)
+
+	if userID == "" {
+		return domainErr.ErrMissingUserID
+	}
+
+	if role == "" && passwordHash == "" {
+		return domainErr.ErrNoFieldsToUpdate
+	}
+
+	if role != "" && !enums.ValidUserRoles[role] {
+		return fmt.Errorf("%w: %q", domainErr.ErrInvalidRole, role)
+	}
+
+	hash, err := security.Hash(passwordHash)
+	if err != nil {
+		return fmt.Errorf("password hash :%w", err)
+	}
+
+	if err := s.repo.UpdateUser(ctx, userID, role, hash); err != nil {
+		if errors.Is(err, domainErr.ErrUserNotFound) {
+			return err
+		}
+		if errors.Is(err, domainErr.ErrNoFieldsToUpdate) {
+			return err
+		}
+		return fmt.Errorf("update user: %w", err)
 	}
 
 	return nil
