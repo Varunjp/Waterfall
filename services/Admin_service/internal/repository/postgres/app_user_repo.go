@@ -2,8 +2,12 @@ package postgres
 
 import (
 	"admin_service/internal/domain/entities"
+	domainErr "admin_service/internal/domain/errors"
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
+	"strings"
 )
 
 type AppUserRepo struct {
@@ -114,13 +118,69 @@ func (r *AppUserRepo) ListPlans() ([]*entities.Plan, error) {
 	return plans, nil
 }
 
-func (r *AppUserRepo) BlockUser(userID, status string) error {
+func (r *AppUserRepo) BlockUser(ctx context.Context, userID, status string) error {
 
-	err := r.db.QueryRow(
+	err := r.db.QueryRowContext(ctx,
 		`UPDATE app_users SET status = $1 WHERE id = $2`,
 		status,
 		userID,
 	).Err()
 
 	return err
+}
+
+func (r *AppUserRepo) UpdateUser(ctx context.Context, userID, role, passwordHash string) error {
+
+	const selectQuery = `SELECT role,password_hash,status FROM app_users  WHERE id = $1`
+
+	var user entities.AppUser
+	err := r.db.QueryRowContext(ctx, selectQuery, userID).Scan(&user.Role, &user.PasswordHash, &user.Status)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domainErr.ErrUserNotFound
+		}
+		return fmt.Errorf("fetch user: %w", err)
+	}
+
+	setClauses := make([]string, 0, 2)
+	args := make([]any, 0, 3)
+	argPos := 1
+
+	if role != "" && role != user.Role {
+		setClauses = append(setClauses, fmt.Sprintf("role = $%d", argPos))
+		args = append(args, role)
+		argPos++
+	}
+
+	if passwordHash != "" && passwordHash != user.PasswordHash {
+		setClauses = append(setClauses, fmt.Sprintf("password_hash = $%d", argPos))
+		args = append(args, passwordHash)
+		argPos++
+	}
+
+	if len(setClauses) == 0 {
+		return domainErr.ErrNoFieldsToUpdate
+	}
+
+	args = append(args, userID)
+
+	query := fmt.Sprintf(
+		"UPDATE app_users SET %s WHERE id = $%d",
+		strings.Join(setClauses, ", "),
+		argPos,
+	)
+	res, err := r.db.ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("update user: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("check rows affected: %w", err)
+	}
+	if rows == 0 {
+		return domainErr.ErrUserNotFound
+	}
+
+	return nil
 }

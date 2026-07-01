@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	AppUserService_CreateUser_FullMethodName             = "/admin.AppUserService/CreateUser"
+	AppUserService_UpdateUser_FullMethodName             = "/admin.AppUserService/UpdateUser"
 	AppUserService_ListUsers_FullMethodName              = "/admin.AppUserService/ListUsers"
 	AppUserService_ListAppUsers_FullMethodName           = "/admin.AppUserService/ListAppUsers"
 	AppUserService_AppLogin_FullMethodName               = "/admin.AppUserService/AppLogin"
@@ -36,6 +37,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AppUserServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
 	ListAppUsers(ctx context.Context, in *ListAppUserRequest, opts ...grpc.CallOption) (*ListAppUserResponse, error)
 	AppLogin(ctx context.Context, in *AppLoginRequest, opts ...grpc.CallOption) (*AppLoginResponse, error)
@@ -58,6 +60,16 @@ func (c *appUserServiceClient) CreateUser(ctx context.Context, in *CreateUserReq
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, AppUserService_CreateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appUserServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AppUserService_UpdateUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -149,6 +161,7 @@ func (c *appUserServiceClient) UpdateUserStatus(ctx context.Context, in *UpdateU
 // for forward compatibility.
 type AppUserServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*emptypb.Empty, error)
+	UpdateUser(context.Context, *UpdateUserRequest) (*emptypb.Empty, error)
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
 	ListAppUsers(context.Context, *ListAppUserRequest) (*ListAppUserResponse, error)
 	AppLogin(context.Context, *AppLoginRequest) (*AppLoginResponse, error)
@@ -169,6 +182,9 @@ type UnimplementedAppUserServiceServer struct{}
 
 func (UnimplementedAppUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedAppUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateUser not implemented")
 }
 func (UnimplementedAppUserServiceServer) ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListUsers not implemented")
@@ -229,6 +245,24 @@ func _AppUserService_CreateUser_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppUserServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppUserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppUserServiceServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppUserService_UpdateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppUserServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -387,6 +421,10 @@ var AppUserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateUser",
 			Handler:    _AppUserService_CreateUser_Handler,
+		},
+		{
+			MethodName: "UpdateUser",
+			Handler:    _AppUserService_UpdateUser_Handler,
 		},
 		{
 			MethodName: "ListUsers",

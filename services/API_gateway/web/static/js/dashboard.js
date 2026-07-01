@@ -725,6 +725,10 @@
     return currentUserRole;
   }
 
+  function canManageUsers() {
+    return ['admin', 'super_admin'].includes(getMyRole());
+  }
+
   function getMyAppId() {
     const p = decodeJwt();
     // Common JWT claim names for app_id
@@ -734,6 +738,7 @@
   async function loadUsers() {
     const area = document.getElementById('content-area');
     const isSuperAdmin = getMyRole() === 'super_admin';
+    const canManage = canManageUsers();
 
     area.innerHTML = `
       <div class="section-header">
