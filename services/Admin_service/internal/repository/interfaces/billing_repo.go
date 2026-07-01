@@ -16,4 +16,5 @@ type BillingRepository interface {
 	BlockAppBilling(ctx context.Context, stripeSubID string) error
 	GetSubscription(ctx context.Context, appID string) (*entities.Subscription, error)
 	GetSubscriptionDetails(ctx context.Context, stripeSubID string) (*entities.InvoiceData, error)
+	RecordPayment(ctx context.Context, payment *entities.Payment) error
 }

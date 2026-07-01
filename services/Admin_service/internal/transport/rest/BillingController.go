@@ -185,13 +185,14 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter, r *http.Request
 
 		invoiceNumber, _ := raw["number"].(string)
 		amountPaid, _ := raw["amount_paid"].(float64)
+		currency, _ := raw["currency"].(string)
 
 		if subscriptionID == "" {
 			log.Println("could not extract subscription ID from invoice")
 			break
 		}
 
-		err := c.service.SendInvoicePdf(context.Background(), subscriptionID, invoiceNumber, amountPaid)
+		err := c.service.SendInvoicePdf(context.Background(), subscriptionID, invoiceNumber, amountPaid,currency)
 
 		if err != nil {
 			log.Println("failed to send invoice pdf :", err)

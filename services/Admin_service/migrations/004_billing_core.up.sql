@@ -97,3 +97,18 @@ CREATE TABLE IF NOT EXISTS usage_monthly (
     jobs_executed INT NOT NULL DEFAULT 0,
     PRIMARY KEY (app_id, month)
 );
+
+CREATE TABLE IF NOT EXISTS payments (
+    invoice_id TEXT PRIMARY KEY,
+    subscription_id TEXT NOT NULL,
+    app_id  UUID NOT NULL,
+    amount  BIGINT NOT NULL,
+    currency VARCHAR(20) NOT NULL,
+    customer_email VARCHAR(255) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    paid_at TIMESTAMPZ NOT NULL,
+    created_at TIMESTAMPZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_payments_app_id_paid_at ON payments(app_id,paid_at DESC);
+CREATE INDEX IF NOT EXISTS idx_payments_subscription_id ON payments(subscription_id);
