@@ -45,12 +45,12 @@ func (r *AdminRepo) Create(admin *entities.PlatformAdmin) error {
 func (r AdminRepo) ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error) {
 	baseQuery := `FROM payments WHERE 1=1`
 	args := []any{}
-	argPos := 1	
+	argPos := 1
 
 	// -------- APP FILTER -----------
 
 	if appID != "" {
-		baseQuery += fmt.Sprintf(" AND app_id = $%d",argPos)
+		baseQuery += fmt.Sprintf(" AND app_id = $%d", argPos)
 		args = append(args, appID)
 		argPos++
 	}
@@ -103,7 +103,7 @@ func (r AdminRepo) ListPayment(ctx context.Context, appID, status string, limit,
 	var payments []entities.Payment
 	for rows.Next() {
 		var p entities.Payment
-		if err := rows.Scan(&p.InvoiceID, &p.PlanName, &p.Amount, &p.Status, &p.PaidAt,&p.AppName,&p.CustomerEmail,&p.PlanAmount); err != nil {
+		if err := rows.Scan(&p.InvoiceID, &p.PlanName, &p.Amount, &p.Status, &p.PaidAt, &p.AppName, &p.CustomerEmail, &p.PlanAmount); err != nil {
 			return nil, 0, err
 		}
 		payments = append(payments, p)

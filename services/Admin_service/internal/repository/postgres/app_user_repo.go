@@ -272,13 +272,13 @@ func (r *AppUserRepo) GetPaymentDetails(ctx context.Context, appID, invoiceID st
 	)
 
 	if err != nil {
-		if errors.Is(err,sql.ErrNoRows) {
-			return nil,fmt.Errorf("Failed to get invoice: %w",err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("Failed to get invoice: %w", err)
 		}
-		return nil,err 
+		return nil, err
 	}
 
-	return &data,nil 
+	return &data, nil
 }
 
 func (r *AppUserRepo) GetInvoiceSubscriptionID(ctx context.Context, appID, invoiceID string) (string, int64, error) {

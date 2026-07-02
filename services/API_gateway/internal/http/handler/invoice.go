@@ -54,7 +54,7 @@ func (h *InvoiceHandle) DownloadInvoice(c *gin.Context) {
 	}
 
 	c.Header("Content-Type", "application/pdf")
-	c.Header("Content-Disposition",fmt.Sprintf(`attachment; filename="%s"`, filename))
+	c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
 	c.Header("Content-Length", strconv.Itoa(len(resp.Pdf)))
 	c.Data(http.StatusOK, "application/pdf", resp.Pdf)
 }

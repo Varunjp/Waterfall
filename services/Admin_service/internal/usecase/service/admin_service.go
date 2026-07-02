@@ -36,8 +36,8 @@ func (s *AdminService) Login(email, password string) (string, error) {
 	return security.GenerateJWT(s.secret, admin.ID, "platform_admin", "")
 }
 
-func (s *AdminService) ListPayment(ctx context.Context,appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error) {
-	
+func (s *AdminService) ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error) {
+
 	if !isValidTime(startDate) {
 		startDate = nil
 	}
