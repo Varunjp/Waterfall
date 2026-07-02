@@ -174,40 +174,40 @@ func (h *AppUserHandler) UpdateUserStatus(ctx context.Context, req *pb.UpdateUse
 	return &emptypb.Empty{}, nil
 }
 
-func (h *AppUserHandler) ListPayments(ctx context.Context, req *pb.ListPaymentRequest) (*pb.ListPaymentResponse,error) {
+func (h *AppUserHandler) ListPayments(ctx context.Context, req *pb.ListPaymentRequest) (*pb.ListPaymentResponse, error) {
 
 	appID, err := utils.GetAppIDFromContext(ctx)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	payments,total,err := h.usecase.ListPayments(ctx,appID,req.Status,int(req.Limit),int(req.Offset),optionalTimestamp(req.StartDate),optionalTimestamp(req.EndDate))
+	payments, total, err := h.usecase.ListPayments(ctx, appID, req.Status, int(req.Limit), int(req.Offset), optionalTimestamp(req.StartDate), optionalTimestamp(req.EndDate))
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	return mapPayments(payments,total,int(req.Limit),int(req.Offset)),nil 
+	return mapPayments(payments, total, int(req.Limit), int(req.Offset)), nil
 }
 
-func (h *AppUserHandler) GetInvoice(ctx context.Context,req *pb.GetInvoiceRequest) (*pb.GetInvoiceResponse,error) {
+func (h *AppUserHandler) GetInvoice(ctx context.Context, req *pb.GetInvoiceRequest) (*pb.GetInvoiceResponse, error) {
 
 	appID, err := utils.GetAppIDFromContext(ctx)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	pdfBytes,err := h.usecase.GetInvoice(ctx,appID,req.InvoiceId)
+	pdfBytes, err := h.usecase.GetInvoice(ctx, appID, req.InvoiceId)
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
 	return &pb.GetInvoiceResponse{
-		Pdf: pdfBytes,
-		Filename: fmt.Sprintf("invoice-%s.pdf",req.InvoiceId),
-	},nil 
+		Pdf:      pdfBytes,
+		Filename: fmt.Sprintf("invoice-%s.pdf", req.InvoiceId),
+	}, nil
 }
 
 func mapUPlans(plans []*entities.Plan) *pb.ListPlansResponse {
@@ -232,15 +232,15 @@ func optionalTimestamp(ts *timestamppb.Timestamp) *time.Time {
 	return &value
 }
 
-func mapPayments(payment []entities.Payment,total,limit,offset int) *pb.ListPaymentResponse {
+func mapPayments(payment []entities.Payment, total, limit, offset int) *pb.ListPaymentResponse {
 	resp := &pb.ListPaymentResponse{}
-	for _,p := range payment {
+	for _, p := range payment {
 		resp.Payments = append(resp.Payments, &pb.Payment{
 			InvoiceId: p.InvoiceID,
-			PlanName: p.PlanName,
-			Amount: float64(p.Amount),
-			Status: p.Status,
-			PaidAt: formatUTC(p.PaidAt),
+			PlanName:  p.PlanName,
+			Amount:    float64(p.Amount),
+			Status:    p.Status,
+			PaidAt:    formatUTC(p.PaidAt),
 		})
 	}
 
@@ -248,5 +248,5 @@ func mapPayments(payment []entities.Payment,total,limit,offset int) *pb.ListPaym
 	resp.Limit = int32(limit)
 	resp.Offset = int32(offset)
 
-	return resp 
+	return resp
 }

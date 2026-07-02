@@ -14,7 +14,7 @@ type AppUserRepository interface {
 	ListPlans() ([]*entities.Plan, error)
 	BlockUser(ctx context.Context, userID, status string) error
 	UpdateUser(ctx context.Context, userID, role, passwordHash string) error
-	ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time)([]entities.Payment,int,error)
+	ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 	GetSubscriptionDetails(ctx context.Context, stripeSubID, invoiceID string) (*entities.InvoiceData, error)
-	GetInvoiceSubscriptionID(ctx context.Context, appID, invoiceID string) (string,int64,error)
+	GetInvoiceSubscriptionID(ctx context.Context, appID, invoiceID string) (string, int64, error)
 }

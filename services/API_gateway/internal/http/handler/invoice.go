@@ -22,7 +22,7 @@ func NewInvoiceHandler(client adminpb.AppUserServiceClient) *InvoiceHandle {
 }
 
 func (h *InvoiceHandle) DownloadInvoice(c *gin.Context) {
-	
+
 	parts := strings.Split(c.Request.URL.Path, "/")
 	if len(parts) < 5 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid invoice path"})
@@ -32,32 +32,32 @@ func (h *InvoiceHandle) DownloadInvoice(c *gin.Context) {
 	invoiceID := parts[4]
 
 	// Get Authorization header
-    auth := c.GetHeader("Authorization")
+	auth := c.GetHeader("Authorization")
 
-    // Create outgoing gRPC metadata
-    md := metadata.New(map[string]string{
-        "authorization": auth,
-    })
+	// Create outgoing gRPC metadata
+	md := metadata.New(map[string]string{
+		"authorization": auth,
+	})
 
-    ctx := metadata.NewOutgoingContext(c.Request.Context(), md)
+	ctx := metadata.NewOutgoingContext(c.Request.Context(), md)
 
-	resp,err := h.adminClient.GetInvoice(ctx,&adminpb.GetInvoiceRequest{InvoiceId: invoiceID})
+	resp, err := h.adminClient.GetInvoice(ctx, &adminpb.GetInvoiceRequest{InvoiceId: invoiceID})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	filename := resp.Filename
 	if filename == "" {
-		filename = fmt.Sprintf("invoice-%s.pdf",invoiceID)
+		filename = fmt.Sprintf("invoice-%s.pdf", invoiceID)
 	}
 
-	c.Header("Content-Type","application/pdf")
+	c.Header("Content-Type", "application/pdf")
 	c.Header(
 		"Content-Disposition",
-		fmt.Sprintf(`attachment; filename="%s"`,filename),
+		fmt.Sprintf(`attachment; filename="%s"`, filename),
 	)
-	c.Header("Content-Length",strconv.Itoa(len(resp.Pdf)))
-	c.Data(http.StatusOK,"application/pdf",resp.Pdf)
+	c.Header("Content-Length", strconv.Itoa(len(resp.Pdf)))
+	c.Data(http.StatusOK, "application/pdf", resp.Pdf)
 }

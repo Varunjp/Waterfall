@@ -229,18 +229,18 @@ func (s *BillingService) SendInvoicePdf(ctx context.Context, subscriptionID, inv
 	data.TotalPaid = amount
 
 	payment := entities.Payment{
-		InvoiceID: invoiceNumber,
+		InvoiceID:      invoiceNumber,
 		SubscriptionID: subscriptionID,
-		AppID: data.UserID,
-		PlanName: data.PlanName,
-		Amount: int64(amount),
-		Currency: currency,
-		CustomerEmail: data.UserEmail,
-		Status: "paid",
-		PaidAt: data.CreatedDate,
+		AppID:          data.UserID,
+		PlanName:       data.PlanName,
+		Amount:         int64(amount),
+		Currency:       currency,
+		CustomerEmail:  data.UserEmail,
+		Status:         "paid",
+		PaidAt:         data.CreatedDate,
 	}
 
-	if err := s.repo.RecordPayment(ctx,&payment); err != nil {
+	if err := s.repo.RecordPayment(ctx, &payment); err != nil {
 		return err
 	}
 

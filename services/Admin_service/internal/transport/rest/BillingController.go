@@ -192,7 +192,7 @@ func (c *BillingController) StripeWebhook(w http.ResponseWriter, r *http.Request
 			break
 		}
 
-		err := c.service.SendInvoicePdf(context.Background(), subscriptionID, invoiceNumber, amountPaid,currency)
+		err := c.service.SendInvoicePdf(context.Background(), subscriptionID, invoiceNumber, amountPaid, currency)
 
 		if err != nil {
 			log.Println("failed to send invoice pdf :", err)

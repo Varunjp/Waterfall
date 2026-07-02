@@ -32,7 +32,7 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
-	adminConn,err := grpc.NewClient(cfg.AdminServiceURL,grpc.WithTransportCredentials(insecure.NewCredentials()))
+	adminConn, err := grpc.NewClient(cfg.AdminServiceURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
@@ -97,10 +97,10 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 	invoiceHandler := handler.NewInvoiceHandler(adminClient)
 
 	r.Use(func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path,"/api/v1/invoice/") {
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v1/invoice/") {
 			invoiceHandler.DownloadInvoice(c)
 			c.Abort()
-			return 
+			return
 		}
 		c.Next()
 	})
