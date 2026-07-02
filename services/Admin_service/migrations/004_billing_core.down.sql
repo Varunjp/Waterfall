@@ -3,7 +3,6 @@ DROP TABLE IF EXISTS usage_daily;
 DROP INDEX IF EXISTS subscriptions_stripe_subscription_id_uq;
 DROP TABLE IF EXISTS subscriptions;
 DROP TABLE IF EXISTS plans;
-DROP TABLE IF EXISTS payments;
 
 ALTER TABLE apps
     DROP CONSTRAINT IF EXISTS emaill_unique;

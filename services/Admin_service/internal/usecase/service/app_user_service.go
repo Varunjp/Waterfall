@@ -12,7 +12,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -193,4 +195,56 @@ func (s *AppUserService) UpdateUser(ctx context.Context, userID, role, passwordH
 	}
 
 	return nil
+}
+
+func (s *AppUserService) ListPayments(ctx context.Context, app_id,status string, limit, offset int, startDate, endDate *time.Time)([]entities.Payment,int,error) {
+	
+	if !isValidTime(startDate) {
+		startDate = nil 
+	}
+
+	if !isValidTime(endDate) {
+		endDate = nil 
+	}
+
+	payments,total,err := s.repo.ListPayment(ctx,app_id,status,limit, offset, startDate,endDate)
+
+	if err != nil {
+		log.Println("Listpayment error: ",err)
+	}
+
+	return payments,total,err
+}
+
+func (s *AppUserService) GetInvoice(ctx context.Context, app_id, invoice_id string) ([]byte,error) {
+
+	subID,amount,err := s.repo.GetInvoiceSubscriptionID(ctx,app_id,invoice_id)
+	if err != nil {
+		log.Println("Get subscription_id in user: ",err)
+		return nil,err 
+	}
+
+	data,err := s.repo.GetSubscriptionDetails(ctx,subID,invoice_id)
+	if err != nil {
+		log.Println("Get subscription details in user: ",err)
+		return nil,err 
+	}
+
+	data.InvoiceNumber = invoice_id
+	data.TotalPaid = float64(amount)
+
+	pdf,err := utils.GeneratePDF(*data)
+	if err != nil {
+		return nil,err 
+	}
+
+	return pdf,nil 
+}
+
+
+func isValidTime(t *time.Time) bool {
+	if t == nil {
+		return false
+	}
+	return !t.IsZero() && t.Unix() != 0
 }

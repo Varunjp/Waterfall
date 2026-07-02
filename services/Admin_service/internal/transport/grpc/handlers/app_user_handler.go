@@ -7,8 +7,11 @@ import (
 	pb "admin_service/internal/proto/admin"
 	"admin_service/internal/usecase/interfaces"
 	"context"
+	"fmt"
+	"time"
 
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type AppUserHandler struct {
@@ -171,6 +174,42 @@ func (h *AppUserHandler) UpdateUserStatus(ctx context.Context, req *pb.UpdateUse
 	return &emptypb.Empty{}, nil
 }
 
+func (h *AppUserHandler) ListPayments(ctx context.Context, req *pb.ListPaymentRequest) (*pb.ListPaymentResponse,error) {
+
+	appID, err := utils.GetAppIDFromContext(ctx)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	payments,total,err := h.usecase.ListPayments(ctx,appID,req.Status,int(req.Limit),int(req.Offset),optionalTimestamp(req.StartDate),optionalTimestamp(req.EndDate))
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return mapPayments(payments,total,int(req.Limit),int(req.Offset)),nil 
+}
+
+func (h *AppUserHandler) GetInvoice(ctx context.Context,req *pb.GetInvoiceRequest) (*pb.GetInvoiceResponse,error) {
+
+	appID, err := utils.GetAppIDFromContext(ctx)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	pdfBytes,err := h.usecase.GetInvoice(ctx,appID,req.InvoiceId)
+	if err != nil {
+		return nil,err 
+	}
+
+	return &pb.GetInvoiceResponse{
+		Pdf: pdfBytes,
+		Filename: fmt.Sprintf("invoice-%s.pdf",req.InvoiceId),
+	},nil 
+}
+
 func mapUPlans(plans []*entities.Plan) *pb.ListPlansResponse {
 	resp := &pb.ListPlansResponse{}
 	for _, p := range plans {
@@ -182,4 +221,32 @@ func mapUPlans(plans []*entities.Plan) *pb.ListPlansResponse {
 		})
 	}
 	return resp
+}
+
+func optionalTimestamp(ts *timestamppb.Timestamp) *time.Time {
+	if ts == nil {
+		return nil
+	}
+
+	value := ts.AsTime().UTC()
+	return &value
+}
+
+func mapPayments(payment []entities.Payment,total,limit,offset int) *pb.ListPaymentResponse {
+	resp := &pb.ListPaymentResponse{}
+	for _,p := range payment {
+		resp.Payments = append(resp.Payments, &pb.Payment{
+			InvoiceId: p.InvoiceID,
+			PlanName: p.PlanName,
+			Amount: float64(p.Amount),
+			Status: p.Status,
+			PaidAt: formatUTC(p.PaidAt),
+		})
+	}
+
+	resp.Total = int32(total)
+	resp.Limit = int32(limit)
+	resp.Offset = int32(offset)
+
+	return resp 
 }

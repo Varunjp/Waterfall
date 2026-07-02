@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"api_gateway/internal/config"
+	"api_gateway/internal/http/handler"
 	"api_gateway/internal/middleware"
 	"api_gateway/internal/proto/adminpb"
 	"api_gateway/internal/proto/jobpb"
@@ -10,6 +11,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -29,7 +31,14 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
-	err := jobpb.RegisterJobServiceHandlerFromEndpoint(
+
+	adminConn,err := grpc.NewClient(cfg.AdminServiceURL,grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	adminClient := adminpb.NewAppUserServiceClient(adminConn)
+
+	err = jobpb.RegisterJobServiceHandlerFromEndpoint(
 		ctx,
 		gwMux,
 		cfg.JobServiceURL,
@@ -83,6 +92,17 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
+	})
+
+	invoiceHandler := handler.NewInvoiceHandler(adminClient)
+
+	r.Use(func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.URL.Path,"/api/v1/invoice/") {
+			invoiceHandler.DownloadInvoice(c)
+			c.Abort()
+			return 
+		}
+		c.Next()
 	})
 
 	r.Any("/api/*any", gin.WrapH(gwMux))

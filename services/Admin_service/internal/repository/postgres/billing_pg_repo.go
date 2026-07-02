@@ -315,13 +315,14 @@ func (r *BillingPGRepo) RecordPayment(ctx context.Context, payment *entities.Pay
 		invoice_id,
 		subscription_id,
 		app_id,
+		plan_name,
 		amount,
 		currency,
 		customer_email,
 		status,
 		paid_at
 	)
-	VALUES($1,$2,$3,$4,$5,$6,$7,$8)`
+	VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`
 
 	_, err := r.db.ExecContext(
 		ctx,
@@ -329,6 +330,7 @@ func (r *BillingPGRepo) RecordPayment(ctx context.Context, payment *entities.Pay
 		payment.InvoiceID,
 		payment.SubscriptionID,
 		payment.AppID,
+		payment.PlanName,
 		payment.Amount,
 		payment.Currency,
 		payment.CustomerEmail,

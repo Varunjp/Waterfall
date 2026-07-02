@@ -232,6 +232,7 @@ func (s *BillingService) SendInvoicePdf(ctx context.Context, subscriptionID, inv
 		InvoiceID: invoiceNumber,
 		SubscriptionID: subscriptionID,
 		AppID: data.UserID,
+		PlanName: data.PlanName,
 		Amount: int64(amount),
 		Currency: currency,
 		CustomerEmail: data.UserEmail,

@@ -30,6 +30,8 @@ const (
 	AppUserService_VerifyPasswordResetOtp_FullMethodName = "/admin.AppUserService/VerifyPasswordResetOtp"
 	AppUserService_ResetPassword_FullMethodName          = "/admin.AppUserService/ResetPassword"
 	AppUserService_UpdateUserStatus_FullMethodName       = "/admin.AppUserService/UpdateUserStatus"
+	AppUserService_ListPayments_FullMethodName           = "/admin.AppUserService/ListPayments"
+	AppUserService_GetInvoice_FullMethodName             = "/admin.AppUserService/GetInvoice"
 )
 
 // AppUserServiceClient is the client API for AppUserService service.
@@ -46,6 +48,8 @@ type AppUserServiceClient interface {
 	VerifyPasswordResetOtp(ctx context.Context, in *VerifyPasswordResetOtpRequest, opts ...grpc.CallOption) (*VerifyPasswordResetOtpResponse, error)
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
 	UpdateUserStatus(ctx context.Context, in *UpdateUserStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListPayments(ctx context.Context, in *ListPaymentRequest, opts ...grpc.CallOption) (*ListPaymentResponse, error)
+	GetInvoice(ctx context.Context, in *GetInvoiceRequest, opts ...grpc.CallOption) (*GetInvoiceResponse, error)
 }
 
 type appUserServiceClient struct {
@@ -156,6 +160,26 @@ func (c *appUserServiceClient) UpdateUserStatus(ctx context.Context, in *UpdateU
 	return out, nil
 }
 
+func (c *appUserServiceClient) ListPayments(ctx context.Context, in *ListPaymentRequest, opts ...grpc.CallOption) (*ListPaymentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPaymentResponse)
+	err := c.cc.Invoke(ctx, AppUserService_ListPayments_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appUserServiceClient) GetInvoice(ctx context.Context, in *GetInvoiceRequest, opts ...grpc.CallOption) (*GetInvoiceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetInvoiceResponse)
+	err := c.cc.Invoke(ctx, AppUserService_GetInvoice_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppUserServiceServer is the server API for AppUserService service.
 // All implementations must embed UnimplementedAppUserServiceServer
 // for forward compatibility.
@@ -170,6 +194,8 @@ type AppUserServiceServer interface {
 	VerifyPasswordResetOtp(context.Context, *VerifyPasswordResetOtpRequest) (*VerifyPasswordResetOtpResponse, error)
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
 	UpdateUserStatus(context.Context, *UpdateUserStatusRequest) (*emptypb.Empty, error)
+	ListPayments(context.Context, *ListPaymentRequest) (*ListPaymentResponse, error)
+	GetInvoice(context.Context, *GetInvoiceRequest) (*GetInvoiceResponse, error)
 	mustEmbedUnimplementedAppUserServiceServer()
 }
 
@@ -209,6 +235,12 @@ func (UnimplementedAppUserServiceServer) ResetPassword(context.Context, *ResetPa
 }
 func (UnimplementedAppUserServiceServer) UpdateUserStatus(context.Context, *UpdateUserStatusRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUserStatus not implemented")
+}
+func (UnimplementedAppUserServiceServer) ListPayments(context.Context, *ListPaymentRequest) (*ListPaymentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPayments not implemented")
+}
+func (UnimplementedAppUserServiceServer) GetInvoice(context.Context, *GetInvoiceRequest) (*GetInvoiceResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetInvoice not implemented")
 }
 func (UnimplementedAppUserServiceServer) mustEmbedUnimplementedAppUserServiceServer() {}
 func (UnimplementedAppUserServiceServer) testEmbeddedByValue()                        {}
@@ -411,6 +443,42 @@ func _AppUserService_UpdateUserStatus_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppUserService_ListPayments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPaymentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppUserServiceServer).ListPayments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppUserService_ListPayments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppUserServiceServer).ListPayments(ctx, req.(*ListPaymentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppUserService_GetInvoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInvoiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppUserServiceServer).GetInvoice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppUserService_GetInvoice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppUserServiceServer).GetInvoice(ctx, req.(*GetInvoiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AppUserService_ServiceDesc is the grpc.ServiceDesc for AppUserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -457,6 +525,14 @@ var AppUserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUserStatus",
 			Handler:    _AppUserService_UpdateUserStatus_Handler,
+		},
+		{
+			MethodName: "ListPayments",
+			Handler:    _AppUserService_ListPayments_Handler,
+		},
+		{
+			MethodName: "GetInvoice",
+			Handler:    _AppUserService_GetInvoice_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
