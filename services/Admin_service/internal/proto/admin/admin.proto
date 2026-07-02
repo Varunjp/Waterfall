@@ -4,6 +4,7 @@ package admin;
 
 option go_package = "internal/proto/admin;adminpb";
 
+import "google/protobuf/timestamp.proto";
 import "googleapis/google/api/annotations.proto";
 
 service AdminService {
@@ -38,6 +39,12 @@ service AdminService {
         option (google.api.http) = {
             patch: "/api/v1/admin/plans/{planID}/status"
             body:"*"
+        };
+    }
+
+    rpc ListPayments(ListPaymentAdminRequest) returns (ListPaymentAdminResponse) {
+        option (google.api.http) = {
+        get: "/api/v1/admin/payments"
         };
     }
 }
@@ -96,4 +103,31 @@ message UpdatePlanStatusRequest {
 
 message UpdatePlanStatusResponse {
     Plan plan = 1;
+}
+
+message ListPaymentAdminRequest {
+  string app_id = 1;
+  string status = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+  google.protobuf.Timestamp startDate = 5;
+  google.protobuf.Timestamp endDate = 6;
+}
+
+message ListPaymentAdminResponse {
+  repeated PaymentAdmin payments = 1;
+  int32 total = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message PaymentAdmin {
+  string invoice_id = 1;
+  string plan_name = 2;
+  double amount = 3;
+  string status = 4;
+  string paid_at = 5;
+  string app_name = 6;
+  string app_email = 7;
+  double plan_amount = 8;
 }

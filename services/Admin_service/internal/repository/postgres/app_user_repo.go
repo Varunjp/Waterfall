@@ -248,57 +248,37 @@ func (r *AppUserRepo) ListPayment(ctx context.Context, appID, status string, lim
 	return payments, total, nil
 }
 
-func (r *AppUserRepo) GetSubscriptionDetails(ctx context.Context, stripeSubID, invoiceID string) (*entities.InvoiceData, error) {
+func (r *AppUserRepo) GetPaymentDetails(ctx context.Context, appID, invoiceID string) (*entities.InvoiceData, error) {
 
 	var data entities.InvoiceData
 
-	subsQuery := `
-		SELECT app_id,plan_id,current_period_start,current_period_end
-		FROM subscriptions
-		WHERE stripe_subscription_id = $1;
-	`
+	query := `SELECT invoice_id, app_id, app_name, customer_email, plan_name, plan_amount, amount, paid_at
+	FROM payments WHERE invoice_id = $1 AND app_id = $2;`
+
 	err := r.db.QueryRowContext(
 		ctx,
-		subsQuery,
-		stripeSubID,
-	).Scan(&data.UserID, &data.PlanID, &data.CreatedDate, &data.NextPayment)
+		query,
+		invoiceID,
+		appID,
+	).Scan(
+		&data.InvoiceNumber,
+		&data.UserID,
+		&data.UserName,
+		&data.UserEmail,
+		&data.PlanName,
+		&data.PlanAmount,
+		&data.TotalPaid,
+		&data.CreatedDate,
+	)
 
 	if err != nil {
-		return nil, err
+		if errors.Is(err,sql.ErrNoRows) {
+			return nil,fmt.Errorf("Failed to get invoice: %w",err)
+		}
+		return nil,err 
 	}
 
-	userQuery := `
-		SELECT app_name, app_email
-		FROM apps
-		WHERE app_id = $1;
-	`
-	err = r.db.QueryRowContext(
-		ctx,
-		userQuery,
-		data.UserID,
-	).Scan(&data.UserName, &data.UserEmail)
-
-	if err != nil {
-		return nil, err
-	}
-
-	planQuery := `
-		SELECT name,price
-		FROM plans 
-		WHERE plan_id = $1;
-	`
-
-	err = r.db.QueryRowContext(
-		ctx,
-		planQuery,
-		data.PlanID,
-	).Scan(&data.PlanName, &data.PlanAmount)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &data, nil
+	return &data,nil 
 }
 
 func (r *AppUserRepo) GetInvoiceSubscriptionID(ctx context.Context, appID, invoiceID string) (string, int64, error) {

@@ -5,18 +5,21 @@ import (
 	pb "admin_service/internal/proto/admin"
 	"admin_service/internal/usecase/service"
 	"context"
+	"time"
 )
 
 type AdminHandler struct {
 	pb.UnimplementedAdminServiceServer
 	usecase interface {
 		Login(string, string) (string, error)
+		ListPayment(ctx context.Context,appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 	}
 	plan *service.PlanService
 }
 
 func NewAdminHandler(u interface {
 	Login(string, string) (string, error)
+	ListPayment(ctx context.Context,appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 }, p *service.PlanService) *AdminHandler {
 	return &AdminHandler{usecase: u, plan: p}
 }
@@ -86,6 +89,17 @@ func (h *AdminHandler) UpdatePlanStatus(ctx context.Context, req *pb.UpdatePlanS
 	}, nil
 }
 
+func (h *AdminHandler) ListPayments(ctx context.Context, req *pb.ListPaymentAdminRequest) (*pb.ListPaymentAdminResponse,error) {
+
+	payments,total,err := h.usecase.ListPayment(ctx,req.AppId,req.Status,int(req.Limit),int(req.Offset),optionalTimestamp(req.StartDate),optionalTimestamp(req.EndDate))
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return mapAdminPayments(payments,total,int(req.Limit),int(req.Offset)),nil 
+} 
+
 func mapPlans(plans []*entities.Plan) *pb.ListPlanResponse {
 	resp := &pb.ListPlanResponse{}
 	for _, p := range plans {
@@ -98,4 +112,26 @@ func mapPlans(plans []*entities.Plan) *pb.ListPlanResponse {
 		})
 	}
 	return resp
+}
+
+func mapAdminPayments(payments []entities.Payment,total,limit,offset int) *pb.ListPaymentAdminResponse {
+	resp := &pb.ListPaymentAdminResponse{}
+	for _,p := range payments {
+		resp.Payments = append(resp.Payments, &pb.PaymentAdmin{
+			InvoiceId: p.InvoiceID,
+			PlanName: p.PlanName,
+			Amount: float64(p.Amount),
+			Status: p.Status,
+			PaidAt: formatUTC(p.PaidAt),
+			AppName: p.AppName,
+			AppEmail: p.CustomerEmail,
+			PlanAmount: float64(p.PlanAmount),
+		})
+	}
+
+	resp.Total = int32(total)
+	resp.Limit = int32(limit)
+	resp.Offset = int32(offset)
+
+	return resp 
 }

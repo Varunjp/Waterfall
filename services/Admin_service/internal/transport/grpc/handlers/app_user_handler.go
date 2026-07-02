@@ -203,10 +203,10 @@ func (h *AppUserHandler) GetInvoice(ctx context.Context, req *pb.GetInvoiceReque
 	if err != nil {
 		return nil, err
 	}
-
+	fileName := fmt.Sprintf("invoice-%s.pdf", req.InvoiceId)
 	return &pb.GetInvoiceResponse{
 		Pdf:      pdfBytes,
-		Filename: fmt.Sprintf("invoice-%s.pdf", req.InvoiceId),
+		Filename: fileName,
 	}, nil
 }
 

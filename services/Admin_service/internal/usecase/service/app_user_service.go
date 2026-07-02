@@ -218,20 +218,17 @@ func (s *AppUserService) ListPayments(ctx context.Context, app_id, status string
 
 func (s *AppUserService) GetInvoice(ctx context.Context, app_id, invoice_id string) ([]byte, error) {
 
-	subID, amount, err := s.repo.GetInvoiceSubscriptionID(ctx, app_id, invoice_id)
-	if err != nil {
-		log.Println("Get subscription_id in user: ", err)
-		return nil, err
-	}
+	// subID, amount, err := s.repo.GetInvoiceSubscriptionID(ctx, app_id, invoice_id)
+	// if err != nil {
+	// 	log.Println("Get subscription_id in user: ", err)
+	// 	return nil, err
+	// }
 
-	data, err := s.repo.GetSubscriptionDetails(ctx, subID, invoice_id)
+	data, err := s.repo.GetPaymentDetails(ctx, app_id, invoice_id)
 	if err != nil {
 		log.Println("Get subscription details in user: ", err)
 		return nil, err
 	}
-
-	data.InvoiceNumber = invoice_id
-	data.TotalPaid = float64(amount)
 
 	pdf, err := utils.GeneratePDF(*data)
 	if err != nil {

@@ -8,7 +8,9 @@ type Payment struct {
 	InvoiceID      string    `db:"invoice_id"`
 	SubscriptionID string    `db:"subscription_id"`
 	AppID          string    `db:"app_id"`
+	AppName 	   string  	 `db:"app_name"`
 	PlanName       string    `db:"plan_name"`
+	PlanAmount     int64	 `db:"plan_amount"`
 	Amount         int64     `db:"amount"`
 	Currency       string    `db:"currency"`
 	CustomerEmail  string    `db:"customer_email"`

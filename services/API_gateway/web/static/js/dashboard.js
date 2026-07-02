@@ -939,7 +939,7 @@
   }
 
   function fmtAmount(paise) {
-    const rupees = Number(paise || 0) / 100;
+    const rupees = Number(paise || 0);
     return rupees.toLocaleString('en-IN', {
       style: 'currency', currency: 'INR', maximumFractionDigits: 2,
     });
@@ -1105,11 +1105,22 @@
       const res = await fetch(`/api/v1/invoice/${encodeURIComponent(invoiceId)}`, { headers: authHeader });
       if (!res.ok) throw new Error(`Failed to fetch invoice (${res.status})`);
 
+      const disposition = res.headers.get("Content-Disposition");
+
+      let filename = "invoice.pdf";
+
+      if (disposition) {
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        if (match) {
+          filename = match[1];
+        }
+      }
+
       const blob = await res.blob();
       const url  = window.URL.createObjectURL(blob);
       const a    = document.createElement('a');
       a.href     = url;
-      a.download = `${invoiceId}.pdf`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       a.remove();

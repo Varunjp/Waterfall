@@ -10,6 +10,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -610,11 +611,263 @@ func (x *UpdatePlanStatusResponse) GetPlan() *Plan {
 	return nil
 }
 
+type ListPaymentAdminRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppId         string                 `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
+	StartDate     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=startDate,proto3" json:"startDate,omitempty"`
+	EndDate       *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=endDate,proto3" json:"endDate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPaymentAdminRequest) Reset() {
+	*x = ListPaymentAdminRequest{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPaymentAdminRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPaymentAdminRequest) ProtoMessage() {}
+
+func (x *ListPaymentAdminRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPaymentAdminRequest.ProtoReflect.Descriptor instead.
+func (*ListPaymentAdminRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ListPaymentAdminRequest) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
+func (x *ListPaymentAdminRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *ListPaymentAdminRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *ListPaymentAdminRequest) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+func (x *ListPaymentAdminRequest) GetStartDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartDate
+	}
+	return nil
+}
+
+func (x *ListPaymentAdminRequest) GetEndDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndDate
+	}
+	return nil
+}
+
+type ListPaymentAdminResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Payments      []*PaymentAdmin        `protobuf:"bytes,1,rep,name=payments,proto3" json:"payments,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPaymentAdminResponse) Reset() {
+	*x = ListPaymentAdminResponse{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPaymentAdminResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPaymentAdminResponse) ProtoMessage() {}
+
+func (x *ListPaymentAdminResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPaymentAdminResponse.ProtoReflect.Descriptor instead.
+func (*ListPaymentAdminResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ListPaymentAdminResponse) GetPayments() []*PaymentAdmin {
+	if x != nil {
+		return x.Payments
+	}
+	return nil
+}
+
+func (x *ListPaymentAdminResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *ListPaymentAdminResponse) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *ListPaymentAdminResponse) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+type PaymentAdmin struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	InvoiceId     string                 `protobuf:"bytes,1,opt,name=invoice_id,json=invoiceId,proto3" json:"invoice_id,omitempty"`
+	PlanName      string                 `protobuf:"bytes,2,opt,name=plan_name,json=planName,proto3" json:"plan_name,omitempty"`
+	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	PaidAt        string                 `protobuf:"bytes,5,opt,name=paid_at,json=paidAt,proto3" json:"paid_at,omitempty"`
+	AppName       string                 `protobuf:"bytes,6,opt,name=app_name,json=appName,proto3" json:"app_name,omitempty"`
+	AppEmail      string                 `protobuf:"bytes,7,opt,name=app_email,json=appEmail,proto3" json:"app_email,omitempty"`
+	PlanAmount    float64                `protobuf:"fixed64,8,opt,name=plan_amount,json=planAmount,proto3" json:"plan_amount,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PaymentAdmin) Reset() {
+	*x = PaymentAdmin{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PaymentAdmin) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PaymentAdmin) ProtoMessage() {}
+
+func (x *PaymentAdmin) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PaymentAdmin.ProtoReflect.Descriptor instead.
+func (*PaymentAdmin) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *PaymentAdmin) GetInvoiceId() string {
+	if x != nil {
+		return x.InvoiceId
+	}
+	return ""
+}
+
+func (x *PaymentAdmin) GetPlanName() string {
+	if x != nil {
+		return x.PlanName
+	}
+	return ""
+}
+
+func (x *PaymentAdmin) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *PaymentAdmin) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *PaymentAdmin) GetPaidAt() string {
+	if x != nil {
+		return x.PaidAt
+	}
+	return ""
+}
+
+func (x *PaymentAdmin) GetAppName() string {
+	if x != nil {
+		return x.AppName
+	}
+	return ""
+}
+
+func (x *PaymentAdmin) GetAppEmail() string {
+	if x != nil {
+		return x.AppEmail
+	}
+	return ""
+}
+
+func (x *PaymentAdmin) GetPlanAmount() float64 {
+	if x != nil {
+		return x.PlanAmount
+	}
+	return 0
+}
+
 var File_internal_proto_admin_admin_proto protoreflect.FileDescriptor
 
 const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\n" +
-	" internal/proto/admin/admin.proto\x12\x05admin\x1a'googleapis/google/api/annotations.proto\"@\n" +
+	" internal/proto/admin/admin.proto\x12\x05admin\x1a\x1fgoogle/protobuf/timestamp.proto\x1a'googleapis/google/api/annotations.proto\"@\n" +
 	"\fLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"2\n" +
@@ -649,7 +902,30 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\x06planID\x18\x01 \x01(\tR\x06planID\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\";\n" +
 	"\x18UpdatePlanStatusResponse\x12\x1f\n" +
-	"\x04plan\x18\x01 \x01(\v2\v.admin.PlanR\x04plan2\x92\x04\n" +
+	"\x04plan\x18\x01 \x01(\v2\v.admin.PlanR\x04plan\"\xe6\x01\n" +
+	"\x17ListPaymentAdminRequest\x12\x15\n" +
+	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x04 \x01(\x05R\x06offset\x128\n" +
+	"\tstartDate\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x124\n" +
+	"\aendDate\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\"\x8f\x01\n" +
+	"\x18ListPaymentAdminResponse\x12/\n" +
+	"\bpayments\x18\x01 \x03(\v2\x13.admin.PaymentAdminR\bpayments\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x04 \x01(\x05R\x06offset\"\xec\x01\n" +
+	"\fPaymentAdmin\x12\x1d\n" +
+	"\n" +
+	"invoice_id\x18\x01 \x01(\tR\tinvoiceId\x12\x1b\n" +
+	"\tplan_name\x18\x02 \x01(\tR\bplanName\x12\x16\n" +
+	"\x06amount\x18\x03 \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12\x17\n" +
+	"\apaid_at\x18\x05 \x01(\tR\x06paidAt\x12\x19\n" +
+	"\bapp_name\x18\x06 \x01(\tR\aappName\x12\x1b\n" +
+	"\tapp_email\x18\a \x01(\tR\bappEmail\x12\x1f\n" +
+	"\vplan_amount\x18\b \x01(\x01R\n" +
+	"planAmount2\x83\x05\n" +
 	"\fAdminService\x12R\n" +
 	"\x05Login\x12\x13.admin.LoginRequest\x1a\x14.admin.LoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/login\x12a\n" +
 	"\n" +
@@ -657,7 +933,8 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\tListPlans\x12\x16.admin.ListPlanRequest\x1a\x17.admin.ListPlanResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/admin/plans\x12j\n" +
 	"\n" +
 	"UpdatePlan\x12\x18.admin.UpdatePlanRequest\x1a\x19.admin.UpdatePlanResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\x1a\x1c/api/v1/admin/plans/{planID}\x12\x83\x01\n" +
-	"\x10UpdatePlanStatus\x12\x1e.admin.UpdatePlanStatusRequest\x1a\x1f.admin.UpdatePlanStatusResponse\".\x82\xd3\xe4\x93\x02(:\x01*2#/api/v1/admin/plans/{planID}/statusB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
+	"\x10UpdatePlanStatus\x12\x1e.admin.UpdatePlanStatusRequest\x1a\x1f.admin.UpdatePlanStatusResponse\".\x82\xd3\xe4\x93\x02(:\x01*2#/api/v1/admin/plans/{planID}/status\x12o\n" +
+	"\fListPayments\x12\x1e.admin.ListPaymentAdminRequest\x1a\x1f.admin.ListPaymentAdminResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/admin/paymentsB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
 
 var (
 	file_internal_proto_admin_admin_proto_rawDescOnce sync.Once
@@ -671,7 +948,7 @@ func file_internal_proto_admin_admin_proto_rawDescGZIP() []byte {
 	return file_internal_proto_admin_admin_proto_rawDescData
 }
 
-var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_internal_proto_admin_admin_proto_goTypes = []any{
 	(*LoginRequest)(nil),             // 0: admin.LoginRequest
 	(*LoginResponse)(nil),            // 1: admin.LoginResponse
@@ -684,26 +961,35 @@ var file_internal_proto_admin_admin_proto_goTypes = []any{
 	(*UpdatePlanResponse)(nil),       // 8: admin.UpdatePlanResponse
 	(*UpdatePlanStatusRequest)(nil),  // 9: admin.UpdatePlanStatusRequest
 	(*UpdatePlanStatusResponse)(nil), // 10: admin.UpdatePlanStatusResponse
+	(*ListPaymentAdminRequest)(nil),  // 11: admin.ListPaymentAdminRequest
+	(*ListPaymentAdminResponse)(nil), // 12: admin.ListPaymentAdminResponse
+	(*PaymentAdmin)(nil),             // 13: admin.PaymentAdmin
+	(*timestamppb.Timestamp)(nil),    // 14: google.protobuf.Timestamp
 }
 var file_internal_proto_admin_admin_proto_depIdxs = []int32{
 	5,  // 0: admin.ListPlanResponse.plans:type_name -> admin.Plan
 	5,  // 1: admin.UpdatePlanResponse.updatedPlan:type_name -> admin.Plan
 	5,  // 2: admin.UpdatePlanStatusResponse.plan:type_name -> admin.Plan
-	0,  // 3: admin.AdminService.Login:input_type -> admin.LoginRequest
-	2,  // 4: admin.AdminService.CreatePlan:input_type -> admin.CreatePlanRequest
-	4,  // 5: admin.AdminService.ListPlans:input_type -> admin.ListPlanRequest
-	7,  // 6: admin.AdminService.UpdatePlan:input_type -> admin.UpdatePlanRequest
-	9,  // 7: admin.AdminService.UpdatePlanStatus:input_type -> admin.UpdatePlanStatusRequest
-	1,  // 8: admin.AdminService.Login:output_type -> admin.LoginResponse
-	3,  // 9: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
-	6,  // 10: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
-	8,  // 11: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
-	10, // 12: admin.AdminService.UpdatePlanStatus:output_type -> admin.UpdatePlanStatusResponse
-	8,  // [8:13] is the sub-list for method output_type
-	3,  // [3:8] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	14, // 3: admin.ListPaymentAdminRequest.startDate:type_name -> google.protobuf.Timestamp
+	14, // 4: admin.ListPaymentAdminRequest.endDate:type_name -> google.protobuf.Timestamp
+	13, // 5: admin.ListPaymentAdminResponse.payments:type_name -> admin.PaymentAdmin
+	0,  // 6: admin.AdminService.Login:input_type -> admin.LoginRequest
+	2,  // 7: admin.AdminService.CreatePlan:input_type -> admin.CreatePlanRequest
+	4,  // 8: admin.AdminService.ListPlans:input_type -> admin.ListPlanRequest
+	7,  // 9: admin.AdminService.UpdatePlan:input_type -> admin.UpdatePlanRequest
+	9,  // 10: admin.AdminService.UpdatePlanStatus:input_type -> admin.UpdatePlanStatusRequest
+	11, // 11: admin.AdminService.ListPayments:input_type -> admin.ListPaymentAdminRequest
+	1,  // 12: admin.AdminService.Login:output_type -> admin.LoginResponse
+	3,  // 13: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
+	6,  // 14: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
+	8,  // 15: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
+	10, // 16: admin.AdminService.UpdatePlanStatus:output_type -> admin.UpdatePlanStatusResponse
+	12, // 17: admin.AdminService.ListPayments:output_type -> admin.ListPaymentAdminResponse
+	12, // [12:18] is the sub-list for method output_type
+	6,  // [6:12] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_internal_proto_admin_admin_proto_init() }
@@ -717,7 +1003,7 @@ func file_internal_proto_admin_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_admin_proto_rawDesc), len(file_internal_proto_admin_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
