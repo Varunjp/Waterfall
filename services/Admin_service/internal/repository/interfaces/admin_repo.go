@@ -11,4 +11,5 @@ type AdminRepository interface {
 	Create(admin *entities.PlatformAdmin) error
 	ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 	GetPaymentDetails(ctx context.Context, invoiceID string) (*entities.InvoiceData, error)
+	ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time) ([]entities.Subscriber, int, error)
 }

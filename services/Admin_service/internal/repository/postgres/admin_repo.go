@@ -113,6 +113,107 @@ func (r AdminRepo) ListPayment(ctx context.Context, appID, status string, limit,
 	return payments, total, nil
 }
 
+func (r AdminRepo) ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time) ([]entities.Subscriber, int, error) {
+	baseQuery := `
+	FROM subscriptions s
+	INNER JOIN apps a ON s.app_id = a.app_id
+	INNER JOIN plans p ON s.plan_id = p.plan_id
+	WHERE 1=1 AND p.name != 'FREE'
+	`
+	args := []any{}
+	argPos := 1
+
+	// -------- DATE FILTER --------
+	if startDate != nil && endDate != nil {
+		baseQuery += fmt.Sprintf(
+			" AND s.current_period_start >= $%d AND s.current_period_end <= $%d",
+			argPos,
+			argPos+1,
+		)
+
+		args = append(args, *startDate, *endDate)
+		argPos += 2
+
+	} else if startDate != nil {
+
+		baseQuery += fmt.Sprintf(
+			" AND s.current_period_start >= $%d",
+			argPos,
+		)
+
+		args = append(args, *startDate)
+		argPos++
+
+	} else if endDate != nil {
+
+		baseQuery += fmt.Sprintf(
+			" AND s.current_period_end <= $%d",
+			argPos,
+		)
+
+		args = append(args, *endDate)
+		argPos++
+	}
+
+	// -------- COUNT QUERY --------
+	countQuery := "SELECT COUNT(*) " + baseQuery
+
+	var total int
+	err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// -------- DATA QUERY --------
+	dataQuery := `
+	SELECT
+		s.app_id,
+		a.app_name,
+		s.plan_id,
+		p.name,
+		s.status,
+		s.current_period_start,
+		s.current_period_end
+	` + baseQuery +
+		fmt.Sprintf(
+			" ORDER BY s.created_at DESC LIMIT $%d OFFSET $%d",
+			argPos,
+			argPos+1,
+		)
+
+	dataArgs := append(args, limit, offset)
+
+	rows, err := r.db.QueryContext(ctx, dataQuery, dataArgs...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	subscribers := make([]entities.Subscriber, 0, limit)
+
+	for rows.Next() {
+		var s entities.Subscriber
+		if err := rows.Scan(
+			&s.AppID,
+			&s.AppName,
+			&s.PlanID,
+			&s.PlanName,
+			&s.Status,
+			&s.StartDate,
+			&s.EndDate,
+		); err != nil {
+			return nil, 0, err
+		}
+		subscribers = append(subscribers, s)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	return subscribers, total, nil
+}
+
 func (r AdminRepo) GetPaymentDetails(ctx context.Context, invoiceID string) (*entities.InvoiceData, error) {
 
 	var data entities.InvoiceData

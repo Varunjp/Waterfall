@@ -49,6 +49,12 @@ service AdminService {
     }
 
     rpc GetAdminInvoice(GetAdminInvoiceRequest) returns (GetAdminInvoiceResponse) {}
+
+    rpc GetSubscribers(GetSubscriberRequest) returns (GetSubscriberResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/admin/subscribers"
+        };
+    }
 }
 
 message LoginRequest {
@@ -143,4 +149,27 @@ message GetAdminInvoiceRequest {
 message GetAdminInvoiceResponse {
     bytes pdf = 1;
     string filename = 2;
+}
+
+message GetSubscriberRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    google.protobuf.Timestamp startDate = 3;
+    google.protobuf.Timestamp endDate = 4;
+}
+
+message GetSubscriberResponse {
+    repeated Subscriber subscribers = 1;
+    int32 total = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+}
+
+message Subscriber {
+    string app_id = 1;
+    string app_name = 2;
+    string plan_name = 3;
+    string status = 4;
+    string startDate = 5;
+    string endDate = 6;
 }

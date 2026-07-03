@@ -58,15 +58,34 @@ func (s *AdminService) ListPayment(ctx context.Context, appID, status string, li
 	return payments, total, err
 }
 
+func (s *AdminService) ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time)([]entities.Subscriber,int,error) {
+
+	if !isValidTime(startDate) {
+		startDate = nil 
+	}
+
+	if !isValidTime(endDate) {
+		endDate = nil 
+	}
+
+	subscribers,total,err := s.repo.ListSubcribers(ctx,limit,offset,startDate,endDate)
+
+	if err != nil {
+		log.Println("List subscribers :",err)
+	}
+
+	return subscribers,total,err 
+}
+
 func (s *AdminService) GetInvoice(ctx context.Context, invoice_id string) ([]byte, error) {
 
 	invoice_id = strings.TrimSpace(invoice_id)
 
 	if invoice_id == "" {
-		return nil,fmt.Errorf("Not valid invoice")
+		return nil, fmt.Errorf("Not valid invoice")
 	}
 
-	data, err := s.repo.GetPaymentDetails(ctx,invoice_id)
+	data, err := s.repo.GetPaymentDetails(ctx, invoice_id)
 	if err != nil {
 		log.Println("Get subscription details in user: ", err)
 		return nil, err

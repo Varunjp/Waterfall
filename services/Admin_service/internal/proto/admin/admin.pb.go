@@ -959,6 +959,226 @@ func (x *GetAdminInvoiceResponse) GetFilename() string {
 	return ""
 }
 
+type GetSubscriberRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	StartDate     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=startDate,proto3" json:"startDate,omitempty"`
+	EndDate       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=endDate,proto3" json:"endDate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSubscriberRequest) Reset() {
+	*x = GetSubscriberRequest{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSubscriberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSubscriberRequest) ProtoMessage() {}
+
+func (x *GetSubscriberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSubscriberRequest.ProtoReflect.Descriptor instead.
+func (*GetSubscriberRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetSubscriberRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *GetSubscriberRequest) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+func (x *GetSubscriberRequest) GetStartDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartDate
+	}
+	return nil
+}
+
+func (x *GetSubscriberRequest) GetEndDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndDate
+	}
+	return nil
+}
+
+type GetSubscriberResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Subscribers   []*Subscriber          `protobuf:"bytes,1,rep,name=subscribers,proto3" json:"subscribers,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSubscriberResponse) Reset() {
+	*x = GetSubscriberResponse{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSubscriberResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSubscriberResponse) ProtoMessage() {}
+
+func (x *GetSubscriberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSubscriberResponse.ProtoReflect.Descriptor instead.
+func (*GetSubscriberResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetSubscriberResponse) GetSubscribers() []*Subscriber {
+	if x != nil {
+		return x.Subscribers
+	}
+	return nil
+}
+
+func (x *GetSubscriberResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *GetSubscriberResponse) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *GetSubscriberResponse) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+type Subscriber struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppId         string                 `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	AppName       string                 `protobuf:"bytes,2,opt,name=app_name,json=appName,proto3" json:"app_name,omitempty"`
+	PlanName      string                 `protobuf:"bytes,3,opt,name=plan_name,json=planName,proto3" json:"plan_name,omitempty"`
+	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	StartDate     string                 `protobuf:"bytes,5,opt,name=startDate,proto3" json:"startDate,omitempty"`
+	EndDate       string                 `protobuf:"bytes,6,opt,name=endDate,proto3" json:"endDate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Subscriber) Reset() {
+	*x = Subscriber{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Subscriber) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Subscriber) ProtoMessage() {}
+
+func (x *Subscriber) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Subscriber.ProtoReflect.Descriptor instead.
+func (*Subscriber) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *Subscriber) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
+func (x *Subscriber) GetAppName() string {
+	if x != nil {
+		return x.AppName
+	}
+	return ""
+}
+
+func (x *Subscriber) GetPlanName() string {
+	if x != nil {
+		return x.PlanName
+	}
+	return ""
+}
+
+func (x *Subscriber) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *Subscriber) GetStartDate() string {
+	if x != nil {
+		return x.StartDate
+	}
+	return ""
+}
+
+func (x *Subscriber) GetEndDate() string {
+	if x != nil {
+		return x.EndDate
+	}
+	return ""
+}
+
 var File_internal_proto_admin_admin_proto protoreflect.FileDescriptor
 
 const file_internal_proto_admin_admin_proto_rawDesc = "" +
@@ -1027,7 +1247,25 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"invoice_id\x18\x01 \x01(\tR\tinvoiceId\"G\n" +
 	"\x17GetAdminInvoiceResponse\x12\x10\n" +
 	"\x03pdf\x18\x01 \x01(\fR\x03pdf\x12\x1a\n" +
-	"\bfilename\x18\x02 \x01(\tR\bfilename2\xd7\x05\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\"\xb4\x01\n" +
+	"\x14GetSubscriberRequest\x12\x14\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x02 \x01(\x05R\x06offset\x128\n" +
+	"\tstartDate\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x124\n" +
+	"\aendDate\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\"\x90\x01\n" +
+	"\x15GetSubscriberResponse\x123\n" +
+	"\vsubscribers\x18\x01 \x03(\v2\x11.admin.SubscriberR\vsubscribers\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x04 \x01(\x05R\x06offset\"\xab\x01\n" +
+	"\n" +
+	"Subscriber\x12\x15\n" +
+	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x19\n" +
+	"\bapp_name\x18\x02 \x01(\tR\aappName\x12\x1b\n" +
+	"\tplan_name\x18\x03 \x01(\tR\bplanName\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12\x1c\n" +
+	"\tstartDate\x18\x05 \x01(\tR\tstartDate\x12\x18\n" +
+	"\aendDate\x18\x06 \x01(\tR\aendDate2\xc7\x06\n" +
 	"\fAdminService\x12R\n" +
 	"\x05Login\x12\x13.admin.LoginRequest\x1a\x14.admin.LoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/login\x12a\n" +
 	"\n" +
@@ -1037,7 +1275,8 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"UpdatePlan\x12\x18.admin.UpdatePlanRequest\x1a\x19.admin.UpdatePlanResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\x1a\x1c/api/v1/admin/plans/{planID}\x12\x83\x01\n" +
 	"\x10UpdatePlanStatus\x12\x1e.admin.UpdatePlanStatusRequest\x1a\x1f.admin.UpdatePlanStatusResponse\".\x82\xd3\xe4\x93\x02(:\x01*2#/api/v1/admin/plans/{planID}/status\x12o\n" +
 	"\fListPayments\x12\x1e.admin.ListPaymentAdminRequest\x1a\x1f.admin.ListPaymentAdminResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/admin/payments\x12R\n" +
-	"\x0fGetAdminInvoice\x12\x1d.admin.GetAdminInvoiceRequest\x1a\x1e.admin.GetAdminInvoiceResponse\"\x00B\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
+	"\x0fGetAdminInvoice\x12\x1d.admin.GetAdminInvoiceRequest\x1a\x1e.admin.GetAdminInvoiceResponse\"\x00\x12n\n" +
+	"\x0eGetSubscribers\x12\x1b.admin.GetSubscriberRequest\x1a\x1c.admin.GetSubscriberResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/admin/subscribersB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
 
 var (
 	file_internal_proto_admin_admin_proto_rawDescOnce sync.Once
@@ -1051,7 +1290,7 @@ func file_internal_proto_admin_admin_proto_rawDescGZIP() []byte {
 	return file_internal_proto_admin_admin_proto_rawDescData
 }
 
-var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_internal_proto_admin_admin_proto_goTypes = []any{
 	(*LoginRequest)(nil),             // 0: admin.LoginRequest
 	(*LoginResponse)(nil),            // 1: admin.LoginResponse
@@ -1069,34 +1308,42 @@ var file_internal_proto_admin_admin_proto_goTypes = []any{
 	(*PaymentAdmin)(nil),             // 13: admin.PaymentAdmin
 	(*GetAdminInvoiceRequest)(nil),   // 14: admin.GetAdminInvoiceRequest
 	(*GetAdminInvoiceResponse)(nil),  // 15: admin.GetAdminInvoiceResponse
-	(*timestamppb.Timestamp)(nil),    // 16: google.protobuf.Timestamp
+	(*GetSubscriberRequest)(nil),     // 16: admin.GetSubscriberRequest
+	(*GetSubscriberResponse)(nil),    // 17: admin.GetSubscriberResponse
+	(*Subscriber)(nil),               // 18: admin.Subscriber
+	(*timestamppb.Timestamp)(nil),    // 19: google.protobuf.Timestamp
 }
 var file_internal_proto_admin_admin_proto_depIdxs = []int32{
 	5,  // 0: admin.ListPlanResponse.plans:type_name -> admin.Plan
 	5,  // 1: admin.UpdatePlanResponse.updatedPlan:type_name -> admin.Plan
 	5,  // 2: admin.UpdatePlanStatusResponse.plan:type_name -> admin.Plan
-	16, // 3: admin.ListPaymentAdminRequest.startDate:type_name -> google.protobuf.Timestamp
-	16, // 4: admin.ListPaymentAdminRequest.endDate:type_name -> google.protobuf.Timestamp
+	19, // 3: admin.ListPaymentAdminRequest.startDate:type_name -> google.protobuf.Timestamp
+	19, // 4: admin.ListPaymentAdminRequest.endDate:type_name -> google.protobuf.Timestamp
 	13, // 5: admin.ListPaymentAdminResponse.payments:type_name -> admin.PaymentAdmin
-	0,  // 6: admin.AdminService.Login:input_type -> admin.LoginRequest
-	2,  // 7: admin.AdminService.CreatePlan:input_type -> admin.CreatePlanRequest
-	4,  // 8: admin.AdminService.ListPlans:input_type -> admin.ListPlanRequest
-	7,  // 9: admin.AdminService.UpdatePlan:input_type -> admin.UpdatePlanRequest
-	9,  // 10: admin.AdminService.UpdatePlanStatus:input_type -> admin.UpdatePlanStatusRequest
-	11, // 11: admin.AdminService.ListPayments:input_type -> admin.ListPaymentAdminRequest
-	14, // 12: admin.AdminService.GetAdminInvoice:input_type -> admin.GetAdminInvoiceRequest
-	1,  // 13: admin.AdminService.Login:output_type -> admin.LoginResponse
-	3,  // 14: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
-	6,  // 15: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
-	8,  // 16: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
-	10, // 17: admin.AdminService.UpdatePlanStatus:output_type -> admin.UpdatePlanStatusResponse
-	12, // 18: admin.AdminService.ListPayments:output_type -> admin.ListPaymentAdminResponse
-	15, // 19: admin.AdminService.GetAdminInvoice:output_type -> admin.GetAdminInvoiceResponse
-	13, // [13:20] is the sub-list for method output_type
-	6,  // [6:13] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	19, // 6: admin.GetSubscriberRequest.startDate:type_name -> google.protobuf.Timestamp
+	19, // 7: admin.GetSubscriberRequest.endDate:type_name -> google.protobuf.Timestamp
+	18, // 8: admin.GetSubscriberResponse.subscribers:type_name -> admin.Subscriber
+	0,  // 9: admin.AdminService.Login:input_type -> admin.LoginRequest
+	2,  // 10: admin.AdminService.CreatePlan:input_type -> admin.CreatePlanRequest
+	4,  // 11: admin.AdminService.ListPlans:input_type -> admin.ListPlanRequest
+	7,  // 12: admin.AdminService.UpdatePlan:input_type -> admin.UpdatePlanRequest
+	9,  // 13: admin.AdminService.UpdatePlanStatus:input_type -> admin.UpdatePlanStatusRequest
+	11, // 14: admin.AdminService.ListPayments:input_type -> admin.ListPaymentAdminRequest
+	14, // 15: admin.AdminService.GetAdminInvoice:input_type -> admin.GetAdminInvoiceRequest
+	16, // 16: admin.AdminService.GetSubscribers:input_type -> admin.GetSubscriberRequest
+	1,  // 17: admin.AdminService.Login:output_type -> admin.LoginResponse
+	3,  // 18: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
+	6,  // 19: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
+	8,  // 20: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
+	10, // 21: admin.AdminService.UpdatePlanStatus:output_type -> admin.UpdatePlanStatusResponse
+	12, // 22: admin.AdminService.ListPayments:output_type -> admin.ListPaymentAdminResponse
+	15, // 23: admin.AdminService.GetAdminInvoice:output_type -> admin.GetAdminInvoiceResponse
+	17, // 24: admin.AdminService.GetSubscribers:output_type -> admin.GetSubscriberResponse
+	17, // [17:25] is the sub-list for method output_type
+	9,  // [9:17] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_internal_proto_admin_admin_proto_init() }
@@ -1110,7 +1357,7 @@ func file_internal_proto_admin_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_admin_proto_rawDesc), len(file_internal_proto_admin_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

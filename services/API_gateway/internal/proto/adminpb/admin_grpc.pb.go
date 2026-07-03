@@ -26,6 +26,7 @@ const (
 	AdminService_UpdatePlanStatus_FullMethodName = "/admin.AdminService/UpdatePlanStatus"
 	AdminService_ListPayments_FullMethodName     = "/admin.AdminService/ListPayments"
 	AdminService_GetAdminInvoice_FullMethodName  = "/admin.AdminService/GetAdminInvoice"
+	AdminService_GetSubscribers_FullMethodName   = "/admin.AdminService/GetSubscribers"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -39,6 +40,7 @@ type AdminServiceClient interface {
 	UpdatePlanStatus(ctx context.Context, in *UpdatePlanStatusRequest, opts ...grpc.CallOption) (*UpdatePlanStatusResponse, error)
 	ListPayments(ctx context.Context, in *ListPaymentAdminRequest, opts ...grpc.CallOption) (*ListPaymentAdminResponse, error)
 	GetAdminInvoice(ctx context.Context, in *GetAdminInvoiceRequest, opts ...grpc.CallOption) (*GetAdminInvoiceResponse, error)
+	GetSubscribers(ctx context.Context, in *GetSubscriberRequest, opts ...grpc.CallOption) (*GetSubscriberResponse, error)
 }
 
 type adminServiceClient struct {
@@ -119,6 +121,16 @@ func (c *adminServiceClient) GetAdminInvoice(ctx context.Context, in *GetAdminIn
 	return out, nil
 }
 
+func (c *adminServiceClient) GetSubscribers(ctx context.Context, in *GetSubscriberRequest, opts ...grpc.CallOption) (*GetSubscriberResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSubscriberResponse)
+	err := c.cc.Invoke(ctx, AdminService_GetSubscribers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServiceServer is the server API for AdminService service.
 // All implementations must embed UnimplementedAdminServiceServer
 // for forward compatibility.
@@ -130,6 +142,7 @@ type AdminServiceServer interface {
 	UpdatePlanStatus(context.Context, *UpdatePlanStatusRequest) (*UpdatePlanStatusResponse, error)
 	ListPayments(context.Context, *ListPaymentAdminRequest) (*ListPaymentAdminResponse, error)
 	GetAdminInvoice(context.Context, *GetAdminInvoiceRequest) (*GetAdminInvoiceResponse, error)
+	GetSubscribers(context.Context, *GetSubscriberRequest) (*GetSubscriberResponse, error)
 	mustEmbedUnimplementedAdminServiceServer()
 }
 
@@ -160,6 +173,9 @@ func (UnimplementedAdminServiceServer) ListPayments(context.Context, *ListPaymen
 }
 func (UnimplementedAdminServiceServer) GetAdminInvoice(context.Context, *GetAdminInvoiceRequest) (*GetAdminInvoiceResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAdminInvoice not implemented")
+}
+func (UnimplementedAdminServiceServer) GetSubscribers(context.Context, *GetSubscriberRequest) (*GetSubscriberResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSubscribers not implemented")
 }
 func (UnimplementedAdminServiceServer) mustEmbedUnimplementedAdminServiceServer() {}
 func (UnimplementedAdminServiceServer) testEmbeddedByValue()                      {}
@@ -308,6 +324,24 @@ func _AdminService_GetAdminInvoice_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_GetSubscribers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSubscriberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).GetSubscribers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_GetSubscribers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).GetSubscribers(ctx, req.(*GetSubscriberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -342,6 +376,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAdminInvoice",
 			Handler:    _AdminService_GetAdminInvoice_Handler,
+		},
+		{
+			MethodName: "GetSubscribers",
+			Handler:    _AdminService_GetSubscribers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

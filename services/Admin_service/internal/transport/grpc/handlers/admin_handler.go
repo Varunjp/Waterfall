@@ -15,6 +15,7 @@ type AdminHandler struct {
 		Login(string, string) (string, error)
 		ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 		GetInvoice(ctx context.Context, invoice_id string) ([]byte, error)
+		ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time)([]entities.Subscriber,int,error)
 	}
 	plan *service.PlanService
 }
@@ -23,6 +24,7 @@ func NewAdminHandler(u interface {
 	Login(string, string) (string, error)
 	ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 	GetInvoice(ctx context.Context, invoice_id string) ([]byte, error)
+	ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time)([]entities.Subscriber,int,error)
 }, p *service.PlanService) *AdminHandler {
 	return &AdminHandler{usecase: u, plan: p}
 }
@@ -103,8 +105,19 @@ func (h *AdminHandler) ListPayments(ctx context.Context, req *pb.ListPaymentAdmi
 	return mapAdminPayments(payments, total, int(req.Limit), int(req.Offset)), nil
 }
 
-func (h *AdminHandler) GetAdminInvoice(ctx context.Context, req *pb.GetAdminInvoiceRequest) (*pb.GetAdminInvoiceResponse,error) {
-	
+func (h *AdminHandler) GetSubscribers(ctx context.Context, req *pb.GetSubscriberRequest)(*pb.GetSubscriberResponse,error) {
+
+	subscribers,total,err := h.usecase.ListSubcribers(ctx,int(req.Limit),int(req.Offset),optionalTimestamp(req.StartDate),optionalTimestamp(req.EndDate))
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return mapSubcribers(subscribers,total,int(req.Limit),int(req.Offset)),nil 
+}
+
+func (h *AdminHandler) GetAdminInvoice(ctx context.Context, req *pb.GetAdminInvoiceRequest) (*pb.GetAdminInvoiceResponse, error) {
+
 	pdfBytes, err := h.usecase.GetInvoice(ctx, req.InvoiceId)
 	if err != nil {
 		return nil, err
@@ -113,7 +126,7 @@ func (h *AdminHandler) GetAdminInvoice(ctx context.Context, req *pb.GetAdminInvo
 	return &pb.GetAdminInvoiceResponse{
 		Pdf:      pdfBytes,
 		Filename: fileName,
-	},nil
+	}, nil
 }
 
 func mapPlans(plans []*entities.Plan) *pb.ListPlanResponse {
@@ -142,6 +155,28 @@ func mapAdminPayments(payments []entities.Payment, total, limit, offset int) *pb
 			AppName:    p.AppName,
 			AppEmail:   p.CustomerEmail,
 			PlanAmount: float64(p.PlanAmount),
+		})
+	}
+
+	resp.Total = int32(total)
+	resp.Limit = int32(limit)
+	resp.Offset = int32(offset)
+
+	return resp
+}
+
+func mapSubcribers(subcribers []entities.Subscriber, total, limit, offset int) *pb.GetSubscriberResponse {
+
+	resp := &pb.GetSubscriberResponse{}
+
+	for _,s := range subcribers {
+		resp.Subscribers = append(resp.Subscribers, &pb.Subscriber{
+			AppId: s.AppID,
+			AppName: s.AppName,
+			PlanName: s.PlanName,
+			Status: s.Status,
+			StartDate: formatUTC(s.StartDate),
+			EndDate: formatUTC(s.EndDate),
 		})
 	}
 

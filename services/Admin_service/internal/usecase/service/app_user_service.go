@@ -228,11 +228,11 @@ func (s *AppUserService) GetInvoice(ctx context.Context, app_id, invoice_id stri
 	invoice_id = strings.TrimSpace(invoice_id)
 
 	if app_id == "" {
-		return nil,fmt.Errorf("failed to retrieve id")
+		return nil, fmt.Errorf("failed to retrieve id")
 	}
 
 	if invoice_id == "" {
-		return nil,fmt.Errorf("Not valid invoice")
+		return nil, fmt.Errorf("Not valid invoice")
 	}
 
 	data, err := s.repo.GetPaymentDetails(ctx, app_id, invoice_id)
