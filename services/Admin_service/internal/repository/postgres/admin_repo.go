@@ -246,7 +246,7 @@ func (r AdminRepo) GetPaymentDetails(ctx context.Context, invoiceID string) (*en
 	return &data, nil
 }
 
-func (r AdminRepo) GetOverview(ctx context.Context) (*entities.DashboardOverview,error) {
+func (r AdminRepo) GetOverview(ctx context.Context) (*entities.DashboardOverview, error) {
 	query := `
 	SELECT
 
@@ -283,7 +283,7 @@ func (r AdminRepo) GetOverview(ctx context.Context) (*entities.DashboardOverview
 
 	var overview entities.DashboardOverview
 
-	err := r.db.QueryRowContext(ctx,query).Scan(
+	err := r.db.QueryRowContext(ctx, query).Scan(
 		&overview.TotalUsers,
 		&overview.TotalApps,
 		&overview.ActiveSubscribers,
@@ -292,8 +292,8 @@ func (r AdminRepo) GetOverview(ctx context.Context) (*entities.DashboardOverview
 	)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	return &overview,nil  
+	return &overview, nil
 }

@@ -58,23 +58,23 @@ func (s *AdminService) ListPayment(ctx context.Context, appID, status string, li
 	return payments, total, err
 }
 
-func (s *AdminService) ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time)([]entities.Subscriber,int,error) {
+func (s *AdminService) ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time) ([]entities.Subscriber, int, error) {
 
 	if !isValidTime(startDate) {
-		startDate = nil 
+		startDate = nil
 	}
 
 	if !isValidTime(endDate) {
-		endDate = nil 
+		endDate = nil
 	}
 
-	subscribers,total,err := s.repo.ListSubcribers(ctx,limit,offset,startDate,endDate)
+	subscribers, total, err := s.repo.ListSubcribers(ctx, limit, offset, startDate, endDate)
 
 	if err != nil {
-		log.Println("List subscribers :",err)
+		log.Println("List subscribers :", err)
 	}
 
-	return subscribers,total,err 
+	return subscribers, total, err
 }
 
 func (s *AdminService) GetInvoice(ctx context.Context, invoice_id string) ([]byte, error) {
@@ -99,13 +99,13 @@ func (s *AdminService) GetInvoice(ctx context.Context, invoice_id string) ([]byt
 	return pdf, nil
 }
 
-func (s *AdminService) GetOverview(ctx context.Context) (*entities.DashboardOverview,error) {
+func (s *AdminService) GetOverview(ctx context.Context) (*entities.DashboardOverview, error) {
 
-	overview,err := s.repo.GetOverview(ctx)
+	overview, err := s.repo.GetOverview(ctx)
 
 	//delete
-	fmt.Println("check overview :",overview)
-	fmt.Println("Check revenue :",overview.RevenueMonth)
+	fmt.Println("check overview :", overview)
+	fmt.Println("Check revenue :", overview.RevenueMonth)
 
-	return overview,err 
+	return overview, err
 }

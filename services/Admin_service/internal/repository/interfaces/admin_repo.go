@@ -12,5 +12,5 @@ type AdminRepository interface {
 	ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 	GetPaymentDetails(ctx context.Context, invoiceID string) (*entities.InvoiceData, error)
 	ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time) ([]entities.Subscriber, int, error)
-	GetOverview(ctx context.Context) (*entities.DashboardOverview,error)
+	GetOverview(ctx context.Context) (*entities.DashboardOverview, error)
 }

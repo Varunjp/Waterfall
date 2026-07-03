@@ -15,8 +15,8 @@ type AdminHandler struct {
 		Login(string, string) (string, error)
 		ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 		GetInvoice(ctx context.Context, invoice_id string) ([]byte, error)
-		ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time)([]entities.Subscriber,int,error)
-		GetOverview(ctx context.Context) (*entities.DashboardOverview,error)
+		ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time) ([]entities.Subscriber, int, error)
+		GetOverview(ctx context.Context) (*entities.DashboardOverview, error)
 	}
 	plan *service.PlanService
 }
@@ -25,8 +25,8 @@ func NewAdminHandler(u interface {
 	Login(string, string) (string, error)
 	ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 	GetInvoice(ctx context.Context, invoice_id string) ([]byte, error)
-	ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time)([]entities.Subscriber,int,error)
-	GetOverview(ctx context.Context) (*entities.DashboardOverview,error)
+	ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time) ([]entities.Subscriber, int, error)
+	GetOverview(ctx context.Context) (*entities.DashboardOverview, error)
 }, p *service.PlanService) *AdminHandler {
 	return &AdminHandler{usecase: u, plan: p}
 }
@@ -107,15 +107,15 @@ func (h *AdminHandler) ListPayments(ctx context.Context, req *pb.ListPaymentAdmi
 	return mapAdminPayments(payments, total, int(req.Limit), int(req.Offset)), nil
 }
 
-func (h *AdminHandler) GetSubscribers(ctx context.Context, req *pb.GetSubscriberRequest)(*pb.GetSubscriberResponse,error) {
+func (h *AdminHandler) GetSubscribers(ctx context.Context, req *pb.GetSubscriberRequest) (*pb.GetSubscriberResponse, error) {
 
-	subscribers,total,err := h.usecase.ListSubcribers(ctx,int(req.Limit),int(req.Offset),optionalTimestamp(req.StartDate),optionalTimestamp(req.EndDate))
+	subscribers, total, err := h.usecase.ListSubcribers(ctx, int(req.Limit), int(req.Offset), optionalTimestamp(req.StartDate), optionalTimestamp(req.EndDate))
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
-	return mapSubcribers(subscribers,total,int(req.Limit),int(req.Offset)),nil 
+	return mapSubcribers(subscribers, total, int(req.Limit), int(req.Offset)), nil
 }
 
 func (h *AdminHandler) GetAdminInvoice(ctx context.Context, req *pb.GetAdminInvoiceRequest) (*pb.GetAdminInvoiceResponse, error) {
@@ -131,23 +131,23 @@ func (h *AdminHandler) GetAdminInvoice(ctx context.Context, req *pb.GetAdminInvo
 	}, nil
 }
 
-func (h *AdminHandler) GetDashboardOverview(ctx context.Context, req *pb.GetDashboardOverviewRequest)(*pb.GetDashboardOverviewResponse,error) {
+func (h *AdminHandler) GetDashboardOverview(ctx context.Context, req *pb.GetDashboardOverviewRequest) (*pb.GetDashboardOverviewResponse, error) {
 
-	overview,err := h.usecase.GetOverview(ctx)
+	overview, err := h.usecase.GetOverview(ctx)
 
 	if err != nil {
-		return nil,err 
+		return nil, err
 	}
 
 	return &pb.GetDashboardOverviewResponse{
-		TotalUsers: overview.TotalUsers,
-		TotalApps: overview.TotalApps,
+		TotalUsers:        overview.TotalUsers,
+		TotalApps:         overview.TotalApps,
 		ActiveSubscribers: overview.ActiveSubscribers,
-		RevenueMonth: overview.RevenueMonth,
-		RevenueLastMonth: overview.RevenueLastMonth,
-		JobsToday: overview.JobsToday,
-		FailedJobsToday: overview.FailedJobsToday,
-	},nil
+		RevenueMonth:      overview.RevenueMonth,
+		RevenueLastMonth:  overview.RevenueLastMonth,
+		JobsToday:         overview.JobsToday,
+		FailedJobsToday:   overview.FailedJobsToday,
+	}, nil
 }
 
 func mapPlans(plans []*entities.Plan) *pb.ListPlanResponse {
@@ -190,14 +190,14 @@ func mapSubcribers(subcribers []entities.Subscriber, total, limit, offset int) *
 
 	resp := &pb.GetSubscriberResponse{}
 
-	for _,s := range subcribers {
+	for _, s := range subcribers {
 		resp.Subscribers = append(resp.Subscribers, &pb.Subscriber{
-			AppId: s.AppID,
-			AppName: s.AppName,
-			PlanName: s.PlanName,
-			Status: s.Status,
+			AppId:     s.AppID,
+			AppName:   s.AppName,
+			PlanName:  s.PlanName,
+			Status:    s.Status,
 			StartDate: formatUTC(s.StartDate),
-			EndDate: formatUTC(s.EndDate),
+			EndDate:   formatUTC(s.EndDate),
 		})
 	}
 

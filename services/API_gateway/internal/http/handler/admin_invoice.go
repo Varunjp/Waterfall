@@ -15,7 +15,7 @@ type AdminInvoiceHandler struct {
 	adminClient adminpb.AdminServiceClient
 }
 
-func NewAdminInvoiceHandler(client adminpb.AdminServiceClient) *AdminInvoiceHandler{
+func NewAdminInvoiceHandler(client adminpb.AdminServiceClient) *AdminInvoiceHandler {
 	return &AdminInvoiceHandler{
 		adminClient: client,
 	}

@@ -108,10 +108,10 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 	})
 
 	r.Use(func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path,"/api/v1/admin/payments/") {
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v1/admin/payments/") {
 			adminInvoiceHandler.DownloadInvoice(c)
 			c.Abort()
-			return 
+			return
 		}
 		c.Next()
 	})
