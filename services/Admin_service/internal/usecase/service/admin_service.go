@@ -100,12 +100,5 @@ func (s *AdminService) GetInvoice(ctx context.Context, invoice_id string) ([]byt
 }
 
 func (s *AdminService) GetOverview(ctx context.Context) (*entities.DashboardOverview, error) {
-
-	overview, err := s.repo.GetOverview(ctx)
-
-	//delete
-	fmt.Println("check overview :", overview)
-	fmt.Println("Check revenue :", overview.RevenueMonth)
-
-	return overview, err
+	return s.repo.GetOverview(ctx)
 }
