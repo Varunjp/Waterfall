@@ -863,6 +863,102 @@ func (x *PaymentAdmin) GetPlanAmount() float64 {
 	return 0
 }
 
+type GetAdminInvoiceRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	InvoiceId     string                 `protobuf:"bytes,1,opt,name=invoice_id,json=invoiceId,proto3" json:"invoice_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAdminInvoiceRequest) Reset() {
+	*x = GetAdminInvoiceRequest{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAdminInvoiceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAdminInvoiceRequest) ProtoMessage() {}
+
+func (x *GetAdminInvoiceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAdminInvoiceRequest.ProtoReflect.Descriptor instead.
+func (*GetAdminInvoiceRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetAdminInvoiceRequest) GetInvoiceId() string {
+	if x != nil {
+		return x.InvoiceId
+	}
+	return ""
+}
+
+type GetAdminInvoiceResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pdf           []byte                 `protobuf:"bytes,1,opt,name=pdf,proto3" json:"pdf,omitempty"`
+	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAdminInvoiceResponse) Reset() {
+	*x = GetAdminInvoiceResponse{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAdminInvoiceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAdminInvoiceResponse) ProtoMessage() {}
+
+func (x *GetAdminInvoiceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAdminInvoiceResponse.ProtoReflect.Descriptor instead.
+func (*GetAdminInvoiceResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetAdminInvoiceResponse) GetPdf() []byte {
+	if x != nil {
+		return x.Pdf
+	}
+	return nil
+}
+
+func (x *GetAdminInvoiceResponse) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
 var File_internal_proto_admin_admin_proto protoreflect.FileDescriptor
 
 const file_internal_proto_admin_admin_proto_rawDesc = "" +
@@ -925,7 +1021,13 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\bapp_name\x18\x06 \x01(\tR\aappName\x12\x1b\n" +
 	"\tapp_email\x18\a \x01(\tR\bappEmail\x12\x1f\n" +
 	"\vplan_amount\x18\b \x01(\x01R\n" +
-	"planAmount2\x83\x05\n" +
+	"planAmount\"7\n" +
+	"\x16GetAdminInvoiceRequest\x12\x1d\n" +
+	"\n" +
+	"invoice_id\x18\x01 \x01(\tR\tinvoiceId\"G\n" +
+	"\x17GetAdminInvoiceResponse\x12\x10\n" +
+	"\x03pdf\x18\x01 \x01(\fR\x03pdf\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename2\xd7\x05\n" +
 	"\fAdminService\x12R\n" +
 	"\x05Login\x12\x13.admin.LoginRequest\x1a\x14.admin.LoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/login\x12a\n" +
 	"\n" +
@@ -934,7 +1036,8 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\n" +
 	"UpdatePlan\x12\x18.admin.UpdatePlanRequest\x1a\x19.admin.UpdatePlanResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\x1a\x1c/api/v1/admin/plans/{planID}\x12\x83\x01\n" +
 	"\x10UpdatePlanStatus\x12\x1e.admin.UpdatePlanStatusRequest\x1a\x1f.admin.UpdatePlanStatusResponse\".\x82\xd3\xe4\x93\x02(:\x01*2#/api/v1/admin/plans/{planID}/status\x12o\n" +
-	"\fListPayments\x12\x1e.admin.ListPaymentAdminRequest\x1a\x1f.admin.ListPaymentAdminResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/admin/paymentsB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
+	"\fListPayments\x12\x1e.admin.ListPaymentAdminRequest\x1a\x1f.admin.ListPaymentAdminResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/admin/payments\x12R\n" +
+	"\x0fGetAdminInvoice\x12\x1d.admin.GetAdminInvoiceRequest\x1a\x1e.admin.GetAdminInvoiceResponse\"\x00B\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
 
 var (
 	file_internal_proto_admin_admin_proto_rawDescOnce sync.Once
@@ -948,7 +1051,7 @@ func file_internal_proto_admin_admin_proto_rawDescGZIP() []byte {
 	return file_internal_proto_admin_admin_proto_rawDescData
 }
 
-var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_internal_proto_admin_admin_proto_goTypes = []any{
 	(*LoginRequest)(nil),             // 0: admin.LoginRequest
 	(*LoginResponse)(nil),            // 1: admin.LoginResponse
@@ -964,14 +1067,16 @@ var file_internal_proto_admin_admin_proto_goTypes = []any{
 	(*ListPaymentAdminRequest)(nil),  // 11: admin.ListPaymentAdminRequest
 	(*ListPaymentAdminResponse)(nil), // 12: admin.ListPaymentAdminResponse
 	(*PaymentAdmin)(nil),             // 13: admin.PaymentAdmin
-	(*timestamppb.Timestamp)(nil),    // 14: google.protobuf.Timestamp
+	(*GetAdminInvoiceRequest)(nil),   // 14: admin.GetAdminInvoiceRequest
+	(*GetAdminInvoiceResponse)(nil),  // 15: admin.GetAdminInvoiceResponse
+	(*timestamppb.Timestamp)(nil),    // 16: google.protobuf.Timestamp
 }
 var file_internal_proto_admin_admin_proto_depIdxs = []int32{
 	5,  // 0: admin.ListPlanResponse.plans:type_name -> admin.Plan
 	5,  // 1: admin.UpdatePlanResponse.updatedPlan:type_name -> admin.Plan
 	5,  // 2: admin.UpdatePlanStatusResponse.plan:type_name -> admin.Plan
-	14, // 3: admin.ListPaymentAdminRequest.startDate:type_name -> google.protobuf.Timestamp
-	14, // 4: admin.ListPaymentAdminRequest.endDate:type_name -> google.protobuf.Timestamp
+	16, // 3: admin.ListPaymentAdminRequest.startDate:type_name -> google.protobuf.Timestamp
+	16, // 4: admin.ListPaymentAdminRequest.endDate:type_name -> google.protobuf.Timestamp
 	13, // 5: admin.ListPaymentAdminResponse.payments:type_name -> admin.PaymentAdmin
 	0,  // 6: admin.AdminService.Login:input_type -> admin.LoginRequest
 	2,  // 7: admin.AdminService.CreatePlan:input_type -> admin.CreatePlanRequest
@@ -979,14 +1084,16 @@ var file_internal_proto_admin_admin_proto_depIdxs = []int32{
 	7,  // 9: admin.AdminService.UpdatePlan:input_type -> admin.UpdatePlanRequest
 	9,  // 10: admin.AdminService.UpdatePlanStatus:input_type -> admin.UpdatePlanStatusRequest
 	11, // 11: admin.AdminService.ListPayments:input_type -> admin.ListPaymentAdminRequest
-	1,  // 12: admin.AdminService.Login:output_type -> admin.LoginResponse
-	3,  // 13: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
-	6,  // 14: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
-	8,  // 15: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
-	10, // 16: admin.AdminService.UpdatePlanStatus:output_type -> admin.UpdatePlanStatusResponse
-	12, // 17: admin.AdminService.ListPayments:output_type -> admin.ListPaymentAdminResponse
-	12, // [12:18] is the sub-list for method output_type
-	6,  // [6:12] is the sub-list for method input_type
+	14, // 12: admin.AdminService.GetAdminInvoice:input_type -> admin.GetAdminInvoiceRequest
+	1,  // 13: admin.AdminService.Login:output_type -> admin.LoginResponse
+	3,  // 14: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
+	6,  // 15: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
+	8,  // 16: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
+	10, // 17: admin.AdminService.UpdatePlanStatus:output_type -> admin.UpdatePlanStatusResponse
+	12, // 18: admin.AdminService.ListPayments:output_type -> admin.ListPaymentAdminResponse
+	15, // 19: admin.AdminService.GetAdminInvoice:output_type -> admin.GetAdminInvoiceResponse
+	13, // [13:20] is the sub-list for method output_type
+	6,  // [6:13] is the sub-list for method input_type
 	6,  // [6:6] is the sub-list for extension type_name
 	6,  // [6:6] is the sub-list for extension extendee
 	0,  // [0:6] is the sub-list for field type_name
@@ -1003,7 +1110,7 @@ func file_internal_proto_admin_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_admin_proto_rawDesc), len(file_internal_proto_admin_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

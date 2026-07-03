@@ -47,6 +47,8 @@ service AdminService {
         get: "/api/v1/admin/payments"
         };
     }
+
+    rpc GetAdminInvoice(GetAdminInvoiceRequest) returns (GetAdminInvoiceResponse) {}
 }
 
 message LoginRequest {
@@ -132,4 +134,13 @@ message PaymentAdmin {
   string app_name = 6;
   string app_email = 7;
   double plan_amount = 8;
+}
+
+message GetAdminInvoiceRequest {
+    string invoice_id = 1;
+}
+
+message GetAdminInvoiceResponse {
+    bytes pdf = 1;
+    string filename = 2;
 }

@@ -224,6 +224,17 @@ func (s *AppUserService) GetInvoice(ctx context.Context, app_id, invoice_id stri
 	// 	return nil, err
 	// }
 
+	app_id = strings.TrimSpace(app_id)
+	invoice_id = strings.TrimSpace(invoice_id)
+
+	if app_id == "" {
+		return nil,fmt.Errorf("failed to retrieve id")
+	}
+
+	if invoice_id == "" {
+		return nil,fmt.Errorf("Not valid invoice")
+	}
+
 	data, err := s.repo.GetPaymentDetails(ctx, app_id, invoice_id)
 	if err != nil {
 		log.Println("Get subscription details in user: ", err)

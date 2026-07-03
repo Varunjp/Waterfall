@@ -36,7 +36,8 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 	if err != nil {
 		panic(err)
 	}
-	adminClient := adminpb.NewAppUserServiceClient(adminConn)
+	adminUserClient := adminpb.NewAppUserServiceClient(adminConn)
+	adminClient := adminpb.NewAdminServiceClient(adminConn)
 
 	err = jobpb.RegisterJobServiceHandlerFromEndpoint(
 		ctx,
@@ -94,13 +95,23 @@ func NewHTTPServer(ctx context.Context, cfg *config.Config, rdb *redis.Client) *
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	invoiceHandler := handler.NewInvoiceHandler(adminClient)
+	invoiceHandler := handler.NewInvoiceHandler(adminUserClient)
+	adminInvoiceHandler := handler.NewAdminInvoiceHandler(adminClient)
 
 	r.Use(func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.URL.Path, "/api/v1/invoice/") {
 			invoiceHandler.DownloadInvoice(c)
 			c.Abort()
 			return
+		}
+		c.Next()
+	})
+
+	r.Use(func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.URL.Path,"/api/v1/admin/payments/") {
+			adminInvoiceHandler.DownloadInvoice(c)
+			c.Abort()
+			return 
 		}
 		c.Next()
 	})

@@ -494,7 +494,7 @@
         <div class="table-toolbar">
           <div class="toolbar-left">
             <span class="toolbar-label">App</span>
-            <input type="text" class="filter-select" id="pay-app" placeholder="App ID or name" style="width:160px" value="${esc(appId)}" />
+            <input type="text" class="filter-select" id="pay-app" placeholder="App ID" style="width:160px" value="${esc(appId)}" />
             <span class="toolbar-divider"></span>
             <span class="toolbar-label">From</span>
             <input type="date" class="filter-date" id="pay-start" max="${today}" value="${start ? toLocalInputValue(start) : ''}" />
@@ -533,17 +533,17 @@
       if (!payments.length) { $('pay-body').innerHTML = '<div class="state-empty">No payments found</div>'; return; }
 
       const rows = payments.map(p => `<tr>
-        <td><span class="cell-id" title="${esc(p.paymentId||p.id)}">${esc(p.paymentId||p.id||'—')}</span></td>
+        <td><span class="cell-id" title="${esc(p.invoiceId||p.id)}">${esc(p.invoiceId||p.id||'—')}</span></td>
         <td>${esc(p.appName||p.appId||'—')}</td>
         <td>${esc(p.planName||'—')}</td>
         <td style="color:var(--green);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.04em">${p.amount!=null?fmtMoney(p.amount):'—'}</td>
         <td>${badge(p.status||'paid')}</td>
         <td>${fmt(p.createdAt||p.paidAt)}</td>
-        <td><button class="btn-invoice" onclick="downloadInvoice('${esc(p.paymentId||p.id)}')">↓ Invoice</button></td>
+        <td><button class="btn-invoice" onclick="downloadInvoice('${esc(p.invoiceId||p.id)}')">↓ Invoice</button></td>
       </tr>`).join('');
 
       $('pay-body').innerHTML = `<table>
-        <thead><tr><th>Payment ID</th><th>App</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Invoice</th></tr></thead>
+        <thead><tr><th>Invoice ID</th><th>App</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Invoice</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
       ${paginationHtml(page, total, '_payPrev', '_payNext')}`;

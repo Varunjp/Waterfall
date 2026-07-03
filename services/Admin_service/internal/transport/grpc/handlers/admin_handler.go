@@ -5,6 +5,7 @@ import (
 	pb "admin_service/internal/proto/admin"
 	"admin_service/internal/usecase/service"
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type AdminHandler struct {
 	usecase interface {
 		Login(string, string) (string, error)
 		ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
+		GetInvoice(ctx context.Context, invoice_id string) ([]byte, error)
 	}
 	plan *service.PlanService
 }
@@ -20,6 +22,7 @@ type AdminHandler struct {
 func NewAdminHandler(u interface {
 	Login(string, string) (string, error)
 	ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
+	GetInvoice(ctx context.Context, invoice_id string) ([]byte, error)
 }, p *service.PlanService) *AdminHandler {
 	return &AdminHandler{usecase: u, plan: p}
 }
@@ -98,6 +101,19 @@ func (h *AdminHandler) ListPayments(ctx context.Context, req *pb.ListPaymentAdmi
 	}
 
 	return mapAdminPayments(payments, total, int(req.Limit), int(req.Offset)), nil
+}
+
+func (h *AdminHandler) GetAdminInvoice(ctx context.Context, req *pb.GetAdminInvoiceRequest) (*pb.GetAdminInvoiceResponse,error) {
+	
+	pdfBytes, err := h.usecase.GetInvoice(ctx, req.InvoiceId)
+	if err != nil {
+		return nil, err
+	}
+	fileName := fmt.Sprintf("invoice-%s.pdf", req.InvoiceId)
+	return &pb.GetAdminInvoiceResponse{
+		Pdf:      pdfBytes,
+		Filename: fileName,
+	},nil
 }
 
 func mapPlans(plans []*entities.Plan) *pb.ListPlanResponse {

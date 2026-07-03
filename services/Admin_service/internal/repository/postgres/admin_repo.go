@@ -4,6 +4,7 @@ import (
 	"admin_service/internal/domain/entities"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -110,4 +111,36 @@ func (r AdminRepo) ListPayment(ctx context.Context, appID, status string, limit,
 	}
 
 	return payments, total, nil
+}
+
+func (r AdminRepo) GetPaymentDetails(ctx context.Context, invoiceID string) (*entities.InvoiceData, error) {
+
+	var data entities.InvoiceData
+
+	query := `SELECT invoice_id, app_id, app_name, customer_email, plan_name, plan_amount, amount, paid_at
+	FROM payments WHERE invoice_id = $1;`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		invoiceID,
+	).Scan(
+		&data.InvoiceNumber,
+		&data.UserID,
+		&data.UserName,
+		&data.UserEmail,
+		&data.PlanName,
+		&data.PlanAmount,
+		&data.TotalPaid,
+		&data.CreatedDate,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("Failed to get invoice: %w", err)
+		}
+		return nil, err
+	}
+
+	return &data, nil
 }

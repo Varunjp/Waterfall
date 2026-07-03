@@ -4,10 +4,13 @@ import (
 	"admin_service/internal/domain/entities"
 	domainErr "admin_service/internal/domain/errors"
 	"admin_service/internal/infrastructure/security"
+	"admin_service/internal/pkg/utils"
 	"admin_service/internal/pkg/validation"
 	repo "admin_service/internal/repository/interfaces"
 	"context"
+	"fmt"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -53,4 +56,26 @@ func (s *AdminService) ListPayment(ctx context.Context, appID, status string, li
 	}
 
 	return payments, total, err
+}
+
+func (s *AdminService) GetInvoice(ctx context.Context, invoice_id string) ([]byte, error) {
+
+	invoice_id = strings.TrimSpace(invoice_id)
+
+	if invoice_id == "" {
+		return nil,fmt.Errorf("Not valid invoice")
+	}
+
+	data, err := s.repo.GetPaymentDetails(ctx,invoice_id)
+	if err != nil {
+		log.Println("Get subscription details in user: ", err)
+		return nil, err
+	}
+
+	pdf, err := utils.GeneratePDF(*data)
+	if err != nil {
+		return nil, err
+	}
+
+	return pdf, nil
 }
