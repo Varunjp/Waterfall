@@ -4,6 +4,7 @@ package admin;
 
 option go_package = "internal/proto/adminpb";
 
+import "google/protobuf/timestamp.proto";
 import "googleapis/google/api/annotations.proto";
 
 service AdminService {
@@ -38,6 +39,26 @@ service AdminService {
         option (google.api.http) = {
             patch: "/api/v1/admin/plans/{planID}/status"
             body:"*"
+        };
+    }
+
+    rpc ListPayments(ListPaymentAdminRequest) returns (ListPaymentAdminResponse) {
+        option (google.api.http) = {
+        get: "/api/v1/admin/payments"
+        };
+    }
+
+    rpc GetAdminInvoice(GetAdminInvoiceRequest) returns (GetAdminInvoiceResponse) {}
+
+    rpc GetSubscribers(GetSubscriberRequest) returns (GetSubscriberResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/admin/subscribers"
+        };
+    }
+
+    rpc GetDashboardOverview(GetDashboardOverviewRequest) returns (GetDashboardOverviewResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/admin/overview"
         };
     }
 }
@@ -97,4 +118,84 @@ message UpdatePlanStatusRequest {
 
 message UpdatePlanStatusResponse {
     Plan plan = 1;
+}
+
+
+message ListPaymentAdminRequest {
+  string app_id = 1;
+  string status = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+  google.protobuf.Timestamp startDate = 5;
+  google.protobuf.Timestamp endDate = 6;
+}
+
+message ListPaymentAdminResponse {
+  repeated PaymentAdmin payments = 1;
+  int32 total = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message PaymentAdmin {
+  string invoice_id = 1;
+  string plan_name = 2;
+  double amount = 3;
+  string status = 4;
+  string paid_at = 5;
+  string app_name = 6;
+  string app_email = 7;
+  double plan_amount = 8;
+}
+
+message GetAdminInvoiceRequest {
+    string invoice_id = 1;
+}
+
+message GetAdminInvoiceResponse {
+    bytes pdf = 1;
+    string filename = 2;
+}
+
+message GetSubscriberRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    google.protobuf.Timestamp startDate = 3;
+    google.protobuf.Timestamp endDate = 4;
+}
+
+message GetSubscriberResponse {
+    repeated Subscriber subscribers = 1;
+    int32 total = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+}
+
+message Subscriber {
+    string app_id = 1;
+    string app_name = 2;
+    string plan_name = 3;
+    string status = 4;
+    string startDate = 5;
+    string endDate = 6;
+}
+
+message GetDashboardOverviewRequest {}
+
+message GetDashboardOverviewResponse {
+
+  // Users
+  int64 total_users = 1;
+
+  // Applications
+  int64 total_apps = 2;
+
+  // Billing
+  int64 active_subscribers = 3;
+  double revenue_month = 4;
+  double revenue_last_month = 5;
+
+  // Jobs
+  int64 jobs_today = 6;
+  int64 failed_jobs_today = 7;
 }

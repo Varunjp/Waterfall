@@ -307,3 +307,40 @@ func (r *BillingPGRepo) GetSubscriptionDetails(ctx context.Context, stripeSubID 
 
 	return &data, nil
 }
+
+func (r *BillingPGRepo) RecordPayment(ctx context.Context, payment *entities.Payment) error {
+
+	query := `
+	INSERT INTO payments(
+		invoice_id,
+		subscription_id,
+		app_id,
+		app_name,
+		plan_name,
+		plan_amount,
+		amount,
+		currency,
+		customer_email,
+		status,
+		paid_at
+	)
+	VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`
+
+	_, err := r.db.ExecContext(
+		ctx,
+		query,
+		payment.InvoiceID,
+		payment.SubscriptionID,
+		payment.AppID,
+		payment.AppName,
+		payment.PlanName,
+		payment.PlanAmount,
+		payment.Amount,
+		payment.Currency,
+		payment.CustomerEmail,
+		payment.Status,
+		payment.PaidAt,
+	)
+
+	return err
+}

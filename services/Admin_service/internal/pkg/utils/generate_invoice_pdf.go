@@ -48,6 +48,9 @@ func GeneratePDF(data entities.InvoiceData) ([]byte, error) {
 		return fmt.Sprintf("Rs. %s", formatINR(v))
 	}
 	fmtDate := func(t time.Time) string {
+		if t.IsZero() {
+			return ""
+		}
 		return t.Format("02 Jan 2006")
 	}
 	drawHRule := func(y float64) {

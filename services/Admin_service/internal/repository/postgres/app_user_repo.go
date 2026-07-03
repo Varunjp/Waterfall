@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 type AppUserRepo struct {
@@ -183,4 +184,116 @@ func (r *AppUserRepo) UpdateUser(ctx context.Context, userID, role, passwordHash
 	}
 
 	return nil
+}
+
+func (r *AppUserRepo) ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error) {
+	baseQuery := `FROM payments WHERE app_id = $1`
+	args := []any{appID}
+	argPos := 2
+
+	// -------- STATUS FILTER --------
+	if status != "" {
+		baseQuery += fmt.Sprintf(" AND status = $%d", argPos)
+		args = append(args, strings.ToLower(status))
+		argPos++
+	}
+
+	// -------- DATE FILTER --------
+	if startDate != nil && endDate != nil {
+		baseQuery += fmt.Sprintf(" AND paid_at BETWEEN $%d AND $%d", argPos, argPos+1)
+		args = append(args, *startDate, *endDate)
+		argPos += 2
+
+	} else if startDate != nil {
+		baseQuery += fmt.Sprintf(" AND paid_at >= $%d", argPos)
+		args = append(args, *startDate)
+		argPos++
+
+	} else if endDate != nil {
+		baseQuery += fmt.Sprintf(" AND paid_at <= $%d", argPos)
+		args = append(args, *endDate)
+		argPos++
+	}
+
+	// -------- COUNT QUERY --------
+	countQuery := "SELECT COUNT(*) " + baseQuery
+
+	var total int
+	err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// -------- DATA QUERY --------
+	dataQuery := `
+	SELECT invoice_id, plan_name, amount, status, paid_at
+	` + baseQuery + fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", argPos, argPos+1)
+	dataArgs := append(args, limit, offset)
+
+	rows, err := r.db.QueryContext(ctx, dataQuery, dataArgs...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var payments []entities.Payment
+	for rows.Next() {
+		var p entities.Payment
+		if err := rows.Scan(&p.InvoiceID, &p.PlanName, &p.Amount, &p.Status, &p.PaidAt); err != nil {
+			return nil, 0, err
+		}
+		payments = append(payments, p)
+	}
+
+	return payments, total, nil
+}
+
+func (r *AppUserRepo) GetPaymentDetails(ctx context.Context, appID, invoiceID string) (*entities.InvoiceData, error) {
+
+	var data entities.InvoiceData
+
+	query := `SELECT invoice_id, app_id, app_name, customer_email, plan_name, plan_amount, amount, paid_at
+	FROM payments WHERE invoice_id = $1 AND app_id = $2;`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		invoiceID,
+		appID,
+	).Scan(
+		&data.InvoiceNumber,
+		&data.UserID,
+		&data.UserName,
+		&data.UserEmail,
+		&data.PlanName,
+		&data.PlanAmount,
+		&data.TotalPaid,
+		&data.CreatedDate,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("Failed to get invoice: %w", err)
+		}
+		return nil, err
+	}
+
+	return &data, nil
+}
+
+func (r *AppUserRepo) GetInvoiceSubscriptionID(ctx context.Context, appID, invoiceID string) (string, int64, error) {
+
+	query := `SELECT subscription_id,amount FROM payments WHERE invoice_id = $1 AND app_id = $2;`
+
+	var subscriptionID string
+	var amount int64
+	err := r.db.QueryRowContext(ctx, query, invoiceID, appID).Scan(&subscriptionID, &amount)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", 0, fmt.Errorf("Failed to retrive invoice")
+		}
+		return "", 0, err
+	}
+
+	return subscriptionID, amount, nil
 }

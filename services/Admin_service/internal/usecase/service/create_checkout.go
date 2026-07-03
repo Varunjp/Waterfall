@@ -215,7 +215,7 @@ func (s *BillingService) HandlePaymentSuccess(
 	return nil
 }
 
-func (s *BillingService) SendInvoicePdf(ctx context.Context, subscriptionID, invoiceNumber string, totalPaid float64) error {
+func (s *BillingService) SendInvoicePdf(ctx context.Context, subscriptionID, invoiceNumber string, totalPaid float64, currency string) error {
 
 	amount := totalPaid / 100
 
@@ -227,6 +227,24 @@ func (s *BillingService) SendInvoicePdf(ctx context.Context, subscriptionID, inv
 
 	data.InvoiceNumber = invoiceNumber
 	data.TotalPaid = amount
+
+	payment := entities.Payment{
+		InvoiceID:      invoiceNumber,
+		SubscriptionID: subscriptionID,
+		AppID:          data.UserID,
+		AppName:        data.UserName,
+		PlanName:       data.PlanName,
+		PlanAmount:     int64(data.PlanAmount),
+		Amount:         int64(amount),
+		Currency:       currency,
+		CustomerEmail:  data.UserEmail,
+		Status:         "paid",
+		PaidAt:         data.CreatedDate,
+	}
+
+	if err := s.repo.RecordPayment(ctx, &payment); err != nil {
+		return err
+	}
 
 	pdf, err := utils.GeneratePDF(*data)
 

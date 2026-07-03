@@ -11,6 +11,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -955,11 +956,327 @@ func (x *UpdateUserRequest) GetPassword() string {
 	return ""
 }
 
+type ListPaymentRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
+	StartDate     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=startDate,proto3" json:"startDate,omitempty"`
+	EndDate       *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=endDate,proto3" json:"endDate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPaymentRequest) Reset() {
+	*x = ListPaymentRequest{}
+	mi := &file_proto_app_user_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPaymentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPaymentRequest) ProtoMessage() {}
+
+func (x *ListPaymentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_app_user_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPaymentRequest.ProtoReflect.Descriptor instead.
+func (*ListPaymentRequest) Descriptor() ([]byte, []int) {
+	return file_proto_app_user_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ListPaymentRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *ListPaymentRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *ListPaymentRequest) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+func (x *ListPaymentRequest) GetStartDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartDate
+	}
+	return nil
+}
+
+func (x *ListPaymentRequest) GetEndDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndDate
+	}
+	return nil
+}
+
+type ListPaymentResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Payments      []*Payment             `protobuf:"bytes,1,rep,name=payments,proto3" json:"payments,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPaymentResponse) Reset() {
+	*x = ListPaymentResponse{}
+	mi := &file_proto_app_user_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPaymentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPaymentResponse) ProtoMessage() {}
+
+func (x *ListPaymentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_app_user_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPaymentResponse.ProtoReflect.Descriptor instead.
+func (*ListPaymentResponse) Descriptor() ([]byte, []int) {
+	return file_proto_app_user_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ListPaymentResponse) GetPayments() []*Payment {
+	if x != nil {
+		return x.Payments
+	}
+	return nil
+}
+
+func (x *ListPaymentResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *ListPaymentResponse) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *ListPaymentResponse) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+type Payment struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	InvoiceId     string                 `protobuf:"bytes,1,opt,name=invoice_id,json=invoiceId,proto3" json:"invoice_id,omitempty"`
+	PlanName      string                 `protobuf:"bytes,2,opt,name=plan_name,json=planName,proto3" json:"plan_name,omitempty"`
+	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	PaidAt        string                 `protobuf:"bytes,5,opt,name=paid_at,json=paidAt,proto3" json:"paid_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Payment) Reset() {
+	*x = Payment{}
+	mi := &file_proto_app_user_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Payment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Payment) ProtoMessage() {}
+
+func (x *Payment) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_app_user_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Payment.ProtoReflect.Descriptor instead.
+func (*Payment) Descriptor() ([]byte, []int) {
+	return file_proto_app_user_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *Payment) GetInvoiceId() string {
+	if x != nil {
+		return x.InvoiceId
+	}
+	return ""
+}
+
+func (x *Payment) GetPlanName() string {
+	if x != nil {
+		return x.PlanName
+	}
+	return ""
+}
+
+func (x *Payment) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *Payment) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *Payment) GetPaidAt() string {
+	if x != nil {
+		return x.PaidAt
+	}
+	return ""
+}
+
+type GetInvoiceRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	InvoiceId     string                 `protobuf:"bytes,1,opt,name=invoice_id,json=invoiceId,proto3" json:"invoice_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetInvoiceRequest) Reset() {
+	*x = GetInvoiceRequest{}
+	mi := &file_proto_app_user_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInvoiceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInvoiceRequest) ProtoMessage() {}
+
+func (x *GetInvoiceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_app_user_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInvoiceRequest.ProtoReflect.Descriptor instead.
+func (*GetInvoiceRequest) Descriptor() ([]byte, []int) {
+	return file_proto_app_user_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetInvoiceRequest) GetInvoiceId() string {
+	if x != nil {
+		return x.InvoiceId
+	}
+	return ""
+}
+
+type GetInvoiceResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pdf           []byte                 `protobuf:"bytes,1,opt,name=pdf,proto3" json:"pdf,omitempty"`
+	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetInvoiceResponse) Reset() {
+	*x = GetInvoiceResponse{}
+	mi := &file_proto_app_user_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInvoiceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInvoiceResponse) ProtoMessage() {}
+
+func (x *GetInvoiceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_app_user_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInvoiceResponse.ProtoReflect.Descriptor instead.
+func (*GetInvoiceResponse) Descriptor() ([]byte, []int) {
+	return file_proto_app_user_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetInvoiceResponse) GetPdf() []byte {
+	if x != nil {
+		return x.Pdf
+	}
+	return nil
+}
+
+func (x *GetInvoiceResponse) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
 var File_proto_app_user_proto protoreflect.FileDescriptor
 
 const file_proto_app_user_proto_rawDesc = "" +
 	"\n" +
-	"\x14proto/app_user.proto\x12\x05admin\x1a'googleapis/google/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"C\n" +
+	"\x14proto/app_user.proto\x12\x05admin\x1a\x1fgoogle/protobuf/timestamp.proto\x1a'googleapis/google/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"C\n" +
 	"\x0fAppLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"5\n" +
@@ -1011,7 +1328,32 @@ const file_proto_app_user_proto_rawDesc = "" +
 	"\x11UpdateUserRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04role\x18\x02 \x01(\tR\x04role\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword2\xdc\b\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\"\xca\x01\n" +
+	"\x12ListPaymentRequest\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x03 \x01(\x05R\x06offset\x128\n" +
+	"\tstartDate\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x124\n" +
+	"\aendDate\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\"\x85\x01\n" +
+	"\x13ListPaymentResponse\x12*\n" +
+	"\bpayments\x18\x01 \x03(\v2\x0e.admin.PaymentR\bpayments\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x04 \x01(\x05R\x06offset\"\x8e\x01\n" +
+	"\aPayment\x12\x1d\n" +
+	"\n" +
+	"invoice_id\x18\x01 \x01(\tR\tinvoiceId\x12\x1b\n" +
+	"\tplan_name\x18\x02 \x01(\tR\bplanName\x12\x16\n" +
+	"\x06amount\x18\x03 \x01(\x01R\x06amount\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12\x17\n" +
+	"\apaid_at\x18\x05 \x01(\tR\x06paidAt\"2\n" +
+	"\x11GetInvoiceRequest\x12\x1d\n" +
+	"\n" +
+	"invoice_id\x18\x01 \x01(\tR\tinvoiceId\"B\n" +
+	"\x12GetInvoiceResponse\x12\x10\n" +
+	"\x03pdf\x18\x01 \x01(\fR\x03pdf\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename2\xac\n" +
+	"\n" +
 	"\x0eAppUserService\x12X\n" +
 	"\n" +
 	"CreateUser\x12\x18.admin.CreateUserRequest\x1a\x16.google.protobuf.Empty\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/users\x12b\n" +
@@ -1024,7 +1366,10 @@ const file_proto_app_user_proto_rawDesc = "" +
 	"\x14RequestResetPassword\x12\".admin.RequestResetPasswordRequest\x1a#.admin.RequestResetPasswordResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/users/password/reset/request\x12\x95\x01\n" +
 	"\x16VerifyPasswordResetOtp\x12$.admin.VerifyPasswordResetOtpRequest\x1a%.admin.VerifyPasswordResetOtpResponse\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/users/password/reset/verify\x12s\n" +
 	"\rResetPassword\x12\x1b.admin.ResetPasswordRequest\x1a\x1c.admin.ResetPasswordResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/v1/users/password/reset\x12u\n" +
-	"\x10UpdateUserStatus\x12\x1e.admin.UpdateUserStatusRequest\x1a\x16.google.protobuf.Empty\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/users/{user_id}/statusB\x18Z\x16internal/proto/adminpbb\x06proto3"
+	"\x10UpdateUserStatus\x12\x1e.admin.UpdateUserStatusRequest\x1a\x16.google.protobuf.Empty\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/users/{user_id}/status\x12e\n" +
+	"\fListPayments\x12\x19.admin.ListPaymentRequest\x1a\x1a.admin.ListPaymentResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/users/payments\x12g\n" +
+	"\n" +
+	"GetInvoice\x12\x18.admin.GetInvoiceRequest\x1a\x19.admin.GetInvoiceResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/invoice/{invoice_id}B\x18Z\x16internal/proto/adminpbb\x06proto3"
 
 var (
 	file_proto_app_user_proto_rawDescOnce sync.Once
@@ -1038,7 +1383,7 @@ func file_proto_app_user_proto_rawDescGZIP() []byte {
 	return file_proto_app_user_proto_rawDescData
 }
 
-var file_proto_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_proto_app_user_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_proto_app_user_proto_goTypes = []any{
 	(*AppLoginRequest)(nil),                // 0: admin.AppLoginRequest
 	(*AppLoginResponse)(nil),               // 1: admin.AppLoginResponse
@@ -1059,37 +1404,50 @@ var file_proto_app_user_proto_goTypes = []any{
 	(*ListPlansResponse)(nil),              // 16: admin.ListPlansResponse
 	(*UpdateUserStatusRequest)(nil),        // 17: admin.UpdateUserStatusRequest
 	(*UpdateUserRequest)(nil),              // 18: admin.UpdateUserRequest
-	(*emptypb.Empty)(nil),                  // 19: google.protobuf.Empty
+	(*ListPaymentRequest)(nil),             // 19: admin.ListPaymentRequest
+	(*ListPaymentResponse)(nil),            // 20: admin.ListPaymentResponse
+	(*Payment)(nil),                        // 21: admin.Payment
+	(*GetInvoiceRequest)(nil),              // 22: admin.GetInvoiceRequest
+	(*GetInvoiceResponse)(nil),             // 23: admin.GetInvoiceResponse
+	(*timestamppb.Timestamp)(nil),          // 24: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),                  // 25: google.protobuf.Empty
 }
 var file_proto_app_user_proto_depIdxs = []int32{
 	11, // 0: admin.ListUsersResponse.users:type_name -> admin.AppUser
 	11, // 1: admin.ListAppUserResponse.users:type_name -> admin.AppUser
 	15, // 2: admin.ListPlansResponse.plans:type_name -> admin.UserPlan
-	8,  // 3: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
-	18, // 4: admin.AppUserService.UpdateUser:input_type -> admin.UpdateUserRequest
-	9,  // 5: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
-	10, // 6: admin.AppUserService.ListAppUsers:input_type -> admin.ListAppUserRequest
-	0,  // 7: admin.AppUserService.AppLogin:input_type -> admin.AppLoginRequest
-	14, // 8: admin.AppUserService.ListPlans:input_type -> admin.ListPlansRequest
-	2,  // 9: admin.AppUserService.RequestResetPassword:input_type -> admin.RequestResetPasswordRequest
-	4,  // 10: admin.AppUserService.VerifyPasswordResetOtp:input_type -> admin.VerifyPasswordResetOtpRequest
-	6,  // 11: admin.AppUserService.ResetPassword:input_type -> admin.ResetPasswordRequest
-	17, // 12: admin.AppUserService.UpdateUserStatus:input_type -> admin.UpdateUserStatusRequest
-	19, // 13: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
-	19, // 14: admin.AppUserService.UpdateUser:output_type -> google.protobuf.Empty
-	12, // 15: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
-	13, // 16: admin.AppUserService.ListAppUsers:output_type -> admin.ListAppUserResponse
-	1,  // 17: admin.AppUserService.AppLogin:output_type -> admin.AppLoginResponse
-	16, // 18: admin.AppUserService.ListPlans:output_type -> admin.ListPlansResponse
-	3,  // 19: admin.AppUserService.RequestResetPassword:output_type -> admin.RequestResetPasswordResponse
-	5,  // 20: admin.AppUserService.VerifyPasswordResetOtp:output_type -> admin.VerifyPasswordResetOtpResponse
-	7,  // 21: admin.AppUserService.ResetPassword:output_type -> admin.ResetPasswordResponse
-	19, // 22: admin.AppUserService.UpdateUserStatus:output_type -> google.protobuf.Empty
-	13, // [13:23] is the sub-list for method output_type
-	3,  // [3:13] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	24, // 3: admin.ListPaymentRequest.startDate:type_name -> google.protobuf.Timestamp
+	24, // 4: admin.ListPaymentRequest.endDate:type_name -> google.protobuf.Timestamp
+	21, // 5: admin.ListPaymentResponse.payments:type_name -> admin.Payment
+	8,  // 6: admin.AppUserService.CreateUser:input_type -> admin.CreateUserRequest
+	18, // 7: admin.AppUserService.UpdateUser:input_type -> admin.UpdateUserRequest
+	9,  // 8: admin.AppUserService.ListUsers:input_type -> admin.ListUsersRequest
+	10, // 9: admin.AppUserService.ListAppUsers:input_type -> admin.ListAppUserRequest
+	0,  // 10: admin.AppUserService.AppLogin:input_type -> admin.AppLoginRequest
+	14, // 11: admin.AppUserService.ListPlans:input_type -> admin.ListPlansRequest
+	2,  // 12: admin.AppUserService.RequestResetPassword:input_type -> admin.RequestResetPasswordRequest
+	4,  // 13: admin.AppUserService.VerifyPasswordResetOtp:input_type -> admin.VerifyPasswordResetOtpRequest
+	6,  // 14: admin.AppUserService.ResetPassword:input_type -> admin.ResetPasswordRequest
+	17, // 15: admin.AppUserService.UpdateUserStatus:input_type -> admin.UpdateUserStatusRequest
+	19, // 16: admin.AppUserService.ListPayments:input_type -> admin.ListPaymentRequest
+	22, // 17: admin.AppUserService.GetInvoice:input_type -> admin.GetInvoiceRequest
+	25, // 18: admin.AppUserService.CreateUser:output_type -> google.protobuf.Empty
+	25, // 19: admin.AppUserService.UpdateUser:output_type -> google.protobuf.Empty
+	12, // 20: admin.AppUserService.ListUsers:output_type -> admin.ListUsersResponse
+	13, // 21: admin.AppUserService.ListAppUsers:output_type -> admin.ListAppUserResponse
+	1,  // 22: admin.AppUserService.AppLogin:output_type -> admin.AppLoginResponse
+	16, // 23: admin.AppUserService.ListPlans:output_type -> admin.ListPlansResponse
+	3,  // 24: admin.AppUserService.RequestResetPassword:output_type -> admin.RequestResetPasswordResponse
+	5,  // 25: admin.AppUserService.VerifyPasswordResetOtp:output_type -> admin.VerifyPasswordResetOtpResponse
+	7,  // 26: admin.AppUserService.ResetPassword:output_type -> admin.ResetPasswordResponse
+	25, // 27: admin.AppUserService.UpdateUserStatus:output_type -> google.protobuf.Empty
+	20, // 28: admin.AppUserService.ListPayments:output_type -> admin.ListPaymentResponse
+	23, // 29: admin.AppUserService.GetInvoice:output_type -> admin.GetInvoiceResponse
+	18, // [18:30] is the sub-list for method output_type
+	6,  // [6:18] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_proto_app_user_proto_init() }
@@ -1103,7 +1461,7 @@ func file_proto_app_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_app_user_proto_rawDesc), len(file_proto_app_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

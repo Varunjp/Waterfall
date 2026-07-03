@@ -4,6 +4,7 @@ package admin;
 
 option go_package = "internal/proto/adminpb";
 
+import "google/protobuf/timestamp.proto";
 import "googleapis/google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
@@ -74,6 +75,18 @@ service AppUserService {
     option (google.api.http) = {
       post: "/api/v1/users/{user_id}/status"
       body: "*"
+    };
+  }
+
+  rpc ListPayments(ListPaymentRequest) returns (ListPaymentResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/payments"
+    };
+  }
+
+  rpc GetInvoice(GetInvoiceRequest) returns (GetInvoiceResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/invoice/{invoice_id}"
     };
   }
 }
@@ -162,4 +175,36 @@ message UpdateUserRequest {
   string user_id = 1;
   string role = 2;
   string password = 3;
+}
+
+message ListPaymentRequest {
+  string status = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+  google.protobuf.Timestamp startDate = 4;
+  google.protobuf.Timestamp endDate = 5;
+}
+
+message ListPaymentResponse {
+  repeated Payment payments = 1;
+  int32 total = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message Payment {
+  string invoice_id = 1;
+  string plan_name = 2;
+  double amount = 3;
+  string status = 4;
+  string paid_at = 5;
+}
+
+message GetInvoiceRequest {
+    string invoice_id = 1;
+}
+
+message GetInvoiceResponse {
+    bytes pdf = 1;
+    string filename = 2;
 }

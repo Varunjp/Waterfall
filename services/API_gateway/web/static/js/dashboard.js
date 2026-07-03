@@ -20,6 +20,14 @@
   let currentUserRole      = null; // decoded from token
   let jobsAutoRefreshTimer = null; // 3-second auto-refresh while on jobs tab
 
+  // Payments tab state
+  let currentPaymentsPage      = 0;
+  let currentPaymentsStatus    = 'ALL';
+  let currentPaymentsStartDate = null;
+  let currentPaymentsEndDate   = null;
+  let totalPayments            = 0;
+  const PAYMENTS_LIMIT         = 10;
+
   /* ── Helpers ───────────────────────────────────── */
   function fmt(dateStr) {
     if (!dateStr) return '—';
@@ -47,9 +55,25 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  /* ── Role-gated nav items ──────────────────────── */
+  function applyRoleVisibility() {
+    const role = getMyRole();
+    document.querySelectorAll('.nav-btn[data-requires-role]').forEach(btn => {
+      const allowed = btn.dataset.requiresRole.split(',').map(r => r.trim());
+      if (!allowed.includes(role)) {
+        btn.style.display = 'none';
+        btn.disabled = true;
+      }
+    });
+  }
+
   /* ── Navigation ────────────────────────────────── */
   document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (btn.dataset.requiresRole) {
+        const allowed = btn.dataset.requiresRole.split(',').map(r => r.trim());
+        if (!allowed.includes(getMyRole())) return;
+      }
       currentSection = btn.dataset.section;
       document.querySelectorAll('.nav-btn[data-section]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -78,6 +102,7 @@
       else if (section === 'users')        loadUsers();
       else if (section === 'subscription') loadSubscription();
       else if (section === 'monitor')      loadMonitor();
+      else if (section === 'payments')     loadPayments(0);
       else                                 renderPlaceholder(section);
     });
   }
@@ -903,6 +928,210 @@
       saveBtn.textContent = 'Save Changes';
     }
   });
+
+
+  /* ══════════════════════════════════════════════════
+     PAYMENTS
+  ══════════════════════════════════════════════════ */
+  function paymentStatusBadge(status) {
+    const cls = status === 'paid' ? 'badge-COMPLETED' : 'badge-FAILED';
+    return `<span class="badge ${cls}">${escHtml(status)}</span>`;
+  }
+
+  function fmtAmount(paise) {
+    const rupees = Number(paise || 0);
+    return rupees.toLocaleString('en-IN', {
+      style: 'currency', currency: 'INR', maximumFractionDigits: 2,
+    });
+  }
+
+  async function loadPayments(page = 0, status = currentPaymentsStatus, startDate = currentPaymentsStartDate, endDate = currentPaymentsEndDate) {
+    if (getMyRole() !== 'super_admin') {
+      renderPlaceholder('payments');
+      return;
+    }
+    currentPaymentsPage      = page;
+    currentPaymentsStatus    = status;
+    currentPaymentsStartDate = startDate;
+    currentPaymentsEndDate   = endDate;
+
+    const area = document.getElementById('content-area');
+    area.innerHTML = `
+      <div class="section-header">
+        <div>
+          <p class="section-sub">Billing History</p>
+          <h2>PAYMENTS</h2>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <div class="table-toolbar-left">
+            <span class="toolbar-label">Status</span>
+            <select class="filter-select" id="paymentsFilterSelect">
+              <option value="ALL">All</option>
+              <option value="paid">Paid</option>
+              <option value="failed">Failed</option>
+            </select>
+            <span class="toolbar-divider"></span>
+            <span class="toolbar-label">From</span>
+            <input type="date" class="filter-date" id="paymentsStartDate" />
+            <span class="toolbar-label">To</span>
+            <input type="date" class="filter-date" id="paymentsEndDate" />
+            <button class="btn-filter-apply" id="btnPaymentsApply">Apply</button>
+            <button class="btn-filter-clear" id="btnPaymentsClear">Clear</button>
+          </div>
+          <span class="toolbar-label" id="payments-record-count">—</span>
+        </div>
+        <div id="payments-table-body"><div class="state-loading">Loading</div></div>
+        <div class="pagination" id="payments-pagination"></div>
+      </div>`;
+
+    // Today in YYYY-MM-DD (local) — hard max for both pickers
+    const todayStr = new Date().toLocaleDateString('en-CA');
+
+    const startEl = document.getElementById('paymentsStartDate');
+    const endEl   = document.getElementById('paymentsEndDate');
+
+    startEl.max = todayStr;
+    endEl.max   = todayStr;
+
+    // Restore saved filter values
+    document.getElementById('paymentsFilterSelect').value = status;
+    if (startDate) startEl.value = startDate.substring(0, 10);
+    if (endDate)   endEl.value   = endDate.substring(0, 10);
+
+    startEl.addEventListener('change', () => {
+      endEl.min = startEl.value || '';
+      if (endEl.value && startEl.value && endEl.value < startEl.value) {
+        endEl.value = startEl.value;
+      }
+    });
+
+    endEl.addEventListener('change', () => {
+      if (startEl.value && endEl.value && endEl.value < startEl.value) {
+        endEl.value = startEl.value;
+      }
+    });
+
+    document.getElementById('paymentsFilterSelect').addEventListener('change', e => {
+      loadPayments(0, e.target.value, currentPaymentsStartDate, currentPaymentsEndDate);
+    });
+
+    document.getElementById('btnPaymentsApply').addEventListener('click', () => {
+      const toISO = (val, endOfDay = false) => {
+        if (!val) return null;
+        return endOfDay ? `${val}T23:59:59Z` : `${val}T00:00:00Z`;
+      };
+      loadPayments(0, currentPaymentsStatus, toISO(startEl.value), toISO(endEl.value, true));
+    });
+
+    document.getElementById('btnPaymentsClear').addEventListener('click', () => {
+      startEl.value = '';
+      endEl.value   = '';
+      loadPayments(0, currentPaymentsStatus, null, null);
+    });
+
+    try {
+      const params = new URLSearchParams({ limit: PAYMENTS_LIMIT, offset: page });
+      if (status !== 'ALL')  params.set('status',    status);
+      if (startDate)         params.set('startDate', startDate);
+      if (endDate)           params.set('endDate',   endDate);
+
+      const res  = await fetch(`/api/v1/users/payments?${params}`, { headers: authHeader });
+      const data = await res.json();
+      const payments  = data.payments || [];
+      totalPayments   = data.total || payments.length;
+
+      renderPaymentsTable(payments);
+      renderPaymentsPagination(page, totalPayments);
+    } catch {
+      document.getElementById('payments-table-body').innerHTML =
+        `<div class="state-empty">Failed to load payments</div>`;
+    }
+  }
+
+  function renderPaymentsTable(payments) {
+    if (!payments.length) {
+      document.getElementById('payments-table-body').innerHTML =
+        `<div class="state-empty">No payments found</div>`;
+      document.getElementById('payments-record-count').textContent = '0 records';
+      return;
+    }
+
+    const rows = payments.map(p => `
+      <tr>
+        <td><a class="cell-id invoice-link" href="#" title="Download invoice" onclick="event.preventDefault(); window.downloadInvoice('${escHtml(p.invoiceId)}', this)">${escHtml(p.invoiceId)}</a></td>
+        <td>${escHtml(p.planName || '—')}</td>
+        <td>${fmtAmount(p.amount)}</td>
+        <td>${paymentStatusBadge(p.status)}</td>
+        <td>${fmt(p.paidAt)}</td>
+      </tr>`).join('');
+
+    document.getElementById('payments-table-body').innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Invoice ID</th><th>Plan</th><th>Amount</th><th>Status</th><th>Paid At</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+
+    document.getElementById('payments-record-count').textContent =
+      `${payments.length} record${payments.length !== 1 ? 's' : ''}`;
+  }
+
+  function renderPaymentsPagination(page, total) {
+    const from = total === 0 ? 0 : page + 1;
+    const to   = Math.min(page + PAYMENTS_LIMIT, total);
+    document.getElementById('payments-pagination').innerHTML = `
+      <span class="pagination-info">${from}–${to} of ${total}</span>
+      <div class="pagination-btns">
+        <button class="btn-page" onclick="window._paymentsPrevPage()" ${page <= 0 ? 'disabled' : ''}>← Prev</button>
+        <button class="btn-page" onclick="window._paymentsNextPage()" ${page + PAYMENTS_LIMIT >= total ? 'disabled' : ''}>Next →</button>
+      </div>`;
+  }
+
+  window._paymentsPrevPage = () => loadPayments(currentPaymentsPage - PAYMENTS_LIMIT, currentPaymentsStatus, currentPaymentsStartDate, currentPaymentsEndDate);
+  window._paymentsNextPage = () => loadPayments(currentPaymentsPage + PAYMENTS_LIMIT, currentPaymentsStatus, currentPaymentsStartDate, currentPaymentsEndDate);
+
+  /* ── Invoice download ──────────────────────────── */
+  window.downloadInvoice = async (invoiceId, linkEl) => {
+    const original = linkEl.textContent;
+    linkEl.classList.add('invoice-link--loading');
+    linkEl.textContent = 'Downloading…';
+
+    try {
+      const res = await fetch(`/api/v1/invoice/${encodeURIComponent(invoiceId)}`, { headers: authHeader });
+      if (!res.ok) throw new Error(`Failed to fetch invoice (${res.status})`);
+
+      const disposition = res.headers.get("Content-Disposition");
+
+      let filename = "invoice.pdf";
+
+      if (disposition) {
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        if (match) {
+          filename = match[1];
+        }
+      }
+
+      const blob = await res.blob();
+      const url  = window.URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      showToast(err.message || 'Failed to download invoice', 'error');
+    } finally {
+      linkEl.classList.remove('invoice-link--loading');
+      linkEl.textContent = original;
+    }
+  };
 
 
   /* ══════════════════════════════════════════════════
@@ -2023,5 +2252,6 @@
 
 
   /* ── Boot ──────────────────────────────────────── */
+  applyRoleVisibility();
   loadJobs(0);
 })();

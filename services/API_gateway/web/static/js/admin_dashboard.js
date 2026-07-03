@@ -166,36 +166,28 @@
       </div>`);
 
     try {
-      const [statsRes, subsRes, appsRes] = await Promise.all([
-        fetch('/api/v1/admin/stats', { headers: authH }).catch(() => null),
-        fetch('/api/v1/admin/subscribers?limit=1', { headers: authH }).catch(() => null),
-        fetch('/api/v1/admin/apps?limit=1', { headers: authH }).catch(() => null),
-      ]);
+      const res = await fetch('/api/v1/admin/overview', {
+          headers: authH
+      });
 
-      if (statsRes?.ok) {
-        const d = await statsRes.json();
-        if ($('kv-users'))   $('kv-users').textContent   = (d.totalUsers   ?? '—').toLocaleString?.() ?? d.totalUsers ?? '—';
-        if ($('kv-revenue')) $('kv-revenue').textContent = d.revenueMonth  != null ? fmtMoney(d.revenueMonth) : '—';
-        if ($('kv-jobs'))    $('kv-jobs').textContent    = (d.jobsToday    ?? '—').toLocaleString?.() ?? '—';
-        if ($('kv-failed'))  $('kv-failed').textContent  = (d.jobsFailed   ?? '—').toLocaleString?.() ?? '—';
+      const d = await res.json();
 
-        if (d.revenueMonth != null && d.revenueLastMonth != null) {
-          const diff  = d.revenueMonth - d.revenueLastMonth;
-          const sign  = diff >= 0 ? '+' : '';
-          const cls   = diff >= 0 ? 'up' : 'down';
-          if ($('kv-delta-val')) { $('kv-delta-val').textContent = `${sign}${fmtMoney(Math.abs(diff))}`; $('kv-delta-val').className = `kpi-delta ${cls}`; }
-        }
-      }
+      $('kv-users').textContent = d.totalUsers.toLocaleString();
+      $('kv-apps').textContent = d.totalApps.toLocaleString();
+      $('kv-subs').textContent = d.activeSubscribers.toLocaleString();
 
-      if (subsRes?.ok) {
-        const d = await subsRes.json();
-        if ($('kv-subs')) $('kv-subs').textContent = (d.total ?? d.subscribers?.length ?? '—').toLocaleString?.() ?? '—';
-      }
+      $('kv-jobs').textContent = d.jobsToday.toLocaleString();
+      $('kv-failed').textContent = d.failedJobsToday.toLocaleString();
+      
+      $('kv-revenue').textContent = fmtMoney(d.revenueMonth);
 
-      if (appsRes?.ok) {
-        const d = await appsRes.json();
-        if ($('kv-apps')) $('kv-apps').textContent = (d.total ?? d.apps?.length ?? '—').toLocaleString?.() ?? '—';
-      }
+      const diff = d.revenueMonth - d.revenueLastMonth;
+
+      $('kv-delta-val').textContent =
+          `${diff >= 0 ? '+' : '-'}${fmtMoney(Math.abs(diff))}`;
+
+      $('kv-delta-val').className =
+          `kpi-delta ${diff >= 0 ? 'up' : 'down'}`;
     } catch { /* KPIs remain — */ }
   }
 
@@ -494,7 +486,7 @@
         <div class="table-toolbar">
           <div class="toolbar-left">
             <span class="toolbar-label">App</span>
-            <input type="text" class="filter-select" id="pay-app" placeholder="App ID or name" style="width:160px" value="${esc(appId)}" />
+            <input type="text" class="filter-select" id="pay-app" placeholder="App ID" style="width:160px" value="${esc(appId)}" />
             <span class="toolbar-divider"></span>
             <span class="toolbar-label">From</span>
             <input type="date" class="filter-date" id="pay-start" max="${today}" value="${start ? toLocalInputValue(start) : ''}" />
@@ -533,17 +525,17 @@
       if (!payments.length) { $('pay-body').innerHTML = '<div class="state-empty">No payments found</div>'; return; }
 
       const rows = payments.map(p => `<tr>
-        <td><span class="cell-id" title="${esc(p.paymentId||p.id)}">${esc(p.paymentId||p.id||'—')}</span></td>
+        <td><span class="cell-id" title="${esc(p.invoiceId||p.id)}">${esc(p.invoiceId||p.id||'—')}</span></td>
         <td>${esc(p.appName||p.appId||'—')}</td>
         <td>${esc(p.planName||'—')}</td>
         <td style="color:var(--green);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.04em">${p.amount!=null?fmtMoney(p.amount):'—'}</td>
         <td>${badge(p.status||'paid')}</td>
         <td>${fmt(p.createdAt||p.paidAt)}</td>
-        <td><button class="btn-invoice" onclick="downloadInvoice('${esc(p.paymentId||p.id)}')">↓ Invoice</button></td>
+        <td><button class="btn-invoice" onclick="downloadInvoice('${esc(p.invoiceId||p.id)}')">↓ Invoice</button></td>
       </tr>`).join('');
 
       $('pay-body').innerHTML = `<table>
-        <thead><tr><th>Payment ID</th><th>App</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Invoice</th></tr></thead>
+        <thead><tr><th>Invoice ID</th><th>App</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Invoice</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
       ${paginationHtml(page, total, '_payPrev', '_payNext')}`;
@@ -635,10 +627,10 @@
   });
 
   /* ── Boot ─────────────────────────────────────────── */
-  // overview();
-  document.querySelector('.nav-btn[data-section="overview"]')?.classList.remove('active');
-  document.querySelector('.nav-btn[data-section="apps"]')?.classList.add('active');
-  $('topbar-title').textContent = 'APPS';
-  state.section = 'apps';
-  loadApps();
+  overview();
+  document.querySelector('.nav-btn[data-section="overview"]')?.classList.add('active');
+  // document.querySelector('.nav-btn[data-section="apps"]')?.classList.add('active');
+  // $('topbar-title').textContent = 'APPS';
+  // state.section = 'apps';
+  // loadApps();
 })();
