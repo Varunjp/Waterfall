@@ -245,3 +245,55 @@ func (r AdminRepo) GetPaymentDetails(ctx context.Context, invoiceID string) (*en
 
 	return &data, nil
 }
+
+func (r AdminRepo) GetOverview(ctx context.Context) (*entities.DashboardOverview,error) {
+	query := `
+	SELECT
+
+	    /* Users */
+	    (SELECT COUNT(*)
+	     FROM app_users) AS total_users,
+
+	    /* Apps */
+	    (SELECT COUNT(*)
+	     FROM apps) AS total_apps,
+
+	    /* Active Subscribers */
+	    (SELECT COUNT(*)
+	     FROM subscriptions
+	     WHERE status='active' AND plan_id != '501faac9-959d-4311-b8ad-27c8cf951da2') AS active_subscribers,
+
+	    /* Revenue Current Month */
+	    (
+	        SELECT COALESCE(SUM(amount),0)
+	        FROM payments
+	        WHERE status='paid'
+	        AND created_at >= DATE_TRUNC('month', CURRENT_DATE)
+	    ) AS revenue_month,
+
+	    /* Revenue Previous Month */
+	    (
+	        SELECT COALESCE(SUM(amount),0)
+	        FROM payments
+	        WHERE status='paid'
+	        AND created_at >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+	        AND created_at < DATE_TRUNC('month', CURRENT_DATE)
+	    ) AS revenue_last_month;
+	`
+
+	var overview entities.DashboardOverview
+
+	err := r.db.QueryRowContext(ctx,query).Scan(
+		&overview.TotalUsers,
+		&overview.TotalApps,
+		&overview.ActiveSubscribers,
+		&overview.RevenueMonth,
+		&overview.RevenueLastMonth,
+	)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return &overview,nil  
+}

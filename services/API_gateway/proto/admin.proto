@@ -55,6 +55,12 @@ service AdminService {
             get: "/api/v1/admin/subscribers"
         };
     }
+
+    rpc GetDashboardOverview(GetDashboardOverviewRequest) returns (GetDashboardOverviewResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/admin/overview"
+        };
+    }
 }
 
 message LoginRequest {
@@ -172,4 +178,24 @@ message Subscriber {
     string status = 4;
     string startDate = 5;
     string endDate = 6;
+}
+
+message GetDashboardOverviewRequest {}
+
+message GetDashboardOverviewResponse {
+
+  // Users
+  int64 total_users = 1;
+
+  // Applications
+  int64 total_apps = 2;
+
+  // Billing
+  int64 active_subscribers = 3;
+  double revenue_month = 4;
+  double revenue_last_month = 5;
+
+  // Jobs
+  int64 jobs_today = 6;
+  int64 failed_jobs_today = 7;
 }

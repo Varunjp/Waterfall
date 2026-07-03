@@ -16,6 +16,7 @@ type AdminHandler struct {
 		ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 		GetInvoice(ctx context.Context, invoice_id string) ([]byte, error)
 		ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time)([]entities.Subscriber,int,error)
+		GetOverview(ctx context.Context) (*entities.DashboardOverview,error)
 	}
 	plan *service.PlanService
 }
@@ -25,6 +26,7 @@ func NewAdminHandler(u interface {
 	ListPayment(ctx context.Context, appID, status string, limit, offset int, startDate, endDate *time.Time) ([]entities.Payment, int, error)
 	GetInvoice(ctx context.Context, invoice_id string) ([]byte, error)
 	ListSubcribers(ctx context.Context, limit, offset int, startDate, endDate *time.Time)([]entities.Subscriber,int,error)
+	GetOverview(ctx context.Context) (*entities.DashboardOverview,error)
 }, p *service.PlanService) *AdminHandler {
 	return &AdminHandler{usecase: u, plan: p}
 }
@@ -127,6 +129,25 @@ func (h *AdminHandler) GetAdminInvoice(ctx context.Context, req *pb.GetAdminInvo
 		Pdf:      pdfBytes,
 		Filename: fileName,
 	}, nil
+}
+
+func (h *AdminHandler) GetDashboardOverview(ctx context.Context, req *pb.GetDashboardOverviewRequest)(*pb.GetDashboardOverviewResponse,error) {
+
+	overview,err := h.usecase.GetOverview(ctx)
+
+	if err != nil {
+		return nil,err 
+	}
+
+	return &pb.GetDashboardOverviewResponse{
+		TotalUsers: overview.TotalUsers,
+		TotalApps: overview.TotalApps,
+		ActiveSubscribers: overview.ActiveSubscribers,
+		RevenueMonth: overview.RevenueMonth,
+		RevenueLastMonth: overview.RevenueLastMonth,
+		JobsToday: overview.JobsToday,
+		FailedJobsToday: overview.FailedJobsToday,
+	},nil
 }
 
 func mapPlans(plans []*entities.Plan) *pb.ListPlanResponse {

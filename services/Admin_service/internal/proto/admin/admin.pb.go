@@ -1179,6 +1179,138 @@ func (x *Subscriber) GetEndDate() string {
 	return ""
 }
 
+type GetDashboardOverviewRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDashboardOverviewRequest) Reset() {
+	*x = GetDashboardOverviewRequest{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDashboardOverviewRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDashboardOverviewRequest) ProtoMessage() {}
+
+func (x *GetDashboardOverviewRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDashboardOverviewRequest.ProtoReflect.Descriptor instead.
+func (*GetDashboardOverviewRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{19}
+}
+
+type GetDashboardOverviewResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Users
+	TotalUsers int64 `protobuf:"varint,1,opt,name=total_users,json=totalUsers,proto3" json:"total_users,omitempty"`
+	// Applications
+	TotalApps int64 `protobuf:"varint,2,opt,name=total_apps,json=totalApps,proto3" json:"total_apps,omitempty"`
+	// Billing
+	ActiveSubscribers int64   `protobuf:"varint,3,opt,name=active_subscribers,json=activeSubscribers,proto3" json:"active_subscribers,omitempty"`
+	RevenueMonth      float64 `protobuf:"fixed64,4,opt,name=revenue_month,json=revenueMonth,proto3" json:"revenue_month,omitempty"`
+	RevenueLastMonth  float64 `protobuf:"fixed64,5,opt,name=revenue_last_month,json=revenueLastMonth,proto3" json:"revenue_last_month,omitempty"`
+	// Jobs
+	JobsToday       int64 `protobuf:"varint,6,opt,name=jobs_today,json=jobsToday,proto3" json:"jobs_today,omitempty"`
+	FailedJobsToday int64 `protobuf:"varint,7,opt,name=failed_jobs_today,json=failedJobsToday,proto3" json:"failed_jobs_today,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *GetDashboardOverviewResponse) Reset() {
+	*x = GetDashboardOverviewResponse{}
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDashboardOverviewResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDashboardOverviewResponse) ProtoMessage() {}
+
+func (x *GetDashboardOverviewResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_admin_admin_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDashboardOverviewResponse.ProtoReflect.Descriptor instead.
+func (*GetDashboardOverviewResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_admin_admin_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetDashboardOverviewResponse) GetTotalUsers() int64 {
+	if x != nil {
+		return x.TotalUsers
+	}
+	return 0
+}
+
+func (x *GetDashboardOverviewResponse) GetTotalApps() int64 {
+	if x != nil {
+		return x.TotalApps
+	}
+	return 0
+}
+
+func (x *GetDashboardOverviewResponse) GetActiveSubscribers() int64 {
+	if x != nil {
+		return x.ActiveSubscribers
+	}
+	return 0
+}
+
+func (x *GetDashboardOverviewResponse) GetRevenueMonth() float64 {
+	if x != nil {
+		return x.RevenueMonth
+	}
+	return 0
+}
+
+func (x *GetDashboardOverviewResponse) GetRevenueLastMonth() float64 {
+	if x != nil {
+		return x.RevenueLastMonth
+	}
+	return 0
+}
+
+func (x *GetDashboardOverviewResponse) GetJobsToday() int64 {
+	if x != nil {
+		return x.JobsToday
+	}
+	return 0
+}
+
+func (x *GetDashboardOverviewResponse) GetFailedJobsToday() int64 {
+	if x != nil {
+		return x.FailedJobsToday
+	}
+	return 0
+}
+
 var File_internal_proto_admin_admin_proto protoreflect.FileDescriptor
 
 const file_internal_proto_admin_admin_proto_rawDesc = "" +
@@ -1265,7 +1397,19 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\tplan_name\x18\x03 \x01(\tR\bplanName\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\tR\x06status\x12\x1c\n" +
 	"\tstartDate\x18\x05 \x01(\tR\tstartDate\x12\x18\n" +
-	"\aendDate\x18\x06 \x01(\tR\aendDate2\xc7\x06\n" +
+	"\aendDate\x18\x06 \x01(\tR\aendDate\"\x1d\n" +
+	"\x1bGetDashboardOverviewRequest\"\xab\x02\n" +
+	"\x1cGetDashboardOverviewResponse\x12\x1f\n" +
+	"\vtotal_users\x18\x01 \x01(\x03R\n" +
+	"totalUsers\x12\x1d\n" +
+	"\n" +
+	"total_apps\x18\x02 \x01(\x03R\ttotalApps\x12-\n" +
+	"\x12active_subscribers\x18\x03 \x01(\x03R\x11activeSubscribers\x12#\n" +
+	"\rrevenue_month\x18\x04 \x01(\x01R\frevenueMonth\x12,\n" +
+	"\x12revenue_last_month\x18\x05 \x01(\x01R\x10revenueLastMonth\x12\x1d\n" +
+	"\n" +
+	"jobs_today\x18\x06 \x01(\x03R\tjobsToday\x12*\n" +
+	"\x11failed_jobs_today\x18\a \x01(\x03R\x0ffailedJobsToday2\xc8\a\n" +
 	"\fAdminService\x12R\n" +
 	"\x05Login\x12\x13.admin.LoginRequest\x1a\x14.admin.LoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/admin/login\x12a\n" +
 	"\n" +
@@ -1276,7 +1420,8 @@ const file_internal_proto_admin_admin_proto_rawDesc = "" +
 	"\x10UpdatePlanStatus\x12\x1e.admin.UpdatePlanStatusRequest\x1a\x1f.admin.UpdatePlanStatusResponse\".\x82\xd3\xe4\x93\x02(:\x01*2#/api/v1/admin/plans/{planID}/status\x12o\n" +
 	"\fListPayments\x12\x1e.admin.ListPaymentAdminRequest\x1a\x1f.admin.ListPaymentAdminResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/admin/payments\x12R\n" +
 	"\x0fGetAdminInvoice\x12\x1d.admin.GetAdminInvoiceRequest\x1a\x1e.admin.GetAdminInvoiceResponse\"\x00\x12n\n" +
-	"\x0eGetSubscribers\x12\x1b.admin.GetSubscriberRequest\x1a\x1c.admin.GetSubscriberResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/admin/subscribersB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
+	"\x0eGetSubscribers\x12\x1b.admin.GetSubscriberRequest\x1a\x1c.admin.GetSubscriberResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/admin/subscribers\x12\x7f\n" +
+	"\x14GetDashboardOverview\x12\".admin.GetDashboardOverviewRequest\x1a#.admin.GetDashboardOverviewResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/admin/overviewB\x1eZ\x1cinternal/proto/admin;adminpbb\x06proto3"
 
 var (
 	file_internal_proto_admin_admin_proto_rawDescOnce sync.Once
@@ -1290,38 +1435,40 @@ func file_internal_proto_admin_admin_proto_rawDescGZIP() []byte {
 	return file_internal_proto_admin_admin_proto_rawDescData
 }
 
-var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_internal_proto_admin_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_internal_proto_admin_admin_proto_goTypes = []any{
-	(*LoginRequest)(nil),             // 0: admin.LoginRequest
-	(*LoginResponse)(nil),            // 1: admin.LoginResponse
-	(*CreatePlanRequest)(nil),        // 2: admin.CreatePlanRequest
-	(*CreatePlanResponse)(nil),       // 3: admin.CreatePlanResponse
-	(*ListPlanRequest)(nil),          // 4: admin.ListPlanRequest
-	(*Plan)(nil),                     // 5: admin.Plan
-	(*ListPlanResponse)(nil),         // 6: admin.ListPlanResponse
-	(*UpdatePlanRequest)(nil),        // 7: admin.UpdatePlanRequest
-	(*UpdatePlanResponse)(nil),       // 8: admin.UpdatePlanResponse
-	(*UpdatePlanStatusRequest)(nil),  // 9: admin.UpdatePlanStatusRequest
-	(*UpdatePlanStatusResponse)(nil), // 10: admin.UpdatePlanStatusResponse
-	(*ListPaymentAdminRequest)(nil),  // 11: admin.ListPaymentAdminRequest
-	(*ListPaymentAdminResponse)(nil), // 12: admin.ListPaymentAdminResponse
-	(*PaymentAdmin)(nil),             // 13: admin.PaymentAdmin
-	(*GetAdminInvoiceRequest)(nil),   // 14: admin.GetAdminInvoiceRequest
-	(*GetAdminInvoiceResponse)(nil),  // 15: admin.GetAdminInvoiceResponse
-	(*GetSubscriberRequest)(nil),     // 16: admin.GetSubscriberRequest
-	(*GetSubscriberResponse)(nil),    // 17: admin.GetSubscriberResponse
-	(*Subscriber)(nil),               // 18: admin.Subscriber
-	(*timestamppb.Timestamp)(nil),    // 19: google.protobuf.Timestamp
+	(*LoginRequest)(nil),                 // 0: admin.LoginRequest
+	(*LoginResponse)(nil),                // 1: admin.LoginResponse
+	(*CreatePlanRequest)(nil),            // 2: admin.CreatePlanRequest
+	(*CreatePlanResponse)(nil),           // 3: admin.CreatePlanResponse
+	(*ListPlanRequest)(nil),              // 4: admin.ListPlanRequest
+	(*Plan)(nil),                         // 5: admin.Plan
+	(*ListPlanResponse)(nil),             // 6: admin.ListPlanResponse
+	(*UpdatePlanRequest)(nil),            // 7: admin.UpdatePlanRequest
+	(*UpdatePlanResponse)(nil),           // 8: admin.UpdatePlanResponse
+	(*UpdatePlanStatusRequest)(nil),      // 9: admin.UpdatePlanStatusRequest
+	(*UpdatePlanStatusResponse)(nil),     // 10: admin.UpdatePlanStatusResponse
+	(*ListPaymentAdminRequest)(nil),      // 11: admin.ListPaymentAdminRequest
+	(*ListPaymentAdminResponse)(nil),     // 12: admin.ListPaymentAdminResponse
+	(*PaymentAdmin)(nil),                 // 13: admin.PaymentAdmin
+	(*GetAdminInvoiceRequest)(nil),       // 14: admin.GetAdminInvoiceRequest
+	(*GetAdminInvoiceResponse)(nil),      // 15: admin.GetAdminInvoiceResponse
+	(*GetSubscriberRequest)(nil),         // 16: admin.GetSubscriberRequest
+	(*GetSubscriberResponse)(nil),        // 17: admin.GetSubscriberResponse
+	(*Subscriber)(nil),                   // 18: admin.Subscriber
+	(*GetDashboardOverviewRequest)(nil),  // 19: admin.GetDashboardOverviewRequest
+	(*GetDashboardOverviewResponse)(nil), // 20: admin.GetDashboardOverviewResponse
+	(*timestamppb.Timestamp)(nil),        // 21: google.protobuf.Timestamp
 }
 var file_internal_proto_admin_admin_proto_depIdxs = []int32{
 	5,  // 0: admin.ListPlanResponse.plans:type_name -> admin.Plan
 	5,  // 1: admin.UpdatePlanResponse.updatedPlan:type_name -> admin.Plan
 	5,  // 2: admin.UpdatePlanStatusResponse.plan:type_name -> admin.Plan
-	19, // 3: admin.ListPaymentAdminRequest.startDate:type_name -> google.protobuf.Timestamp
-	19, // 4: admin.ListPaymentAdminRequest.endDate:type_name -> google.protobuf.Timestamp
+	21, // 3: admin.ListPaymentAdminRequest.startDate:type_name -> google.protobuf.Timestamp
+	21, // 4: admin.ListPaymentAdminRequest.endDate:type_name -> google.protobuf.Timestamp
 	13, // 5: admin.ListPaymentAdminResponse.payments:type_name -> admin.PaymentAdmin
-	19, // 6: admin.GetSubscriberRequest.startDate:type_name -> google.protobuf.Timestamp
-	19, // 7: admin.GetSubscriberRequest.endDate:type_name -> google.protobuf.Timestamp
+	21, // 6: admin.GetSubscriberRequest.startDate:type_name -> google.protobuf.Timestamp
+	21, // 7: admin.GetSubscriberRequest.endDate:type_name -> google.protobuf.Timestamp
 	18, // 8: admin.GetSubscriberResponse.subscribers:type_name -> admin.Subscriber
 	0,  // 9: admin.AdminService.Login:input_type -> admin.LoginRequest
 	2,  // 10: admin.AdminService.CreatePlan:input_type -> admin.CreatePlanRequest
@@ -1331,16 +1478,18 @@ var file_internal_proto_admin_admin_proto_depIdxs = []int32{
 	11, // 14: admin.AdminService.ListPayments:input_type -> admin.ListPaymentAdminRequest
 	14, // 15: admin.AdminService.GetAdminInvoice:input_type -> admin.GetAdminInvoiceRequest
 	16, // 16: admin.AdminService.GetSubscribers:input_type -> admin.GetSubscriberRequest
-	1,  // 17: admin.AdminService.Login:output_type -> admin.LoginResponse
-	3,  // 18: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
-	6,  // 19: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
-	8,  // 20: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
-	10, // 21: admin.AdminService.UpdatePlanStatus:output_type -> admin.UpdatePlanStatusResponse
-	12, // 22: admin.AdminService.ListPayments:output_type -> admin.ListPaymentAdminResponse
-	15, // 23: admin.AdminService.GetAdminInvoice:output_type -> admin.GetAdminInvoiceResponse
-	17, // 24: admin.AdminService.GetSubscribers:output_type -> admin.GetSubscriberResponse
-	17, // [17:25] is the sub-list for method output_type
-	9,  // [9:17] is the sub-list for method input_type
+	19, // 17: admin.AdminService.GetDashboardOverview:input_type -> admin.GetDashboardOverviewRequest
+	1,  // 18: admin.AdminService.Login:output_type -> admin.LoginResponse
+	3,  // 19: admin.AdminService.CreatePlan:output_type -> admin.CreatePlanResponse
+	6,  // 20: admin.AdminService.ListPlans:output_type -> admin.ListPlanResponse
+	8,  // 21: admin.AdminService.UpdatePlan:output_type -> admin.UpdatePlanResponse
+	10, // 22: admin.AdminService.UpdatePlanStatus:output_type -> admin.UpdatePlanStatusResponse
+	12, // 23: admin.AdminService.ListPayments:output_type -> admin.ListPaymentAdminResponse
+	15, // 24: admin.AdminService.GetAdminInvoice:output_type -> admin.GetAdminInvoiceResponse
+	17, // 25: admin.AdminService.GetSubscribers:output_type -> admin.GetSubscriberResponse
+	20, // 26: admin.AdminService.GetDashboardOverview:output_type -> admin.GetDashboardOverviewResponse
+	18, // [18:27] is the sub-list for method output_type
+	9,  // [9:18] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
 	9,  // [9:9] is the sub-list for extension extendee
 	0,  // [0:9] is the sub-list for field type_name
@@ -1357,7 +1506,7 @@ func file_internal_proto_admin_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_admin_admin_proto_rawDesc), len(file_internal_proto_admin_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
