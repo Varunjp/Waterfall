@@ -7,7 +7,22 @@ scrape_configs:
     static_configs:
       - targets: ["admin_service:9101"]
 
+  - job_name: "job"
+
+    static_configs:
+      - targets: ["job_service:9100"]
+
   - job_name: "scheduler"
 
     static_configs:
       - targets: ["scheduler_service:9100"]
+
+  - job_name: node-exporter
+    static_configs:
+      - targets:
+          - node-exporter:9100
+
+  - job_name: cadvisor
+    static_configs:
+      - targets:
+          - cadvisor:8080

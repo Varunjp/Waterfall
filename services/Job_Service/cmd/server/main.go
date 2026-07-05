@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"job_service/internal/config"
 	"job_service/internal/handler"
 	postgresclient "job_service/internal/infra/postgres"
 	redisclient "job_service/internal/infra/redis"
 	"job_service/internal/logger"
+	jobmetrics "job_service/internal/metrics"
 	"job_service/internal/middleware"
 	"job_service/internal/pkg/grpc/interceptor"
 	"job_service/internal/producer"
@@ -36,6 +38,9 @@ func main() {
 		panic(err)
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	db := postgresclient.MustConntect(cfg.DBDSN)
 	adminDb := postgresclient.MustConntect(cfg.DBADMINDNS)
 	jobRepo := repository.NewJobRepo(db)
@@ -46,19 +51,26 @@ func main() {
 		panic(err)
 	}
 	rr := redisRepo.NewRedisRepo(rc.Client, adminRepo)
-	queueProducer := queue.NewKafkaProducer([]string{cfg.KafkaBrokers[0]}, cfg.KafkaTopic)
-	testProducer := producer.NewTestKafkaProducer(cfg.KafkaBrokers, cfg.TestTopic)
-	producer := producer.NewKafkaProducer(cfg.KafkaBrokers, cfg.KafkaTopic)
+	jobMetrics := jobmetrics.NewMetrics()
+	go func() {
+		if err := jobmetrics.RunServer(ctx, ":"+cfg.Metrics.Port, logg); err != nil {
+			log.Printf("metrics server error: %v", err)
+		}
+	}()
 
-	uc := usecase.NewJobUsecase(producer, testProducer, logg, rr)
+	queueProducer := queue.NewKafkaProducer([]string{cfg.KafkaBrokers[0]}, cfg.KafkaTopic)
+	testProducer := producer.NewTestKafkaProducer(cfg.KafkaBrokers, cfg.TestTopic, jobMetrics)
+	producer := producer.NewKafkaProducer(cfg.KafkaBrokers, cfg.KafkaTopic, jobMetrics)
+
+	uc := usecase.NewJobUsecase(producer, testProducer, logg, rr, jobMetrics)
 	dc := usecase.NewDashboardUsecase(jobRepo, logRepo, queueProducer, rr)
 	h := handler.NewJobHandler(uc, *dc)
 
 	server := grpc.NewServer(
-		// grpc.UnaryInterceptor(middleware.APIKeyInterceptor(cfg.JWTKey)),
 		grpc.ChainUnaryInterceptor(
 			middleware.APIKeyInterceptor(cfg.JWTKey),
 			interceptor.UnaryErrorInterceptor(),
+			jobMetrics.UnaryServerInterceptor(),
 		),
 	)
 

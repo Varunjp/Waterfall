@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 	pb "worker_service/internal/grpc/schedulerpb"
 )
 
@@ -26,7 +25,6 @@ func ExecuteJob(ctx context.Context,job *pb.JobAssignment) error {
 	// }
 	
 	fmt.Println("Work started")
-	time.Sleep(time.Second * 3)
 
 	switch job.JobType {
 

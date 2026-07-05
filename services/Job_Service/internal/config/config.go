@@ -4,7 +4,13 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
+
+type MetricsConfig struct {
+	Enabled bool
+	Port    string
+}
 
 type Config struct {
 	ServiceName   string
@@ -19,6 +25,7 @@ type Config struct {
 	RedisAddr     string
 	RedisPassword string
 	RedisDB       int
+	Metrics       MetricsConfig
 }
 
 func Load() *Config {
@@ -36,6 +43,10 @@ func Load() *Config {
 		RedisAddr:     os.Getenv("REDIS_ADDR"),
 		RedisPassword: os.Getenv("REDIS_PASSWORD"),
 		RedisDB:       redisDB,
+		Metrics: MetricsConfig{
+			Enabled: getEnvBool("METRICS_ENABLED", true),
+			Port:    GetEnv("METRICS_PORT", "9102"),
+		},
 	}
 }
 
@@ -45,4 +56,24 @@ func must(key string) string {
 		log.Fatalf("missing env var %s", key)
 	}
 	return v
+}
+
+func getEnvBool(key string, fallback bool) bool {
+	value := strings.TrimSpace(GetEnv(key, ""))
+	if value == "" {
+		return fallback
+	}
+
+	parsed, err := strconv.ParseBool(value)
+	if err != nil {
+		return fallback
+	}
+	return parsed
+}
+
+func GetEnv(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
 }
