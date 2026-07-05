@@ -22,3 +22,5 @@ dev.bat
 dev.sh
 docker-compose.dev.yml
 DEV_WORKFLOW.md
+
+/tests

@@ -19,6 +19,6 @@ RUN apk add --no-cache ca-certificates
 
 COPY --from=builder /app/job-service .
 
-EXPOSE 50051
+EXPOSE 50051 9102
 
 CMD ["./job-service"]

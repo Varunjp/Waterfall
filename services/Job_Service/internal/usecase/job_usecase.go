@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"job_service/internal/domain"
+	jobmetrics "job_service/internal/metrics"
 	"job_service/internal/producer"
 	redisRepo "job_service/internal/repository/redis"
 	"time"
@@ -23,16 +24,26 @@ type jobUsecase struct {
 	test     producer.Producer
 	logger   *zap.Logger
 	redis    *redisRepo.RedisRepo
+	metrics  *jobmetrics.JobMetrics
 }
 
-func NewJobUsecase(p producer.Producer, t producer.Producer, l *zap.Logger, r *redisRepo.RedisRepo) JobUseCase {
-	return &jobUsecase{producer: p, test: t, logger: l, redis: r}
+func NewJobUsecase(p producer.Producer, t producer.Producer, l *zap.Logger, r *redisRepo.RedisRepo, m *jobmetrics.JobMetrics) JobUseCase {
+	return &jobUsecase{producer: p, test: t, logger: l, redis: r, metrics: m}
 }
 
 func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string, scheduleAt *time.Time) (string, error) {
+	start := time.Now()
+	defer func() {
+		if u.metrics != nil {
+			u.metrics.ObserveCreateDuration(time.Since(start))
+		}
+	}()
 
 	err := u.redis.CheckQuota(ctx, appID)
 	if err != nil {
+		if u.metrics != nil {
+			u.metrics.RecordJobCreation(len(payload), false)
+		}
 		return "", err
 	}
 
@@ -60,13 +71,23 @@ func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string,
 
 	err = u.producer.Publish(ctx, jobID, event)
 	if err != nil {
+		if u.metrics != nil {
+			u.metrics.RecordJobCreation(len(payload), false)
+		}
 		return "", err
 	}
 
 	err = u.redis.Incr(ctx, appID)
 
 	if err != nil {
+		if u.metrics != nil {
+			u.metrics.RecordJobCreation(len(payload), false)
+		}
 		return "", err
+	}
+
+	if u.metrics != nil {
+		u.metrics.RecordJobCreation(len(payload), true)
 	}
 
 	u.logger.Info("job created", zap.String("job_id", jobID))
@@ -74,6 +95,12 @@ func (u *jobUsecase) Create(ctx context.Context, appID, jobType, payload string,
 }
 
 func (u *jobUsecase) CreateTest(ctx context.Context, appID, jobType, payload string) (string, error) {
+	start := time.Now()
+	defer func() {
+		if u.metrics != nil {
+			u.metrics.ObserveCreateDuration(time.Since(start))
+		}
+	}()
 
 	jobID := uuid.NewString()
 
@@ -87,7 +114,14 @@ func (u *jobUsecase) CreateTest(ctx context.Context, appID, jobType, payload str
 
 	err := u.test.Publish(ctx, jobID, event)
 	if err != nil {
+		if u.metrics != nil {
+			u.metrics.RecordJobCreation(len(payload), false)
+		}
 		return "", err
+	}
+
+	if u.metrics != nil {
+		u.metrics.RecordJobCreation(len(payload), true)
 	}
 
 	return jobID, nil
