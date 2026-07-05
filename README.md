@@ -169,7 +169,7 @@ Scheduled Jobs:
 ## For Full report download and open in browser
 
 ### Before
-[Download k6 report (open in browser)](docs/reports/report-before.html)
+[Download k6 report (open in browser)](docs/reports/report_before.html)
 
 ### After
 [Download k6 report (open in browser)](docs/reports/report.html)
