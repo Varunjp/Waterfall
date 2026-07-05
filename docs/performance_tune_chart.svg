@@ -1,0 +1,80 @@
+<svg viewBox="0 0 900 660" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', -apple-system, Helvetica, Arial, sans-serif">
+
+  <!-- Background -->
+  <rect x="0" y="0" width="900" height="660" fill="#FBFCFE"/>
+
+  <!-- Title -->
+  <text x="450" y="42" text-anchor="middle" font-size="24" font-weight="700" fill="#101828">
+    Kafka Writer Tuning — Load Test Results
+  </text>
+  <text x="450" y="66" text-anchor="middle" font-size="13" fill="#667085">
+    k6 · 10 VUs · 30s duration · identical endpoint and payload
+  </text>
+
+  <!-- Legend -->
+  <rect x="325" y="84" width="12" height="12" rx="2" fill="#F04438"/>
+  <text x="343" y="94" font-size="12" fill="#344054">Before (default batching)</text>
+  <rect x="530" y="84" width="12" height="12" rx="2" fill="#12B76A"/>
+  <text x="548" y="94" font-size="12" fill="#344054">After (tuned batch size / linger.ms)</text>
+
+  <!-- ===================== PANEL 1: Avg Latency (log scale) ===================== -->
+  <text x="185" y="135" text-anchor="middle" font-size="14" font-weight="600" fill="#101828">Avg Latency (ms, log scale)</text>
+  <text x="185" y="153" text-anchor="middle" font-size="11" fill="#98A2B3">lower is better</text>
+
+  <!-- baseline -->
+  <line x1="90" y1="400" x2="290" y2="400" stroke="#D0D5DD" stroke-width="1"/>
+
+  <!-- Before bar: 1060ms -->
+  <rect x="115" y="195.4" width="60" height="204.6" rx="4" fill="#F04438"/>
+  <text x="145" y="182" text-anchor="middle" font-size="13" font-weight="700" fill="#B42318">1.06s</text>
+  <text x="145" y="420" text-anchor="middle" font-size="11" fill="#667085">Before</text>
+
+  <!-- After bar: 17.96ms -->
+  <rect x="205" y="374.3" width="60" height="25.7" rx="4" fill="#12B76A"/>
+  <text x="235" y="361" text-anchor="middle" font-size="13" font-weight="700" fill="#067647">17.96ms</text>
+  <text x="235" y="420" text-anchor="middle" font-size="11" fill="#667085">After</text>
+
+  <!-- callout -->
+  <text x="185" y="450" text-anchor="middle" font-size="15" font-weight="700" fill="#101828">≈ 59x faster</text>
+
+  <!-- ===================== PANEL 2: Throughput (log scale) ===================== -->
+  <text x="635" y="135" text-anchor="middle" font-size="14" font-weight="600" fill="#101828">Throughput (req/s, log scale)</text>
+  <text x="635" y="153" text-anchor="middle" font-size="11" fill="#98A2B3">higher is better</text>
+
+  <!-- baseline -->
+  <line x1="540" y1="400" x2="740" y2="400" stroke="#D0D5DD" stroke-width="1"/>
+
+  <!-- Before bar: 9.34 req/s -->
+  <rect x="565" y="372.6" width="60" height="27.4" rx="4" fill="#F04438"/>
+  <text x="595" y="359" text-anchor="middle" font-size="13" font-weight="700" fill="#B42318">9.3 req/s</text>
+  <text x="595" y="420" text-anchor="middle" font-size="11" fill="#667085">Before</text>
+
+  <!-- After bar: 520.64 req/s -->
+  <rect x="655" y="196.2" width="60" height="203.8" rx="4" fill="#12B76A"/>
+  <text x="685" y="183" text-anchor="middle" font-size="13" font-weight="700" fill="#067647">520.6 req/s</text>
+  <text x="685" y="420" text-anchor="middle" font-size="11" fill="#667085">After</text>
+
+  <!-- callout -->
+  <text x="635" y="450" text-anchor="middle" font-size="15" font-weight="700" fill="#101828">≈ 56x throughput</text>
+
+  <!-- ===================== Divider ===================== -->
+  <line x1="450" y1="120" x2="450" y2="430" stroke="#EAECF0" stroke-width="1"/>
+
+  <!-- ===================== Bottom stat row: error rate ===================== -->
+  <rect x="150" y="480" width="600" height="110" rx="12" fill="#F9FAFB" stroke="#EAECF0" stroke-width="1"/>
+
+  <text x="450" y="510" text-anchor="middle" font-size="13" font-weight="600" fill="#101828">Error Rate</text>
+
+  <!-- Before -->
+  <circle cx="290" cy="542" r="6" fill="#F04438"/>
+  <text x="308" y="547" font-size="13" fill="#344054">Before: 3.44% (10 / 290 requests failed)</text>
+
+  <!-- After -->
+  <circle cx="290" cy="570" r="6" fill="#12B76A"/>
+  <text x="308" y="575" font-size="13" fill="#344054">After: 0.00% (0 / 15,626 requests failed)</text>
+
+  <!-- footer -->
+  <text x="450" y="625" text-anchor="middle" font-size="11" fill="#98A2B3">
+    Source: k6 load test output, before/after Kafka producer BatchSize / BatchTimeout tuning
+  </text>
+</svg>
