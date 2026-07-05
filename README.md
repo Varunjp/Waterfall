@@ -160,6 +160,12 @@ Scheduled Jobs:
 
 ---
 
+## Performance: Kafka Writer Tune
+
+![Kafka_tune benchmark](docs/performance_tune_chart.svg)
+
+---
+
 # 💳 Billing & Monetization
 
 - Tier-based pricing
