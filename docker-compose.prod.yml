@@ -44,14 +44,19 @@ services:
       - start
       - --overprovisioned
       - --smp=1
-      - --memory=1G
+      - --memory=512M
       - --reserve-memory=0M
       - --node-id=0
       - --check=false
       - --kafka-addr=PLAINTEXT://0.0.0.0:9092
       - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+      - --set redpanda.log_segment_size=16777216
+      - --set redpanda.retention_bytes=104857600
+      - --set redpanda.retention_ms=3600000
     volumes:
       - redpanda_data:/var/lib/redpanda/data
+    mem_limit: 700m
+    memswap_limit: 700m
     healthcheck:
       test: ["CMD-SHELL", "rpk cluster health | grep -q Healthy"]
       interval: 15s
