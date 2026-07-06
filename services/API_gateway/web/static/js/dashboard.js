@@ -186,12 +186,7 @@
             </svg>
             <span><strong>${limit}</strong> jobs / month</span>
           </li>
-          <li class="plan-feature">
-            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12">
-              <polyline points="2 7 5.5 10.5 12 3.5"/>
-            </svg>
-            <span>Priority queue access</span>
-          </li>
+          
           <li class="plan-feature">
             <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12">
               <polyline points="2 7 5.5 10.5 12 3.5"/>
