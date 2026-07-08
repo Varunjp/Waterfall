@@ -265,11 +265,15 @@ services:
     privileged: true
     ports:
       - "8082:8080"
+    command:
+      - --docker_only=true
+      - --store_container_labels=true
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
+      - /var/lib/containerd:/var/lib/containerd:ro
       - /dev/disk:/dev/disk:ro
     networks:
       - waterfall-network
