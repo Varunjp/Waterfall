@@ -52,7 +52,6 @@ services:
       - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
       - --set redpanda.log_segment_size=16777216
       - --set redpanda.retention_bytes=104857600
-      - --set redpanda.retention_ms=3600000
     volumes:
       - redpanda_data:/var/lib/redpanda/data
     mem_limit: 700m
