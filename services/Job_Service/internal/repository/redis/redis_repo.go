@@ -62,7 +62,7 @@ func (r *RedisRepo) Incr(ctx context.Context, appID string) error {
 			return err
 		}
 
-		return r.redis.Expire(freeUsageKey, 1*time.Minute).Err()
+		return r.redis.Expire(freeUsageKey, 24*time.Hour).Err()
 	}
 
 	// Subcribed plan increment
