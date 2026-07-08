@@ -1,55 +1,52 @@
-# 🚀 Waterfall – Multi-Tenant SaaS Distributed Job Scheduling Platform
+# Waterfall — Multi-Tenant SaaS Distributed Job Scheduling Platform
 
-A production-grade **SaaS job scheduling platform** built using **Golang, PostgreSQL, Redis, and Kafka**, designed with **Clean Architecture** and **Microservices** principles.
+A production-grade job scheduling platform built with **Go, PostgreSQL, Redis, and Kafka**, designed around **Clean Architecture** and **Domain-Driven Design**.
 
-This platform enables tenants to register applications, schedule asynchronous jobs (immediate or future), monitor execution, and manage billing — while providing platform admins with full operational control and observability.
+The platform allows tenants to register applications, schedule asynchronous jobs (immediate or deferred), monitor execution, and manage usage-based billing — while giving platform administrators full operational control and observability.
 
 ---
 
-# 📌 Problem Statement
+## Problem Statement
 
 Modern SaaS systems require:
 
 - Reliable background job execution
-- Scheduled & delayed job processing
+- Scheduled and delayed job processing
 - Multi-tenant isolation
-- Retry & Dead Letter Queue handling
+- Retry handling with failure tracking
 - Usage-based billing
-- Observability & monitoring
-- Secure authentication & RBAC
+- Observability and monitoring
+- Secure authentication and authorization
 
-This platform solves these challenges in a scalable, production-ready way.
-
----
-
-# 🏗️ Architecture Overview
-
-The system follows:
-
-- Clean Architecture
-- Service–Repository Pattern
-- SOLID Principles
-- Domain-driven design
-- Microservices Architecture
-
-Each service is independently deployable and scalable.
+This platform addresses these requirements in a scalable, production-ready architecture.
 
 ---
 
-# 🧩 Microservices
+## Architecture Overview
 
-1. API Service – Public REST APIs for tenants  
-2. Admin Service – Platform admin management APIs  
-3. Job Service – Core job management & state machine  
-4. Scheduler Service – Moves scheduled jobs to queue    
-5. Watcher Service – Monitors worker & pick jobs moves to db 
-6. Billing Service – Usage tracking & subscription handling  
+The system is built on:
+
+- **Clean Architecture** — clear separation between domain, use case, and delivery layers
+- **Domain-Driven Design** — business logic modeled around entities, aggregates, and domain services
+- **Repository Pattern** — a persistence abstraction used within the domain/infrastructure boundary, in line with standard DDD tactical design.
+- **SOLID Principles**
+- **Microservices Architecture** — each service is independently deployable and scalable
 
 ---
 
-# 🛠 Tech Stack
+## Microservices
 
-Backend:
+1. **API Service** — Public REST APIs for tenants
+2. **Admin Service** — Platform administration, tenant management, and billing
+3. **Job Service** — Core job management and state machine
+4. **Scheduler Service** — Moves due scheduled jobs to the queue
+5. **Watcher Service** — Monitors worker execution and persists job outcomes to the database
+
+---
+
+## Tech Stack
+
+**Backend**
 - Golang
 - PostgreSQL
 - Redis Streams / Kafka
@@ -58,7 +55,7 @@ Backend:
 - Prometheus
 - Grafana
 
-Infrastructure:
+**Infrastructure**
 - Docker
 - Docker Compose
 - Environment-based configuration (.env)
@@ -66,7 +63,7 @@ Infrastructure:
 
 ---
 
-# 🏛 Clean Architecture Structure
+## Clean Architecture Structure
 
 Each service follows this structure:
 
@@ -94,12 +91,10 @@ Each service follows this structure:
 └── dto/
     ├── create_job_request.go
     └── job_response.go
-
 ```
 
-Architecture flow:
-
-Controller → UseCase → Repository Interface → Repository Implementation
+**Architecture flow:**
+`Controller → UseCase → Repository Interface → Repository Implementation`
 
 This ensures:
 - Testability
@@ -109,19 +104,19 @@ This ensures:
 
 ---
 
-# 🔐 Authentication & Authorization
+## Authentication & Authorization
 
-Platform Admin:
+**Platform Admin**
 - Admin login
-- JWT Access + Refresh tokens
+- JWT access + refresh tokens
 - List all tenants
-- Block / Unblock tenant
+- Block / unblock tenants
 - View billing per tenant
-- Inspect jobs & DLQ
+- Inspect job execution and status
 
-Tenant:
+**Tenant**
 - Tenant registration
-- AppID & API key generation
+- AppID and API key generation
 - Worker registration
 - RBAC user roles
 - Tenant login (JWT)
@@ -129,30 +124,28 @@ Tenant:
 
 ---
 
-# 🧵 Job Lifecycle
+## Job Lifecycle
 
-Immediate Jobs:
-1. Tenant creates job via API
-2. Job stored in PostgreSQL
-3. Job pushed to Redis/Kafka
-4. Worker consumes & executes
-5. Status updated
+**Immediate Jobs**
+1. Tenant creates a job via API
+2. Job is stored in PostgreSQL
+3. Job is pushed to Redis/Kafka
+4. Worker consumes and executes the job
+5. Status is updated
 
-Scheduled Jobs:
-1. schedule_at column used
-2. Job state = SCHEDULED
-3. Scheduler scans due jobs
-4. Moves job to queue
-5. Worker executes
+**Scheduled Jobs**
+1. `schedule_at` column is used
+2. Job state is set to `SCHEDULED`
+3. Scheduler scans for due jobs
+4. Job is moved to the queue
+5. Worker executes the job
 
 ---
 
-# 🔁 Reliability Features
+## Reliability Features
 
 - Retry mechanism with exponential backoff
-- retry_count & max_retries tracking
-- Dead Letter Queue (DLQ)
-- Manual retry API
+- `retry_count` and `max_retries` tracking
 - Job state machine enforcement
 - Idempotent execution
 - Execution locks
@@ -164,19 +157,16 @@ Scheduled Jobs:
 
 ![Kafka_tune benchmark](docs/performance_tune_chart.svg)
 
----
+**Full load test reports**
 
-## For Full report download and open in browser
-
-### Before
-[Download k6 report (open in browser)](docs/reports/report_before.html)
-
-### After
-[Download k6 report (open in browser)](docs/reports/report.html)
+- [k6 report — before tuning](docs/reports/report_before.html)
+- [k6 report — after tuning](docs/reports/report.html)
 
 ---
 
-# 💳 Billing & Monetization
+## Billing & Monetization
+
+*(Handled by the Admin Service)*
 
 - Tier-based pricing
 - Per-job execution tracking
@@ -185,14 +175,14 @@ Scheduled Jobs:
 - Subscription plans
 - Invoice generation
 - Quota enforcement
-- Soft limits & grace periods
-- Automatic job blocking if quota exceeded
+- Soft limits and grace periods
+- Automatic job blocking when quota is exceeded
 
 ---
 
-# 📊 Observability
+## Observability
 
-Prometheus Metrics:
+**Prometheus Metrics**
 - Jobs created
 - Jobs succeeded
 - Jobs failed
@@ -201,47 +191,48 @@ Prometheus Metrics:
 - Worker count
 - Throughput
 
-Grafana Dashboards:
+**Grafana Dashboards**
 - Job throughput dashboard
-- Worker health dashboard
+- Service health dashboard
 - Queue lag monitoring
 - Failure rate visualization
 
 ---
 
-# 🗃 Database Tables
+## Database Tables
 
 Core tables:
 
-- tenants
-- users
-- apps
-- jobs
-- job_logs
-- dlq_jobs
-- usage_daily
-- subscriptions
-- invoices
+- `platform_admins`
+- `app_users`
+- `apps`
+- `jobs`
+- `job_logs`
+- `usage_daily`
+- `subscriptions`
+- `payments`
 
 ---
 
-# 🧠 Job State Machine
+## Job State Machine
 
-CREATED → QUEUED → RUNNING → SUCCESS  
-                         ↓  
-                      FAILED → RETRYING  
-                                   ↓  
-                                DLQ  
+```
+CREATED → QUEUED → RUNNING → SUCCESS
+                       ↓
+                    RETRYING → FAILED
+```
 
-Only valid transitions are allowed.
+- `RETRYING` is entered on execution failure, up to `max_retries` attempts.
+- Once retries are exhausted, the job transitions to a terminal `FAILED` state.
+- Only valid transitions defined above are permitted.
 
 ---
 
-# 🔐 Security
+## Security
 
 - JWT-based authentication
 - Role-based access control (RBAC)
-- API Key authentication for job creation
+- API key authentication for job creation
 - Middleware-based token validation
 - Tenant isolation
 - Environment-based secret management
@@ -249,28 +240,34 @@ Only valid transitions are allowed.
 
 ---
 
-# 📦 Example APIs
+## Example APIs
 
-Tenant:
+**Tenant**
 
-POST /v1/tenants  
-POST /v1/auth/login  
-POST /v1/jobs (X-API-KEY required)  
-GET /v1/jobs/{id}  
+```
+POST /api/v1/apps
+POST /api/v1/users/login
+POST /api/v1/users
+POST /api/v1/jobs 
+GET  /api/v1/jobs/{job_id}/logs
+```
 
-Admin:
+**Admin**
 
-POST /admin/login  
-GET /admin/tenants  
-PATCH /admin/tenants/{id}/block  
-GET /admin/tenants/{id}/billing  
+```
+POST  /api/v1/admin/login
+GET   /api/v1/apps
+PATCH /api/v1/apps/{app_id}/block
+GET   /api/v1/admin/payments
+GET   /api/v1/admin/plans
+```
 
 ---
 
-# 🚀 Running the Project
+## Running the Project
 
 ```bash
-# Clone Repository
+# Clone repository
 git clone https://github.com/Varunjp/waterfall.git
 cd waterfall
 
@@ -280,12 +277,12 @@ cp .env.example .env
 # Install dependencies
 go mod tidy
 
-# Run all service
+# Run all services
 go run main.go
 ```
 
+**.env file**
 
-2. Create .env file
 ```env
 DB_HOST=localhost
 DB_PORT=5432
@@ -303,9 +300,9 @@ JWT_SECRET=supersecret
 
 ---
 
-# 🧪 Testing Strategy
+## Testing Strategy
 
-- Unit tests for usecases
+- Unit tests for use cases
 - Repository mock testing
 - Integration testing
 - Retry simulation tests
@@ -314,62 +311,53 @@ JWT_SECRET=supersecret
 
 ---
 
-# 📈 Scaling Strategy
+## Engineering Decisions
 
-- Horizontal worker scaling
-- Consumer group balancing
-- Backpressure handling
-- Autoscaling based on metrics
-- Queue depth monitoring
-
----
-
-# 🎯 Engineering Decisions
-
-Clean Architecture – Maintainability & testability  
-Redis Streams / Kafka – Distributed queue reliability  
-PostgreSQL – ACID guarantees  
-JWT – Stateless authentication  
-RBAC – Multi-role security  
-Microservices – Independent scaling  
-Prometheus – Native Go support  
-Structured logging – Production debugging  
+| Decision | Rationale |
+|---|---|
+| Clean Architecture | Maintainability and testability |
+| Redis Streams / Kafka | Distributed queue reliability |
+| PostgreSQL | ACID guarantees |
+| JWT | Stateless authentication |
+| RBAC | Multi-role security |
+| Microservices | Independent scaling |
+| Prometheus | Native Go support |
+| Structured logging | Production debugging |
 
 ---
 
-# 📚 Learning Outcomes
+## Learning Outcomes
 
 This project demonstrates:
 
 - Distributed systems fundamentals
-- Exactly-once execution simulation
-- Retry & DLQ design patterns
+- Atleast-once execution simulation
+- Retry and failure-handling design patterns
 - Multi-tenant SaaS architecture
 - Billing system design
 - Production monitoring setup
-- Clean Architecture mastery
+- Clean Architecture and DDD in practice
 - System reliability engineering
 
 ---
 
-# 🏁 Production Readiness Checklist
+## Production Readiness Checklist
 
-[✔] Structured logging  
-[✔] Centralized error handling  
-[✔] JWT authentication  
-[✔] RBAC  
-[✔] Retry engine  
-[✔] DLQ  
-[✔] Scheduler reliability  
-[✔] Billing enforcement  
-[✔] Metrics & monitoring  
-[✔] Dockerized services  
-[✔] Environment-based configuration  
+- [x] Structured logging
+- [x] Centralized error handling
+- [x] JWT authentication
+- [x] RBAC
+- [x] Retry engine
+- [x] Scheduler reliability
+- [x] Billing enforcement
+- [x] Metrics and monitoring
+- [x] Dockerized services
+- [x] Environment-based configuration
 
 ---
 
-# 👨‍💻 Author
+## Author
 
-Varun JP  
-Backend Engineer – Golang  
-Distributed Systems & Scalable Architecture Enthusiast  
+**Varun JP**
+Backend Engineer — Golang
+Distributed Systems & Scalable Architecture Enthusiast
