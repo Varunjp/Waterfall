@@ -156,6 +156,7 @@ services:
       - ./env/job.env
     expose:
       - "50051"
+      - "9102"
     depends_on:
       postgres:
         condition: service_healthy
