@@ -75,13 +75,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Copy docker-compose.prod.yml to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.prod.yml"
+          source: "./docker-compose.prod.yml"
           target: "~/waterfall/"
 
       - name: Deploy via SSH
@@ -150,7 +153,9 @@ jobs:
               watcher_service \
               api_gateway \
               prometheus \
-              grafana
+              grafana \
+              node-exporter \
+              cadvisor
 
             echo "Removing old images"
             docker image prune -af
