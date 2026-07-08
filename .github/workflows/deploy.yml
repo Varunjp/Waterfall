@@ -150,7 +150,9 @@ jobs:
               watcher_service \
               api_gateway \
               prometheus \
-              grafana
+              grafana \
+              node-exporter \
+              cadvisor
 
             echo "Removing old images"
             docker image prune -af
